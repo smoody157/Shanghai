@@ -135,14 +135,25 @@ async function saveStats(email,data){ await db.collection("stats").doc(email).se
 async function getHistory(email){ const snap=await db.collection("history").where("players","array-contains",email).orderBy("endedAt","desc").limit(60).get(); return snap.docs.map(d=>d.data()); }
 async function saveHistoryEntry(entry){ await db.collection("history").add(entry); }
 
-// ===== Auth Functions =====
-async function signInEmail(email){
-  const doc = await db.collection("players").doc(email).get();
-  return doc.exists?doc.data():null;
+// ===== Fixed Authentication Functions =====
+
+// Normalize email consistently
+function normEmail(email){
+  return String(email||"").trim().toLowerCase();
 }
+
+// Sign in player by email
+async function signInEmail(email){
+  const e = normEmail(email);
+  const doc = await db.collection("players").doc(e).get();
+  return doc.exists ? doc.data() : null;
+}
+
+// Sign up new player
 async function signUpEmail(name,email){
-  await upsertPlayer(name,email);
-  return {name,email};
+  const e = normEmail(email);
+  await upsertPlayer(name,e);
+  return {name,email:e};
 }
 
 // ===== Event Listeners =====
