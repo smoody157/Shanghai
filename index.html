@@ -7,8 +7,6 @@
   <style>
     :root{
       --bg:#0b1a2e;
-      --panel:#122746;
-      --line:rgba(255,255,255,.12);
       --text:#eaf2ff;
       --muted:#b9cbe5;
       --accent:#4ea8ff;
@@ -42,7 +40,7 @@
     .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
     .btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
     .btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
-    .wrap{max-width:760px;margin:0 auto;padding:14px}
+    .wrap{max-width:920px;margin:0 auto;padding:14px}
     .card{
       background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
       border:1px solid rgba(255,255,255,.10);
@@ -108,12 +106,22 @@
     .hitBtn.undo{background:rgba(255,255,255,.08);color:var(--muted)}
     .hitBtn.next{background:rgba(43,213,118,.18);border-color:rgba(43,213,118,.30)}
     .small{font-size:12px;color:var(--muted)}
-    table{border-collapse:collapse;width:100%;min-width:520px;background:rgba(0,0,0,.14)}
+    table{border-collapse:collapse;width:100%;min-width:560px;background:rgba(0,0,0,.14)}
     th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);text-align:center}
     th{font-size:12px;color:var(--muted);font-weight:1000;background:rgba(255,255,255,.05)}
     td.l{text-align:left}
     .badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12px;color:var(--muted)}
     .activeCell{outline:2px solid rgba(78,168,255,.55);outline-offset:-2px;border-radius:10px}
+    .kpi{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi .box{flex:1;min-width:150px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:10px}
+    .kpi .box .v{font-weight:1000;font-size:20px}
+    .kpi .box .l{font-size:12px;color:var(--muted)}
+    .barRow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.10)}
+    .barRow:last-child{border-bottom:none}
+    .barLabel{width:56px;font-weight:1000;color:#dfe9ff}
+    .barOuter{flex:1;height:12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);overflow:hidden}
+    .barInner{height:100%;background:rgba(78,168,255,.55)}
+    .barVal{width:70px;text-align:right;color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
@@ -131,61 +139,47 @@
   <div class="wrap" id="app"></div>
 
 <script>
-/* ========= SAFE HELPERS (no replaceAll, no optional chaining) ========= */
 function esc(s){
   s = String(s === undefined || s === null ? "" : s);
-  return s
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 }
 function normEmail(s){ return String(s||"").trim().toLowerCase(); }
 function now(){ return new Date().getTime(); }
 function readJSON(k, fallback){
-  try{
-    var v = localStorage.getItem(k);
-    return v ? JSON.parse(v) : fallback;
-  }catch(e){ return fallback; }
+  try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
 }
-function writeJSON(k, v){
-  try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){}
-}
+function writeJSON(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
-/* ========= STORAGE (LOCAL) ========= */
-var LS_PLAYERS="gnd_players_v2";
-var LS_SESSION="gnd_session_email_v2";
+var LS_PLAYERS="gnd_players_v3";
+var LS_SESSION="gnd_session_email_v3";
+var LS_STATS="gnd_stats_v3";
+var LS_HISTORY="gnd_history_v3";
 
-/* ========= STATE ========= */
-var appEl = document.getElementById("app");
-var homeBtn = document.getElementById("homeBtn");
-var signOutBtn = document.getElementById("signOutBtn");
+var appEl=document.getElementById("app");
+var homeBtn=document.getElementById("homeBtn");
+var signOutBtn=document.getElementById("signOutBtn");
 
 var toastMsg="";
-var screen="auth";     // auth | home | match | play
-var meEmail = "";
+var screen="auth"; // auth | home | match | play | stats | history
+var meEmail="";
 try{ meEmail = localStorage.getItem(LS_SESSION) || ""; }catch(e){ meEmail=""; }
 
-var match = null;
+var match=null;
 
-/* ========= PLAYERS ========= */
 function getPlayers(){ return readJSON(LS_PLAYERS, []); }
 function savePlayers(a){ writeJSON(LS_PLAYERS, a); }
 function findPlayer(email){
-  email = normEmail(email);
-  var a = getPlayers();
-  for(var i=0;i<a.length;i++) if(a[i].email===email) return a[i];
+  email=normEmail(email);
+  var a=getPlayers();
+  for(var i=0;i<a.length;i++){ if(a[i].email===email) return a[i]; }
   return null;
 }
 function upsertPlayer(name,email){
-  name = String(name||"").trim();
-  email = normEmail(email);
-  var a = getPlayers();
-  var found=null;
-  for(var i=0;i<a.length;i++){
-    if(a[i].email===email){ found=a[i]; break; }
-  }
+  name=String(name||"").trim();
+  email=normEmail(email);
+  var a=getPlayers(), found=null;
+  for(var i=0;i<a.length;i++){ if(a[i].email===email){ found=a[i]; break; } }
   if(found){ if(name) found.name=name; }
   else { a.push({name:name,email:email,createdAt:now()}); }
   savePlayers(a);
@@ -193,7 +187,144 @@ function upsertPlayer(name,email){
 }
 function me(){ return meEmail ? findPlayer(meEmail) : null; }
 
-/* ========= DARTBOARD SVG (real look + active wedge glow) ========= */
+function getStats(){ return readJSON(LS_STATS, {}); }
+function saveStats(s){ writeJSON(LS_STATS, s); }
+function getHistory(){ return readJSON(LS_HISTORY, []); }
+function saveHistory(h){ writeJSON(LS_HISTORY, h); }
+
+function ensureShanghaiStats(obj){
+  if(!obj.shanghai){
+    obj.shanghai={games:0,best:0,totalPoints:0,byTarget:{}};
+  }
+  return obj.shanghai;
+}
+
+var TARGETS=[20,19,18,17,16,15,"B"];
+function pts(hit){ return hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0; }
+function targetLabel(t){ return t==="B" ? "BULL" : String(t); }
+
+function newMatch(players){
+  var m={
+    gameId:"shanghai",
+    players:[],
+    turnIndex:0,
+    targetIndex:0,
+    dartInTurn:0,
+    grid:{},
+    finished:false,
+    startedAt:now(),
+    endedAt:null,
+    snaps:[]
+  };
+  for(var i=0;i<players.length;i++){
+    m.players.push({name:players[i].name,email:players[i].email,total:0});
+    m.grid[players[i].email]={};
+    for(var j=0;j<TARGETS.length;j++){
+      var k=String(TARGETS[j]);
+      m.grid[players[i].email][k]={throws:[],points:0,shanghai:false};
+    }
+  }
+  return m;
+}
+
+function pushSnap(){
+  if(!match) return;
+  try{
+    match.snaps.push(JSON.stringify(match));
+    if(match.snaps.length>60) match.snaps.shift();
+  }catch(e){}
+}
+function popSnap(){
+  if(!match || !match.snaps || match.snaps.length<2) return false;
+  match.snaps.pop();
+  var prev=match.snaps.pop();
+  if(!prev) return false;
+  try{ match=JSON.parse(prev); return true; }catch(e){ return false; }
+}
+
+function addThrow(m, hit){
+  if(m.finished) return;
+  var p=m.players[m.turnIndex];
+  var t=TARGETS[m.targetIndex];
+  var key=String(t);
+  var cell=m.grid[p.email][key];
+
+  cell.throws.push(hit);
+  cell.points += pts(hit);
+  p.total += pts(hit);
+
+  if(cell.throws.length===3){
+    var a=cell.throws, hasS=false,hasT=false,hasD=false;
+    for(var i=0;i<a.length;i++){
+      if(a[i]==="S") hasS=true;
+      if(a[i]==="T") hasT=true;
+      if(a[i]==="D") hasD=true;
+    }
+    if(hasS && hasT && hasD && a[2]==="D"){
+      cell.shanghai=true;
+      cell.points += 5;
+      p.total += 5;
+    }
+  }
+
+  m.dartInTurn++;
+  if(m.dartInTurn>=3){
+    m.dartInTurn=0;
+    m.turnIndex=(m.turnIndex+1) % m.players.length;
+    if(m.turnIndex===0){
+      m.targetIndex++;
+      if(m.targetIndex>=TARGETS.length){
+        m.finished=true;
+        m.endedAt=now();
+      }
+    }
+  }
+}
+
+function saveCompletedMatch(){
+  if(!match || !match.finished) return;
+
+  var hist=getHistory();
+  var summaryParts=[];
+  for(var i=0;i<match.players.length;i++){
+    summaryParts.push(match.players[i].name + ": " + match.players[i].total);
+  }
+  hist.unshift({
+    gameId:"shanghai",
+    startedAt:match.startedAt,
+    endedAt:match.endedAt || now(),
+    players:match.players,
+    summary:"Shanghai • " + summaryParts.join(" | ")
+  });
+  if(hist.length>120) hist.length=120;
+  saveHistory(hist);
+
+  var stats=getStats();
+  for(var pi=0;pi<match.players.length;pi++){
+    var pl=match.players[pi];
+    if(!stats[pl.email]) stats[pl.email]={};
+    var sh=ensureShanghaiStats(stats[pl.email]);
+
+    sh.games += 1;
+    sh.totalPoints += pl.total;
+    if(pl.total > sh.best) sh.best = pl.total;
+
+    for(var ti=0;ti<TARGETS.length;ti++){
+      var tk=String(TARGETS[ti]);
+      if(!sh.byTarget[tk]) sh.byTarget[tk]={S:0,D:0,T:0,M:0,points:0};
+      var cell=match.grid[pl.email][tk];
+      for(var di=0;di<cell.throws.length;di++){
+        var h=cell.throws[di];
+        if(h==="S"||h==="D"||h==="T"||h==="M") sh.byTarget[tk][h] += 1;
+        sh.byTarget[tk].points += pts(h);
+      }
+      if(cell.shanghai) sh.byTarget[tk].points += 5;
+    }
+  }
+  saveStats(stats);
+}
+
+/* dartboard */
 var BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 function polar(cx,cy,r,deg){
   var rad=(deg-90)*Math.PI/180;
@@ -235,6 +366,13 @@ function dartboardSVG(activeNumber){
     return out;
   }
 
+  var numText="";
+  for(var i=0;i<20;i++){
+    var ang=i*seg+seg/2;
+    var p=polar(cx,cy,95,ang);
+    numText += '<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>';
+  }
+
   return ''+
   '<svg viewBox="0 0 200 200" width="94%" aria-label="dartboard">'+
     '<defs>'+
@@ -257,15 +395,7 @@ function dartboardSVG(activeNumber){
     ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
     '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
     '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+
-    (function(){
-      var out="";
-      for(var i=0;i<20;i++){
-        var ang=i*seg+seg/2;
-        var p=polar(cx,cy,95,ang);
-        out += '<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>';
-      }
-      return out;
-    })()+
+    numText+
     '<g>'+
       '<rect x="60" y="8" rx="8" ry="8" width="80" height="18" fill="rgba(0,0,0,.35)" stroke="rgba(255,255,255,.12)"/>'+
       '<text x="100" y="21" text-anchor="middle" font-size="9.5" fill="#cfe4ff" font-weight="900">TARGET: '+(activeNumber==="B"?"BULL":activeNumber)+'</text>'+
@@ -273,126 +403,42 @@ function dartboardSVG(activeNumber){
   '</svg>';
 }
 
-/* ========= SHANGHAI ENGINE (1–4 players, buttons input) ========= */
-var TARGETS=[20,19,18,17,16,15,"B"];
-function pts(hit){ return hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0; }
-function targetLabel(t){ return t==="B" ? "BULL" : String(t); }
-
-function newMatch(players){
-  var m={
-    players: [],
-    turnIndex:0,
-    targetIndex:0,
-    dartInTurn:0,
-    grid:{},
-    finished:false
-  };
-  for(var i=0;i<players.length;i++){
-    m.players.push({name:players[i].name,email:players[i].email,total:0});
-    m.grid[players[i].email]={};
-    for(var j=0;j<TARGETS.length;j++){
-      var k=String(TARGETS[j]);
-      m.grid[players[i].email][k]={throws:[],points:0,shanghai:false};
-    }
-  }
-  return m;
-}
-
-function addThrow(m, hit){
-  if(m.finished) return;
-  var p=m.players[m.turnIndex];
-  var t=TARGETS[m.targetIndex];
-  var key=String(t);
-  var cell=m.grid[p.email][key];
-
-  cell.throws.push(hit);
-  cell.points += pts(hit);
-  p.total += pts(hit);
-
-  // Shanghai bonus (S+T+D with D last)
-  if(cell.throws.length===3){
-    var a=cell.throws;
-    var hasS=false,hasT=false,hasD=false;
-    for(var i=0;i<a.length;i++){
-      if(a[i]==="S") hasS=true;
-      if(a[i]==="T") hasT=true;
-      if(a[i]==="D") hasD=true;
-    }
-    if(hasS && hasT && hasD && a[2]==="D"){
-      cell.shanghai=true;
-      cell.points += 5;
-      p.total += 5;
-    }
-  }
-
-  m.dartInTurn++;
-  if(m.dartInTurn>=3){
-    m.dartInTurn=0;
-    m.turnIndex = (m.turnIndex+1) % m.players.length;
-
-    if(m.turnIndex===0){
-      m.targetIndex++;
-      if(m.targetIndex>=TARGETS.length){
-        m.finished=true;
-      }
-    }
-  }
-}
-
-/* ========= NAV ========= */
+/* nav */
 homeBtn.onclick=function(){
   toastMsg="";
-  if(meEmail) screen="home";
-  else screen="auth";
-  match=null;
+  screen = meEmail ? "home" : "auth";
   render();
 };
 signOutBtn.onclick=function(){
   try{ localStorage.removeItem(LS_SESSION); }catch(e){}
-  meEmail="";
-  match=null;
-  screen="auth";
-  toastMsg="";
-  render();
+  meEmail=""; match=null; toastMsg=""; screen="auth"; render();
 };
 
-/* ========= RENDER ========= */
 function render(){
+  if(meEmail && screen==="auth") screen="home";
   signOutBtn.style.display = meEmail ? "inline-block" : "none";
 
   var html="";
   if(toastMsg) html += '<div class="toast">'+esc(toastMsg)+'</div>';
-
   if(!meEmail) screen="auth";
 
   if(screen==="auth"){
     html += ''+
-    '<div class="card">'+
-      '<div class="h1">Sign in</div>'+
-      '<div class="sub">Enter your email. If you’re new, create an account.</div>'+
-    '</div>'+
-    '<div class="card">'+
-      '<div class="stack">'+
-        '<div><label>Email</label><input id="inEmail" inputmode="email" placeholder="you@email.com"/></div>'+
-        '<div class="row">'+
-          '<button class="btn" id="signInBtn" type="button">Sign in</button>'+
-          '<button class="btn ghost" id="showUpBtn" type="button">Sign up</button>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
+    '<div class="card"><div class="h1">Sign in</div><div class="sub">Enter your email. If you’re new, create an account.</div></div>'+
+    '<div class="card"><div class="stack">'+
+      '<div><label>Email</label><input id="inEmail" inputmode="email" placeholder="you@email.com"/></div>'+
+      '<div class="row"><button class="btn" id="signInBtn" type="button">Sign in</button>'+
+      '<button class="btn ghost" id="showUpBtn" type="button">Sign up</button></div>'+
+    '</div></div>'+
     '<div class="card" id="upCard" style="display:none;">'+
-      '<span class="pill">Create account</span>'+
-      '<div class="divider"></div>'+
+      '<span class="pill">Create account</span><div class="divider"></div>'+
       '<div class="stack">'+
         '<div><label>Name</label><input id="upName" placeholder="Steve Moody"/></div>'+
         '<div><label>Email</label><input id="upEmail" inputmode="email" placeholder="you@email.com"/></div>'+
-        '<div class="row">'+
-          '<button class="btn ok" id="createBtn" type="button">Create</button>'+
-          '<button class="btn ghost" id="cancelBtn" type="button">Cancel</button>'+
-        '</div>'+
-      '</div>'+
-    '</div>';
-    appEl.innerHTML = html;
+        '<div class="row"><button class="btn ok" id="createBtn" type="button">Create</button>'+
+        '<button class="btn ghost" id="cancelBtn" type="button">Cancel</button></div>'+
+      '</div></div>';
+    appEl.innerHTML=html;
 
     document.getElementById("signInBtn").onclick=function(){
       toastMsg="";
@@ -402,15 +448,10 @@ function render(){
       if(!p){ toastMsg="No account found. Use Sign up."; render(); return; }
       meEmail=e;
       try{ localStorage.setItem(LS_SESSION,e); }catch(err){}
-      screen="home";
-      render();
+      screen="home"; render();
     };
-    document.getElementById("showUpBtn").onclick=function(){
-      document.getElementById("upCard").style.display="block";
-    };
-    document.getElementById("cancelBtn").onclick=function(){
-      document.getElementById("upCard").style.display="none";
-    };
+    document.getElementById("showUpBtn").onclick=function(){ document.getElementById("upCard").style.display="block"; };
+    document.getElementById("cancelBtn").onclick=function(){ document.getElementById("upCard").style.display="none"; };
     document.getElementById("createBtn").onclick=function(){
       toastMsg="";
       var n=String(document.getElementById("upName").value||"").trim();
@@ -420,8 +461,7 @@ function render(){
       upsertPlayer(n,e);
       meEmail=e;
       try{ localStorage.setItem(LS_SESSION,e); }catch(err){}
-      screen="home";
-      render();
+      screen="home"; render();
     };
     return;
   }
@@ -438,6 +478,10 @@ function render(){
         '<button class="btn" id="playNowBtn" type="button">Play Now</button>'+
         '<button class="btn" id="soloBtn" type="button">Practice Solo</button>'+
       '</div>'+
+      '<div class="row" style="margin-top:10px;">'+
+        '<button class="btn ghost" id="statsBtn" type="button">My Stats</button>'+
+        '<button class="btn ghost" id="histBtn" type="button">Match History</button>'+
+      '</div>'+
     '</div>';
     appEl.innerHTML=html;
 
@@ -445,44 +489,136 @@ function render(){
       toastMsg="";
       var p=me();
       match=newMatch([{name:p.name,email:p.email}]);
-      screen="play";
-      render();
+      match.snaps=[]; pushSnap();
+      screen="play"; render();
     };
-    document.getElementById("playNowBtn").onclick=function(){
-      toastMsg="";
-      screen="match";
-      render();
+    document.getElementById("playNowBtn").onclick=function(){ toastMsg=""; screen="match"; render(); };
+    document.getElementById("statsBtn").onclick=function(){ toastMsg=""; screen="stats"; render(); };
+    document.getElementById("histBtn").onclick=function(){ toastMsg=""; screen="history"; render(); };
+    return;
+  }
+
+  if(screen==="stats"){
+    var p=me();
+    var allStats=getStats();
+    var mine = allStats[p.email] ? allStats[p.email] : {};
+    var sh = mine.shanghai ? mine.shanghai : {games:0,best:0,totalPoints:0,byTarget:{}};
+    var avg = sh.games ? Math.round((sh.totalPoints/sh.games)*10)/10 : 0;
+
+    var maxPts=0;
+    for(var i=0;i<TARGETS.length;i++){
+      var k=String(TARGETS[i]);
+      var bt=sh.byTarget[k] ? sh.byTarget[k] : {points:0,S:0,D:0,T:0,M:0};
+      if(bt.points>maxPts) maxPts=bt.points;
+    }
+    if(maxPts<1) maxPts=1;
+
+    var bars="";
+    for(var i=0;i<TARGETS.length;i++){
+      var t=TARGETS[i], k=String(t);
+      var bt=sh.byTarget[k] ? sh.byTarget[k] : {points:0,S:0,D:0,T:0,M:0};
+      var w=Math.round((bt.points/maxPts)*100);
+      bars += '<div class="barRow">'+
+        '<div class="barLabel">'+esc(targetLabel(t))+'</div>'+
+        '<div class="barOuter"><div class="barInner" style="width:'+w+'%"></div></div>'+
+        '<div class="barVal">'+bt.points+' pts</div>'+
+      '</div>';
+    }
+
+    html += ''+
+      '<div class="card"><div class="row">'+
+        '<button class="btn ghost" id="backHome1" type="button">Back</button>'+
+        '<button class="btn danger" id="clearStatsBtn" type="button">Clear My Stats</button>'+
+      '</div></div>'+
+      '<div class="card">'+
+        '<span class="pill">My Stats</span>'+
+        '<div class="h1" style="margin-top:8px;">Shanghai</div>'+
+        '<div class="sub">T=3, D=2, S=1, M=0 • Shanghai bonus +5</div>'+
+        '<div class="divider"></div>'+
+        '<div class="kpi">'+
+          '<div class="box"><div class="v">'+sh.games+'</div><div class="l">Games played</div></div>'+
+          '<div class="box"><div class="v">'+sh.best+'</div><div class="l">Best score</div></div>'+
+          '<div class="box"><div class="v">'+avg+'</div><div class="l">Average score</div></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
+
+    appEl.innerHTML=html;
+    document.getElementById("backHome1").onclick=function(){ screen="home"; render(); };
+    document.getElementById("clearStatsBtn").onclick=function(){
+      var all=getStats();
+      if(all[p.email] && all[p.email].shanghai){ delete all[p.email].shanghai; saveStats(all); }
+      toastMsg="Stats cleared."; render();
+    };
+    return;
+  }
+
+  if(screen==="history"){
+    var p=me();
+    var hist=getHistory();
+    var mine=[];
+    for(var i=0;i<hist.length;i++){
+      var h=hist[i], isMine=false;
+      for(var j=0;j<h.players.length;j++){ if(h.players[j].email===p.email){ isMine=true; break; } }
+      if(isMine) mine.push(h);
+    }
+    if(mine.length>60) mine.length=60;
+
+    var list="";
+    if(mine.length===0) list='<div class="sub">No matches yet.</div>';
+    else{
+      for(var i=0;i<mine.length;i++){
+        list += '<div class="li"><div class="meta">'+
+          '<div class="nm">'+esc(mine[i].summary)+'</div>'+
+          '<div class="em">'+esc(new Date(mine[i].endedAt).toLocaleString())+'</div>'+
+        '</div></div>';
+      }
+    }
+
+    html += ''+
+      '<div class="card"><div class="row">'+
+        '<button class="btn ghost" id="backHome2" type="button">Back</button>'+
+        '<button class="btn danger" id="clearHistBtn" type="button">Clear My History</button>'+
+      '</div></div>'+
+      '<div class="card"><span class="pill">Match History</span>'+
+      '<div class="h1" style="margin-top:8px;">Your recent games</div><div class="divider"></div>'+list+'</div>';
+
+    appEl.innerHTML=html;
+    document.getElementById("backHome2").onclick=function(){ screen="home"; render(); };
+    document.getElementById("clearHistBtn").onclick=function(){
+      var hist=getHistory(), keep=[];
+      for(var i=0;i<hist.length;i++){
+        var h=hist[i], hasMe=false;
+        for(var j=0;j<h.players.length;j++){ if(h.players[j].email===p.email){ hasMe=true; break; } }
+        if(!hasMe) keep.push(h);
+      }
+      saveHistory(keep);
+      toastMsg="History cleared."; render();
     };
     return;
   }
 
   if(screen==="match"){
     var p=me();
-    var all=getPlayers();
-    // filter out me
-    var opp=[];
-    for(var i=0;i<all.length;i++){
-      if(all[i].email!==p.email) opp.push(all[i]);
-    }
+    var all=getPlayers(), opp=[];
+    for(var i=0;i<all.length;i++){ if(all[i].email!==p.email) opp.push(all[i]); }
 
     html += ''+
-    '<div class="card">'+
-      '<span class="pill">Play Now</span>'+
-      '<div class="h1" style="margin-top:8px;">Add players (1–4)</div>'+
-      '<div class="sub">You are already added. Add up to 3 opponents.</div>'+
-    '</div>'+
+    '<div class="card"><span class="pill">Play Now</span>'+
+    '<div class="h1" style="margin-top:8px;">Add players (1–4)</div>'+
+    '<div class="sub">You are already added. Add up to 3 opponents.</div></div>'+
     '<div class="card">'+
       '<div class="li"><div class="meta"><div class="nm">'+esc(p.name)+'</div><div class="em">'+esc(p.email)+'</div></div><span class="badge">You</span></div>'+
       '<div class="divider"></div>'+
       '<label>Add opponent</label>'+
       '<select id="oppSel"><option value="">Select opponent…</option>'+
-        (function(){
-          var s="";
-          for(var i=0;i<opp.length;i++){
-            s += '<option value="'+esc(opp[i].email)+'">'+esc(opp[i].name)+' • '+esc(opp[i].email)+'</option>';
-          }
-          return s;
-        })()+
+      (function(){
+        var s="";
+        for(var i=0;i<opp.length;i++){
+          s+='<option value="'+esc(opp[i].email)+'">'+esc(opp[i].name)+' • '+esc(opp[i].email)+'</option>';
+        }
+        return s;
+      })()+
       '</select>'+
       '<div class="row" style="margin-top:10px;">'+
         '<button class="btn" id="addBtn" type="button">Add</button>'+
@@ -499,7 +635,6 @@ function render(){
     appEl.innerHTML=html;
 
     var picked=[];
-
     function redrawPicked(){
       var wrap=document.getElementById("pickedWrap");
       if(picked.length===0){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
@@ -530,7 +665,6 @@ function render(){
       toastMsg="";
       var e=document.getElementById("oppSel").value;
       if(!e){ toastMsg="Pick an opponent."; render(); return; }
-      // already?
       for(var i=0;i<picked.length;i++){ if(picked[i]===e){ toastMsg="Already added."; render(); return; } }
       if(picked.length>=3){ toastMsg="Max 4 players total."; render(); return; }
       picked.push(e);
@@ -544,18 +678,18 @@ function render(){
         if(pl) players.push({name:pl.name,email:pl.email});
       }
       match=newMatch(players);
-      screen="play";
-      render();
+      match.snaps=[]; pushSnap();
+      screen="play"; render();
     };
     return;
   }
 
   if(screen==="play"){
     if(!match){ screen="home"; render(); return; }
+
     var t=TARGETS[match.targetIndex];
     var active=match.players[match.turnIndex];
 
-    // table
     var thead='<tr><th>Target</th>';
     for(var i=0;i<match.players.length;i++){
       thead+='<th>'+esc(match.players[i].name)+'<div class="small">'+match.players[i].total+' pts</div></th>';
@@ -578,12 +712,10 @@ function render(){
     }
 
     html += ''+
-    '<div class="card">'+
-      '<div class="row">'+
-        '<button class="btn ghost" id="backHome" type="button">Back</button>'+
-        '<button class="btn danger" id="resetBtn" type="button">Reset</button>'+
-      '</div>'+
-    '</div>'+
+    '<div class="card"><div class="row">'+
+      '<button class="btn ghost" id="backHome" type="button">Back</button>'+
+      '<button class="btn danger" id="resetBtn" type="button">Reset</button>'+
+    '</div></div>'+
     '<div class="card">'+
       '<span class="pill">Shanghai (Accuracy)</span>'+
       '<div class="divider"></div>'+
@@ -604,11 +736,9 @@ function render(){
         '<button class="hitBtn" disabled type="button"></button>'+
         '<button class="hitBtn next" id="nextBtn" type="button">Next</button>'+
       '</div>'+
-      (match.finished ? '<div class="divider"></div><div class="pill">Finished</div>' : '')+
+      (match.finished ? '<div class="divider"></div><div class="pill">Finished • Saved to stats + history</div>' : '')+
     '</div>'+
-    '<div class="card">'+
-      '<div class="pill">Round table</div>'+
-      '<div class="divider"></div>'+
+    '<div class="card"><div class="pill">Round table</div><div class="divider"></div>'+
       '<div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">'+
         '<table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table>'+
       '</div>'+
@@ -618,7 +748,9 @@ function render(){
 
     function onHit(h){
       if(match.finished) return;
+      pushSnap();
       addThrow(match,h);
+      if(match.finished){ saveCompletedMatch(); }
       render();
     }
     document.getElementById("hitT").onclick=function(){ onHit("T"); };
@@ -626,60 +758,26 @@ function render(){
     document.getElementById("hitD").onclick=function(){ onHit("D"); };
     document.getElementById("hitM").onclick=function(){ onHit("M"); };
 
-    // Simple undo: reload match from a snapshot stack
-    // (Lightweight: keep last 40 states)
-    if(!match._snaps){ match._snaps=[]; }
-    function snap(){
-      try{
-        match._snaps.push(JSON.stringify(match));
-        if(match._snaps.length>40) match._snaps.shift();
-      }catch(e){}
-    }
-    // take a snapshot before each hit
-    // (we can’t intercept earlier now, so snapshot current state here)
-    // We'll snapshot on each render if not finished:
-    if(!match.finished) snap();
-
-    document.getElementById("undoBtn").onclick=function(){
-      if(!match._snaps || match._snaps.length<2) return;
-      // pop current
-      match._snaps.pop();
-      var prev=match._snaps.pop();
-      if(!prev) return;
-      try{ match=JSON.parse(prev); }catch(e){}
-      render();
-    };
+    document.getElementById("undoBtn").onclick=function(){ popSnap(); render(); };
 
     document.getElementById("nextBtn").onclick=function(){
-      // fill remaining darts as miss
       if(match.finished) return;
-      while(match.dartInTurn<3){
-        addThrow(match,"M");
-      }
+      while(match.dartInTurn<3){ pushSnap(); addThrow(match,"M"); }
+      if(match.finished){ saveCompletedMatch(); }
       render();
     };
 
     document.getElementById("resetBtn").onclick=function(){
-      // restart same players
       var pls=[];
-      for(var i=0;i<match.players.length;i++){
-        pls.push({name:match.players[i].name,email:match.players[i].email});
-      }
-      match=newMatch(pls);
-      render();
+      for(var i=0;i<match.players.length;i++){ pls.push({name:match.players[i].name,email:match.players[i].email}); }
+      match=newMatch(pls); match.snaps=[]; pushSnap(); render();
     };
 
-    document.getElementById("backHome").onclick=function(){
-      match=null;
-      screen="home";
-      render();
-    };
-
+    document.getElementById("backHome").onclick=function(){ match=null; screen="home"; render(); };
     return;
   }
 }
 
-/* boot */
 render();
 </script>
 </body>
