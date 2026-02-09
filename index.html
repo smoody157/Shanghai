@@ -796,5 +796,36 @@ function pressHit(hit){
 })();
 </script>
 
+  <div class="dartboardBox" style="height:320px; border-radius:18px; border:1px solid var(--line); background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.12)); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+  <svg viewBox="0 0 200 200" width="92%" aria-label="dartboard">
+    <!-- background -->
+    <defs>
+      <radialGradient id="g" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#123458"/>
+        <stop offset="100%" stop-color="#08121f"/>
+      </radialGradient>
+    </defs>
+    <circle cx="100" cy="100" r="96" fill="url(#g)" stroke="#2f3f5e" stroke-width="2"/>
+
+    <!-- rings -->
+    <circle cx="100" cy="100" r="82" fill="none" stroke="#1f3550" stroke-width="14"/>
+    <circle cx="100" cy="100" r="62" fill="none" stroke="#0b1522" stroke-width="18"/>
+    <circle cx="100" cy="100" r="44" fill="none" stroke="#1f3550" stroke-width="12"/>
+    <circle cx="100" cy="100" r="28" fill="none" stroke="#0b1522" stroke-width="10"/>
+    <circle cx="100" cy="100" r="12" fill="#11243a" stroke="#2f3f5e" stroke-width="2"/>
+
+    <!-- bull -->
+    <circle cx="100" cy="100" r="5" fill="#4ea8ff"/>
+    <circle cx="100" cy="100" r="2.2" fill="#ffffff" opacity=".85"/>
+
+    <!-- label -->
+    <text x="100" y="18" text-anchor="middle" font-size="12" fill="#c7d2e0" font-weight="800">DARTBOARD</text>
+  </svg>
+
+  <div style="position:absolute; top:10px; left:12px; font-size:12px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase;">
+    dartboard
+  </div>
+</div>
+
 </body>
 </html>
