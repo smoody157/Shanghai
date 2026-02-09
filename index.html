@@ -1,255 +1,565 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Game Night Darts</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Game Night Darts</title>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-<style>
-:root{
-  --bg:#0b1a2e; --text:#eaf2ff; --muted:#b9cbe5;
-  --accent:#4ea8ff; --danger:#ff4d5a; --ok:#2bd576;
-  --shadow: rgba(0,0,0,.25);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
-  color:var(--text);
-}
-.topbar{
-  position:sticky;top:0;z-index:10;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-.brand{display:flex;flex-direction:column;line-height:1.05}
-.brand .t{font-weight:900;font-size:16px}
-.brand .s{font-size:12px;color:var(--muted)}
-.btn{
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.08); color:var(--text);
-  border-radius:14px;padding:10px 12px;font-weight:900;
-  box-shadow:0 6px 16px var(--shadow);
-}
-.btn:active{transform:translateY(1px)}
-.btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
-.btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
-.btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
-.wrap{max-width:920px;margin:0 auto;padding:14px}
-.card{
-  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:18px;padding:14px;
-  box-shadow:0 10px 28px rgba(0,0,0,.28);
-  margin-bottom:12px;
-}
-.h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
-.sub{color:var(--muted);font-size:13px}
-label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
-input, select{
-  width:100%;background:rgba(10,20,35,.65);
-  border:1px solid rgba(255,255,255,.14);
-  color:var(--text);border-radius:14px;padding:12px;font-size:16px;outline:none;
-}
-.row{display:flex;gap:10px}
-.row > *{flex:1}
-.stack{display:flex;flex-direction:column;gap:10px}
-.toast{
-  background:rgba(255,77,90,.12);
-  border:1px solid rgba(255,77,90,.30);
-  color:#ffd6da;border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
-}
-.pill{
-  display:inline-block;padding:6px 10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(78,168,255,.08);color:var(--accent);
-  font-weight:900;font-size:12px;
-}
-.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-.boardBox{
-  width:80%;height:250px;border-radius:18px;
-  border:1px solid rgba(255,255,255,.12);
-  background:radial-gradient(circle at 50% 40%, rgba(78,168,255,.10), rgba(0,0,0,.12) 55%, rgba(0,0,0,.22));
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-  box-shadow: inset 0 0 40px rgba(0,0,0,.35);
-}
-.hitRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.hitBtn{
-  border-radius:16px;padding:14px 10px;border:1px solid rgba(255,255,255,.14);
-  background:rgba(78,168,255,.16); color:var(--text);
-  font-weight:1000;font-size:16px; box-shadow:0 10px 24px rgba(0,0,0,.25);
-}
-.hitBtn:active{transform:translateY(1px)}
-.hitBtn.miss{background:rgba(255,77,90,.18);border-color:rgba(255,77,90,.30)}
-.hitBtn.undo{background:rgba(255,255,255,.08);color:var(--muted)}
-.hitBtn.next{background:rgba(43,213,118,.18);border-color:rgba(43,213,118,.30)}
-.small{font-size:12px;color:var(--muted)}
-table{border-collapse:collapse;width:100%;min-width:0;background:rgba(0,0,0,.14)}
-th,td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:center;font-size:12px}
-th{font-size:12px;color:var(--muted);font-weight:1000;background:rgba(255,255,255,.05)}
-td.l{text-align:left}
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12px;color:var(--muted)}
-.activeCell{outline:2px solid rgba(78,168,255,.55);outline-offset:-2px;border-radius:10px}
-.kpi{display:flex;gap:10px;flex-wrap:wrap}
-.kpi .box{flex:1;min-width:150px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:10px}
-.kpi .box .v{font-weight:1000;font-size:20px}
-.kpi .box .l{font-size:12px;color:var(--muted)}
-.barRow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.10)}
-.barRow:last-child{border-bottom:none}
-.barLabel{width:56px;font-weight:1000;color:#dfe9ff}
-.barOuter{flex:1;height:12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);overflow:hidden}
-.barInner{height:100%;background:rgba(78,168,255,.55)}
-.barVal{width:70px;text-align:right;color:var(--muted);font-size:12px}
-</style>
+  <style>
+    :root {
+      --bg:#0b1a2e;
+      --text:#eaf2ff;
+      --muted:#b9cbe5;
+      --accent:#4ea8ff;
+      --danger:#ff4d5a;
+      --ok:#2bd576;
+      --shadow: rgba(0,0,0,.25);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
+      color:var(--text);
+    }
+    .topbar{
+      position:sticky;top:0;z-index:10;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .brand{display:flex;flex-direction:column;line-height:1.05}
+    .brand .t{font-weight:900;font-size:16px}
+    .brand .s{font-size:12px;color:var(--muted)}
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
+      color:var(--text);border-radius:14px;padding:10px 12px;font-weight:900;
+      box-shadow:0 6px 16px var(--shadow);
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
+    .btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
+    .btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
+    .wrap{max-width:920px;margin:0 auto;padding:14px}
+    .card{
+      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;padding:14px;
+      box-shadow:0 10px 28px rgba(0,0,0,.28);
+      margin-bottom:12px;
+    }
+    .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
+    .sub{color:var(--muted);font-size:13px}
+    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+    input, select{
+      width:100%;
+      background:rgba(10,20,35,.65);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+      border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
+    }
+    .row{display:flex;gap:10px}
+    .row > *{flex:1}
+    .stack{display:flex;flex-direction:column;gap:10px}
+    .toast{
+      background:rgba(255,77,90,.12);
+      border:1px solid rgba(255,77,90,.30);
+      color:#ffd6da;
+      border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
+    }
+    .pill{
+      display:inline-block;padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(78,168,255,.08);
+      color:var(--accent);font-weight:900;font-size:12px;
+    }
+    .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+    .li{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:12px;border-radius:16px;background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .meta{display:flex;flex-direction:column;gap:2px}
+    .meta .nm{font-weight:1000}
+    .meta .em{font-size:12px;color:var(--muted)}
+    .boardBox{
+      width:280px;
+      height:280px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.12);
+      background:radial-gradient(circle at 50% 40%, rgba(78,168,255,.10), rgba(0,0,0,.12) 55%, rgba(0,0,0,.22));
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+      box-shadow: inset 0 0 40px rgba(0,0,0,.35);
+    }
+    .hitRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .hitBtn{
+      border-radius:16px;padding:14px 10px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(78,168,255,.16);
+      color:var(--text);
+      font-weight:1000;font-size:16px;
+      box-shadow:0 10px 24px rgba(0,0,0,.25);
+    }
+    .hitBtn:active{transform:translateY(1px)}
+    .hitBtn.miss{background:rgba(255,77,90,.18);border-color:rgba(255,77,90,.30)}
+    .hitBtn.undo{background:rgba(255,255,255,.08);color:var(--muted)}
+    .hitBtn.next{background:rgba(43,213,118,.18);border-color:rgba(43,213,118,.30)}
+    .small{font-size:12px;color:var(--muted)}
+  </style>
 </head>
 <body>
-<div class="topbar">
-  <div class="brand">
-    <div class="t">Game Night Darts</div>
-    <div class="s">The Dart Room presents • Developed & designed by Steve’s Graphic Designs</div>
+  <div class="topbar">
+    <div class="brand">
+      <div class="t">Game Night Darts</div>
+      <div class="s">The Dart Room presents • Developed & designed by Steve’s Graphic Designs</div>
+    </div>
+    <div>
+      <button class="btn ghost" id="homeBtn">Home</button>
+      <button class="btn ghost" id="signOutBtn" style="display:none;">Sign out</button>
+    </div>
   </div>
-  <div>
-    <button class="btn ghost" id="homeBtn" type="button">Home</button>
-    <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
-  </div>
-</div>
 
-<div class="wrap" id="app"></div>
+  <div class="wrap" id="app"></div>
 
 <script>
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_ID",
-  appId: "YOUR_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(); const db=firebase.firestore();
+  <script>
+  // ===== Firebase Initialization =====
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-const appEl=document.getElementById("app");
-const homeBtn=document.getElementById("homeBtn");
-const signOutBtn=document.getElementById("signOutBtn");
+  // ===== Utility functions =====
+  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function normEmail(e){ return String(e||"").trim().toLowerCase(); }
+  function now(){ return new Date().getTime(); }
 
-let toastMsg=""; let screen="auth"; let meUser=null; let match=null;
+  // ===== State =====
+  let meUser = null;
+  let screen = "auth"; // auth | home | match | play | stats | history
+  let match = null;
+  let playersCache = [];
 
-function esc(s){s=String(s||"");return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-function now(){return new Date().getTime();}
-function pts(hit){return hit==="T"?3:hit==="D"?2:hit==="S"?1:0;}
-function targetLabel(t){return t==="B"?"BULL":String(t);}
+  // ===== Firebase operations =====
+  async function getPlayers(){
+    const snapshot = await db.collection("players").orderBy("name").get();
+    playersCache = snapshot.docs.map(d=>d.data());
+    return playersCache;
+  }
+  async function upsertPlayer(name,email){
+    const docRef = db.collection("players").doc(normEmail(email));
+    await docRef.set({name,email,createdAt:now()},{merge:true});
+    await getPlayers();
+  }
+  async function getStats(email){
+    const doc = await db.collection("stats").doc(normEmail(email)).get();
+    return doc.exists ? doc.data() : {};
+  }
+  async function saveStats(email,data){
+    await db.collection("stats").doc(normEmail(email)).set(data,{merge:true});
+  }
+  async function getHistory(email){
+    const snapshot = await db.collection("history")
+      .where("players", "array-contains", normEmail(email))
+      .orderBy("endedAt","desc")
+      .limit(60)
+      .get();
+    return snapshot.docs.map(d=>d.data());
+  }
+  async function saveHistoryEntry(entry){
+    await db.collection("history").add(entry);
+  }
 
-async function getPlayers(){ const snapshot=await db.collection("players").get(); return snapshot.docs.map(d=>d.data()); }
-async function upsertPlayer(name,email){ await db.collection("players").doc(email).set({name,email,createdAt:now()},{merge:true}); }
-async function getStats(email){ const doc=await db.collection("stats").doc(email).get(); return doc.exists?doc.data():{}; }
-async function saveStats(email,data){ await db.collection("stats").doc(email).set(data,{merge:true}); }
-async function getHistory(email){ const snapshot=await db.collection("history").where("players","array-contains",email).orderBy("endedAt","desc").limit(60).get(); return snapshot.docs.map(d=>d.data()); }
-async function saveHistoryEntry(entry){ await db.collection("history").add(entry); }
+  // ===== Authentication by email only =====
+  function findPlayerByEmail(email){ return playersCache.find(p=>p.email===normEmail(email)); }
 
-auth.onAuthStateChanged(user=>{ meUser=user; screen=user?"home":"auth"; render(); });
+  async function handleSignIn(email){
+    const p = findPlayerByEmail(email);
+    if(p){ meUser = p; screen="home"; render(); }
+    else { meUser={email:normEmail(email)}; screen="create"; render(); }
+  }
 
-async function signUp(name,email){
-  try{ 
-    const res = await auth.signInAnonymously(); // no password, just sign in
-    meUser={email,name}; 
-    await upsertPlayer(name,email); 
+  async function handleCreatePlayer(name,email){
+    await upsertPlayer(name,email);
+    meUser = findPlayerByEmail(email);
     screen="home"; render();
-  }catch(e){ toastMsg=e.message; render(); }
-}
-async function signIn(email){
-  const snapshot=await db.collection("players").doc(email).get();
-  if(snapshot.exists){ meUser={email:snapshot.data().email,name:snapshot.data().name}; screen="home"; render(); }
-  else{ screen="signup"; render(); }
-}
-async function signOutF(){ await auth.signOut(); meUser=null; screen="auth"; render(); }
-
-homeBtn.onclick=()=>{screen=meUser?"home":"auth"; render();}
-signOutBtn.onclick=async()=>{await signOutF();};
-
-function dartboardSVG(activeNumber){
-  const cx=100,cy=100; const outer=90; const r=80; const seg=360/20;
-  const nums=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-  let paths=""; for(let i=0;i<20;i++){
-    const a0=i*seg; const a1=(i+1)*seg;
-    const highlight=(activeNumber===nums[i])?"rgba(255,255,0,.6)":"rgba(78,168,255,.16)";
-    const rad0=(Math.PI/180)*a0; const rad1=(Math.PI/180)*a1;
-    paths+='<path d="M100,100 L'+(100+r*Math.cos(rad0))+','+(100+r*Math.sin(rad0))+' L'+(100+r*Math.cos(rad1))+','+(100+r*Math.sin(rad1))+' Z" fill="'+highlight+'"/>';
-  }
-  let numText=""; for(let i=0;i<20;i++){ const ang=i*seg+seg/2; const rad=(Math.PI/180)*ang; const x=100+r*Math.cos(rad); const y=100+r*Math.sin(rad); numText+='<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900">'+nums[i]+'</text>'; }
-  return '<svg viewBox="0 0 200 200" width="94%">'+paths+'<circle cx="100" cy="100" r="10" fill="#c63a3a"/>'+numText+'</svg>';
-}
-
-async function render(){
-  let html=""; if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
-
-  if(screen==="auth"){
-    html+='<div class="card"><div class="h1">Enter Email</div></div>'+
-    '<div class="card"><input type="email" id="inEmail" placeholder="you@email.com"/>'+
-    '<button class="btn" id="goBtn">Go</button></div>';
-    appEl.innerHTML=html;
-    document.getElementById("goBtn").onclick=()=>signIn(document.getElementById("inEmail").value.trim());
-    return;
   }
 
-  if(screen==="signup"){
-    html+='<div class="card"><div class="h1">Create Player</div></div>'+
-    '<div class="card"><input type="text" id="inName" placeholder="Your Name"/>'+
-    '<button class="btn ok" id="createBtn">Create Player</button></div>';
-    appEl.innerHTML=html;
-    document.getElementById("createBtn").onclick=()=>signUp(document.getElementById("inName").value,document.getElementById("inEmail").value);
-    return;
+  // ===== Render UI =====
+  async function render(){
+    let html="";
+    if(screen==="auth"){
+      html+='<div class="card"><div class="h1">Sign in</div></div>'+
+            '<div class="card"><label>Email</label><input id="inEmail" placeholder="you@email.com"/>'+
+            '<button class="btn" id="goBtn">Go</button></div>';
+      appEl.innerHTML=html;
+      document.getElementById("goBtn").onclick=()=>handleSignIn(document.getElementById("inEmail").value);
+      signOutBtn.style.display="none";
+      return;
+    }
+
+    if(screen==="create"){
+      html+='<div class="card"><div class="h1">Create Account</div></div>'+
+            '<div class="card"><label>Name</label><input id="nameInput" placeholder="Your Name"/>'+
+            '<button class="btn ok" id="createBtn">Create Player</button></div>';
+      appEl.innerHTML=html;
+      document.getElementById("createBtn").onclick=()=>handleCreatePlayer(document.getElementById("nameInput").value, meUser.email);
+      signOutBtn.style.display="none";
+      return;
+    }
+
+    if(screen==="home"){
+      html+='<div class="card"><span class="pill">Signed in</span><div class="h1">'+esc(meUser.name||meUser.email)+'</div>'+
+            '<div class="sub">'+esc(meUser.email)+'</div></div>'+
+            '<div class="row"><button class="btn" id="playNowBtn">Play Now</button>'+
+            '<button class="btn ghost" id="statsBtn">My Stats</button></div>';
+      appEl.innerHTML=html;
+      document.getElementById("playNowBtn").onclick=async ()=>{
+        await getPlayers(); // refresh
+        screen="match"; render();
+      };
+      document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
+      signOutBtn.style.display="inline-block";
+      return;
+    }
+
+    signOutBtn.onclick=()=>{ meUser=null; screen="auth"; render(); };
   }
 
-  if(screen==="home"){
-    const p=meUser;
-    html+='<div class="card"><span class="pill">Signed in</span><div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>'+
-    '<div class="row"><button class="btn" id="playNowBtn">Play Now</button></div>';
-    appEl.innerHTML=html;
-    document.getElementById("playNowBtn").onclick=()=>{screen="match"; render();};
-    signOutBtn.style.display="inline-block";
-    return;
-  }
+  getPlayers().then(render);
 
-  if(screen==="match"){
-    html+='<div class="card"><span class="pill">Match Setup</span><div class="sub">Select Opponent (current implementation uses dropdown)</div></div>'+
-    '<div class="card"><select id="oppSel"><option value="">Select opponent…</option></select>'+
-    '<button class="btn ok" id="startBtn">Start Game</button></div>';
-    appEl.innerHTML=html;
-
-    // populate opponents
-    const allPlayers=await getPlayers();
-    const sel=document.getElementById("oppSel");
-    allPlayers.forEach(pl=>{if(pl.email!==meUser.email){let opt=document.createElement("option"); opt.value=pl.email; opt.textContent=pl.name; sel.appendChild(opt);}});
-
-    document.getElementById("startBtn").onclick=()=>{
-      const oppEmail=sel.value; if(!oppEmail){toastMsg="Select opponent"; render(); return;}
-      const opp=allPlayers.find(p=>p.email===oppEmail);
-      match={players:[meUser,opp],turnIndex:0,targetIndex:0,dartInTurn:0,grid:{},finished:false,snaps:[]};
-      const targets=[20,19,18,17,16,15,"B"];
-      match.players.forEach(pl=>{match.grid[pl.email]={}; targets.forEach(t=>{match.grid[pl.email][t]={throws:[],points:0,shanghai:false};});});
-      screen="play"; render();
-    };
-    return;
-  }
-
-  if(screen==="play"){
-    const targets=[20,19,18,17,16,15,"B"];
-    const t=targets[match.targetIndex]; const active=match.players[match.turnIndex];
-    html+='<div class="card"><div class="sub">Target: '+esc(targetLabel(t))+' • Turn: '+esc(active.name)+' • Dart '+(match.dartInTurn+1)+'/3</div>'+
-    '<div class="boardBox">'+dartboardSVG(t)+'</div></div>';
-    appEl.innerHTML=html;
-    return;
-  }
-}
-
-render();
 </script>
-</body>
-</html>
+<script>
+  // ===== Part 3: Match, Play, Dartboard, Scoring, History =====
+
+  const TARGETS = [20,19,18,17,16,15,"B"];
+
+  function pts(hit){ return hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0; }
+
+  function targetLabel(t){ return t==="B"?"BULL":String(t); }
+
+  function newMatch(players){
+    let m = {
+      players:players.map(p=>({name:p.name,email:p.email,total:0})),
+      turnIndex:0,
+      targetIndex:0,
+      dartInTurn:0,
+      grid:{},
+      finished:false,
+      startedAt: now(),
+      endedAt:null,
+      snaps:[]
+    };
+    for(const p of players){
+      m.grid[p.email] = {};
+      for(const t of TARGETS){
+        m.grid[p.email][t] = {throws:[],points:0,shanghai:false};
+      }
+    }
+    return m;
+  }
+
+  function pushSnap(){
+    if(!match) return;
+    match.snaps.push(JSON.stringify(match));
+    if(match.snaps.length>60) match.snaps.shift();
+  }
+
+  function popSnap(){
+    if(!match || match.snaps.length<2) return false;
+    match.snaps.pop();
+    const prev = match.snaps.pop();
+    match = JSON.parse(prev);
+    return true;
+  }
+
+  function addThrow(hit){
+    if(match.finished) return;
+    let p = match.players[match.turnIndex];
+    let t = TARGETS[match.targetIndex];
+    let cell = match.grid[p.email][t];
+
+    cell.throws.push(hit);
+    cell.points += pts(hit);
+    p.total += pts(hit);
+
+    if(cell.throws.length===3){
+      if(cell.throws.includes("S") && cell.throws.includes("T") && cell.throws.includes("D") && cell.throws[2]==="D"){
+        cell.shanghai=true;
+        cell.points+=5; p.total+=5;
+      }
+    }
+
+    match.dartInTurn++;
+    if(match.dartInTurn>=3){
+      match.dartInTurn=0;
+      match.turnIndex = (match.turnIndex+1)%match.players.length;
+      if(match.turnIndex===0){
+        match.targetIndex++;
+        if(match.targetIndex>=TARGETS.length){
+          match.finished=true;
+          match.endedAt=now();
+          saveCompletedMatch();
+        }
+      }
+    }
+  }
+
+  async function saveCompletedMatch(){
+    if(!match || !match.finished) return;
+    const summary = match.players.map(p=>`${p.name}: ${p.total}`).join(" | ");
+    await saveHistoryEntry({gameId:"shanghai",startedAt:match.startedAt,endedAt:match.endedAt,players:match.players.map(p=>p.email),summary});
+
+    for(const p of match.players){
+      let stats = await getStats(p.email);
+      stats.shanghai = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
+      const sh = stats.shanghai;
+      sh.games+=1;
+      sh.totalPoints+=p.total;
+      if(p.total>sh.best) sh.best=p.total;
+
+      for(const t of TARGETS){
+        sh.byTarget[t]=sh.byTarget[t]||{S:0,D:0,T:0,M:0,points:0};
+        const cell = match.grid[p.email][t];
+        for(const h of cell.throws){
+          if(["S","D","T","M"].includes(h)) sh.byTarget[t][h]+=1;
+          sh.byTarget[t].points+=["S","D","T","M"].includes(h)?pts(h):0;
+        }
+        if(cell.shanghai) sh.byTarget[t].points+=5;
+      }
+      await saveStats(p.email,stats);
+    }
+  }
+
+  // ===== Dartboard Rendering =====
+  const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+  function polar(cx,cy,r,deg){ let rad=(deg-90)*Math.PI/180; return {x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)}; }
+
+  function arcWedgePath(cx,cy,r0,r1,a0,a1){
+    let p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1), p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
+    let large=(a1-a0>180)?1:0;
+    function f(n){return (Math.round(n*1000)/1000).toFixed(3);}
+    return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
+  }
+
+  function dartboardSVG(activeNumber){
+    let cx=100,cy=100; let outer=80,rDoubleOuter=74,rDoubleInner=66,rTripleOuter=50,rTripleInner=42,rSingleInner=12;
+    let seg=360/20; let idx=-1;
+    if(typeof activeNumber==="number"){ for(let i=0;i<BOARD_NUMS.length;i++){ if(BOARD_NUMS[i]===activeNumber){ idx=i; break; } } }
+    let activePath = "";
+    if(idx>=0){ let a0=idx*seg+1.2,a1=(idx+1)*seg-1.2; activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1); }
+    function ringWedges(r0,r1,fA,fB){ let out=""; for(let i=0;i<20;i++){ let a0=i*seg+0.8,a1=(i+1)*seg-0.8; let p=arcWedgePath(cx,cy,r0,r1,a0,a1); out+=`<path d="${p}" fill="${i%2===0?fA:fB}" opacity="0.95"/>`; } return out; }
+    let numText=""; for(let i=0;i<20;i++){ let ang=i*seg+seg/2; let p=polar(cx,cy,95,ang); numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900">${BOARD_NUMS[i]}</text>`; }
+    return `<svg viewBox="0 0 200 200" width="80%" aria-label="dartboard">
+      <circle cx="100" cy="100" r="${outer}" fill="#0b1a2e" stroke="#2a3f5f" stroke-width="2"/>
+      ${activePath?`<path d="${activePath}" fill="rgba(78,168,255,0.3)" stroke="rgba(78,168,255,0.8)" stroke-width="1.6"><animate attributeName="opacity" values="0.3;0.8;0.3" dur="1s" repeatCount="indefinite"/></path>`:""}
+      ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
+      ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
+      ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
+      ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
+      <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
+      <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
+      ${numText}
+    </svg>`;
+  }
+
+  // ===== Play screen rendering =====
+  function renderPlay(){
+    if(!match) { screen="home"; render(); return; }
+    let t=TARGETS[match.targetIndex]; let active=match.players[match.turnIndex];
+    let html='<div class="card"><span class="pill">Shanghai</span><div class="divider"></div>';
+    html+=`<div class="sub">Target: <b>${esc(targetLabel(t))}</b> • Turn: <b>${esc(active.name)}</b> • Dart ${match.dartInTurn+1}/3</div><div class="divider"></div>`;
+    html+=`<div class="boardBox">${dartboardSVG(t)}</div>`;
+    html+=`<div class="divider"></div><div class="hitRow">
+      <button class="hitBtn" id="hitT">T</button>
+      <button class="hitBtn" id="hitS">S</button>
+      <button class="hitBtn" id="hitD">D</button>
+      <button class="hitBtn miss" id="hitM">M</button>
+    </div>
+    <div class="divider"></div>
+    <div class="hitRow">
+      <button class="hitBtn undo" id="undoBtn">Undo</button>
+      <button class="hitBtn next" id="nextBtn">Next</button>
+    </div>`;
+    html+='</div>';
+    appEl.innerHTML=html;
+
+    document.getElementById("hitT").onclick=()=>{pushSnap(); addThrow("T"); renderPlay();};
+    document.getElementById("hitS").onclick=()=>{pushSnap(); addThrow("S"); renderPlay();};
+    document.getElementById("hitD").onclick=()=>{pushSnap(); addThrow("D"); renderPlay();};
+    document.getElementById("hitM").onclick=()=>{pushSnap(); addThrow("M"); renderPlay();};
+    document.getElementById("undoBtn").onclick=()=>{popSnap(); renderPlay();};
+    document.getElementById("nextBtn").onclick=()=>{
+      while(match.dartInTurn<3){ pushSnap(); addThrow("M"); }
+      renderPlay();
+    };
+  }
+
+  // You would integrate renderPlay() call when starting match
+  // Example: match = newMatch([meUser, opponent]); renderPlay();
+
+</script>
+<script>
+  // ===== Part 4: Match Selection, Stats, History, Firebase Integration =====
+
+  async function renderMatchScreen(){
+    if(!meUser) return;
+    const allPlayers = await getPlayers();
+    const myEmail = meUser.email;
+    const opponents = allPlayers.filter(p=>p.email!==myEmail);
+
+    let html='<div class="card"><span class="pill">Play Now</span><div class="h1">Add players (1–4)</div><div class="sub">You are added. Add up to 3 opponents.</div></div>';
+    html+='<div class="card">';
+    html+=`<div class="li"><div class="meta"><div class="nm">${esc(meUser.displayName||myEmail)}</div><div class="em">${esc(myEmail)}</div></div><span class="badge">You</span></div>`;
+    html+='<div class="divider"></div>';
+    html+='<label>Add opponent</label>';
+    html+='<input type="text" id="oppSearch" placeholder="Type opponent name..." />';
+    html+='<div class="row" style="margin-top:10px;"><button class="btn" id="addBtn">Add</button><button class="btn ghost" id="backBtn">Back</button></div>';
+    html+='<div class="divider"></div><div id="pickedWrap" class="small"></div>';
+    html+='<div class="row" style="margin-top:10px;"><button class="btn ok" id="startBtn">Start Shanghai</button><button class="btn danger" id="clearBtn">Clear</button></div>';
+    html+='</div>';
+
+    appEl.innerHTML=html;
+
+    let picked=[];
+
+    function redrawPicked(){
+      const wrap=document.getElementById("pickedWrap");
+      if(picked.length===0){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
+      let out="";
+      for(const e of picked){
+        const pl = allPlayers.find(p=>p.email===e);
+        if(!pl) continue;
+        out+=`<div class="li" style="margin-top:10px;"><div class="meta"><div class="nm">${esc(pl.name)}</div><div class="em">${esc(pl.email)}</div></div><button class="btn danger" data-rem="${esc(pl.email)}">Remove</button></div>`;
+      }
+      wrap.innerHTML=out;
+      wrap.querySelectorAll("[data-rem]").forEach(btn=>{
+        btn.onclick=()=>{ picked=picked.filter(x=>x!==btn.getAttribute("data-rem")); redrawPicked(); };
+      });
+    }
+    redrawPicked();
+
+    const oppSearch = document.getElementById("oppSearch");
+    oppSearch.addEventListener("input",()=>{
+      const val=oppSearch.value.toLowerCase();
+      const options=opponents.filter(p=>p.name.toLowerCase().includes(val));
+      const dlist=options.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+      if(!document.getElementById("oppDatalist")){
+        const dl=document.createElement("datalist"); dl.id="oppDatalist"; document.body.appendChild(dl);
+        oppSearch.setAttribute("list","oppDatalist");
+      }
+      document.getElementById("oppDatalist").innerHTML=dlist;
+    });
+
+    document.getElementById("addBtn").onclick=()=>{
+      const emailInput = oppSearch.value;
+      if(!emailInput){ toastMsg="Pick an opponent."; renderMatchScreen(); return; }
+      if(picked.includes(emailInput)){ toastMsg="Already added."; renderMatchScreen(); return; }
+      if(picked.length>=3){ toastMsg="Max 4 players total."; renderMatchScreen(); return; }
+      picked.push(emailInput);
+      oppSearch.value="";
+      redrawPicked();
+    };
+
+    document.getElementById("clearBtn").onclick=()=>{ picked=[]; redrawPicked(); };
+    document.getElementById("backBtn").onclick=()=>{ screen="home"; render(); };
+    document.getElementById("startBtn").onclick=()=>{
+      const players=[{name:meUser.displayName||myEmail,email:myEmail}];
+      for(const e of picked){
+        const pl = allPlayers.find(p=>p.email===e);
+        if(pl) players.push({name:pl.name,email:pl.email});
+      }
+      match=newMatch(players);
+      match.snaps=[]; pushSnap();
+      renderPlay();
+    };
+  }
+
+  async function renderStatsScreen(){
+    if(!meUser) return;
+    const stats = await getStats(meUser.email);
+    const sh = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
+    let html='<div class="card"><span class="pill">My Stats</span><div class="divider"></div>';
+    html+=`<div class="kpi">
+      <div class="box"><div class="v">${sh.games}</div><div class="l">Games played</div></div>
+      <div class="box"><div class="v">${sh.best}</div><div class="l">Best score</div></div>
+      <div class="box"><div class="v">${Math.round(sh.totalPoints/sh.games*10)/10||0}</div><div class="l">Average score</div></div>
+    </div>`;
+    html+='<div class="divider"></div><div class="card"><span class="pill">Points by target</span>';
+    for(const t of TARGETS){
+      const bt=sh.byTarget[t]||{points:0};
+      html+=`<div class="barRow"><div class="barLabel">${esc(targetLabel(t))}</div><div class="barOuter"><div class="barInner" style="width:${bt.points||0}%"></div></div><div class="barVal">${bt.points||0} pts</div></div>`;
+    }
+    html+='</div>';
+    html+=`<div class="row"><button class="btn ghost" id="backHomeStats">Back</button></div>`;
+    appEl.innerHTML=html;
+    document.getElementById("backHomeStats").onclick=()=>{ screen="home"; render(); };
+  }
+
+  async function renderHistoryScreen(){
+    if(!meUser) return;
+    const hist = await getHistory(meUser.email);
+    let html='<div class="card"><span class="pill">Match History</span><div class="divider"></div>';
+    if(hist.length===0) html+='<div class="sub">No matches yet.</div>';
+    else{
+      for(const h of hist){
+        html+=`<div class="li"><div class="meta"><div class="nm">${esc(h.summary)}</div><div class="em">${esc(new Date(h.endedAt).toLocaleString())}</div></div></div>`;
+      }
+    }
+    html+=`<div class="row"><button class="btn ghost" id="backHomeHist">Back</button></div>`;
+    appEl.innerHTML=html;
+    document.getElementById("backHomeHist").onclick=()=>{ screen="home"; render(); };
+  }
+
+  // ===== Updated Main Render Function =====
+  async function render(){
+    if(!meUser) screen="auth";
+    if(screen==="auth") return renderAuthScreen();
+    if(screen==="home"){
+      let html='<div class="card"><span class="pill">Signed in</span>';
+      html+=`<div class="h1">${esc(meUser.displayName||meUser.email)}</div>`;
+      html+=`<div class="sub">${esc(meUser.email)}</div></div>`;
+      html+=`<div class="row"><button class="btn" id="playNowBtn">Play Now</button><button class="btn ghost" id="statsBtn">My Stats</button><button class="btn ghost" id="histBtn">History</button></div>`;
+      appEl.innerHTML=html;
+      document.getElementById("playNowBtn").onclick=()=>renderMatchScreen();
+      document.getElementById("statsBtn").onclick=()=>renderStatsScreen();
+      document.getElementById("histBtn").onclick=()=>renderHistoryScreen();
+      return;
+    }
+  }
+
+  function renderAuthScreen(){
+    let html='<div class="card"><div class="h1">Enter your email</div></div>';
+    html+='<div class="card"><input type="email" id="authEmail" placeholder="you@email.com"/><button class="btn" id="goBtn">Go</button></div>';
+    appEl.innerHTML=html;
+    document.getElementById("goBtn").onclick=async ()=>{
+      const email=document.getElementById("authEmail").value.trim().toLowerCase();
+      if(!email){ toastMsg="Enter valid email"; renderAuthScreen(); return; }
+      let p = await db.collection("players").doc(email).get();
+      if(p.exists){ meUser={email:email, displayName:p.data().name}; screen="home"; render(); return; }
+      // Not exist -> ask for name
+      appEl.innerHTML=`<div class="card"><div class="h1">New Player</div><label>Name</label><input type="text" id="newName"/><button class="btn ok" id="createPlayerBtn">Create Player</button></div>`;
+      document.getElementById("createPlayerBtn").onclick=async ()=>{
+        const name=document.getElementById("newName").value.trim();
+        if(!name){ toastMsg="Enter a name"; renderAuthScreen(); return; }
+        await upsertPlayer(name,email);
+        meUser={email:email, displayName:name};
+        screen="home"; render();
+      };
+    };
+  }
+
+</script>
