@@ -136,6 +136,17 @@ async function getHistory(email){ const snap=await db.collection("history").wher
 async function saveHistoryEntry(entry){ await db.collection("history").add(entry); }
 
 // ===== Fixed Authentication Functions =====
+  async function signInEmail(email){
+  const normalizedEmail = String(email||'').trim().toLowerCase();
+  const doc = await db.collection('players').doc(normalizedEmail).get();
+  return doc.exists ? doc.data() : null;
+}
+
+async function signUpEmail(name,email){
+  const normalizedEmail = String(email||'').trim().toLowerCase();
+  await upsertPlayer(name, normalizedEmail);
+  return {name, email: normalizedEmail};
+}
 
 // Normalize email consistently
 function normEmail(email){
