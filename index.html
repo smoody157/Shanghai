@@ -1,431 +1,255 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Game Night Darts</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Game Night Darts</title>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <style>
-    :root{
-      --bg:#0b1a2e; --text:#eaf2ff; --muted:#b9cbe5;
-      --accent:#4ea8ff; --danger:#ff4d5a; --ok:#2bd576;
-      --shadow: rgba(0,0,0,.25);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
-      color:var(--text);
-    }
-    .topbar{
-      position:sticky;top:0;z-index:10;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .brand{display:flex;flex-direction:column;line-height:1.05}
-    .brand .t{font-weight:900;font-size:16px}
-    .brand .s{font-size:12px;color:var(--muted)}
-    .btn{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.08);color:var(--text);border-radius:14px;padding:10px 12px;font-weight:900;
-      box-shadow:0 6px 16px var(--shadow);
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
-    .btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
-    .btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
-    .wrap{max-width:920px;margin:0 auto;padding:14px}
-    .card{
-      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;padding:14px;
-      box-shadow:0 10px 28px rgba(0,0,0,.28);
-      margin-bottom:12px;
-    }
-    .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
-    .sub{color:var(--muted);font-size:13px}
-    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
-    input, select{
-      width:100%;
-      background:rgba(10,20,35,.65);
-      border:1px solid rgba(255,255,255,.14);
-      color:var(--text);
-      border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
-    }
-    .row{display:flex;gap:10px}
-    .row > *{flex:1}
-    .stack{display:flex;flex-direction:column;gap:10px}
-    .toast{
-      background:rgba(255,77,90,.12);
-      border:1px solid rgba(255,77,90,.30);
-      color:#ffd6da;
-      border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
-    }
-    .pill{
-      display:inline-block;padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(78,168,255,.08);
-      color:var(--accent);font-weight:900;font-size:12px;
-    }
-    .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-    .li{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:12px;border-radius:16px;background:rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .meta{display:flex;flex-direction:column;gap:2px}
-    .meta .nm{font-weight:1000}
-    .meta .em{font-size:12px;color:var(--muted)}
-    .boardBox{
-      width:80%;
-      max-width:300px;
-      height:300px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.12);
-      background:radial-gradient(circle at 50% 40%, rgba(78,168,255,.10), rgba(0,0,0,.12) 55%, rgba(0,0,0,.22));
-      display:flex;align-items:center;justify-content:center;
-      overflow:hidden;
-      box-shadow: inset 0 0 40px rgba(0,0,0,.35);
-    }
-    /* ... additional CSS for dartboard segments, hit buttons, etc. ... */
-  </style>
+<style>
+:root{
+  --bg:#0b1a2e; --text:#eaf2ff; --muted:#b9cbe5;
+  --accent:#4ea8ff; --danger:#ff4d5a; --ok:#2bd576;
+  --shadow: rgba(0,0,0,.25);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
+  color:var(--text);
+}
+.topbar{
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.brand{display:flex;flex-direction:column;line-height:1.05}
+.brand .t{font-weight:900;font-size:16px}
+.brand .s{font-size:12px;color:var(--muted)}
+.btn{
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08); color:var(--text);
+  border-radius:14px;padding:10px 12px;font-weight:900;
+  box-shadow:0 6px 16px var(--shadow);
+}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
+.btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
+.btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
+.wrap{max-width:920px;margin:0 auto;padding:14px}
+.card{
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;padding:14px;
+  box-shadow:0 10px 28px rgba(0,0,0,.28);
+  margin-bottom:12px;
+}
+.h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
+.sub{color:var(--muted);font-size:13px}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+input, select{
+  width:100%;background:rgba(10,20,35,.65);
+  border:1px solid rgba(255,255,255,.14);
+  color:var(--text);border-radius:14px;padding:12px;font-size:16px;outline:none;
+}
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+.stack{display:flex;flex-direction:column;gap:10px}
+.toast{
+  background:rgba(255,77,90,.12);
+  border:1px solid rgba(255,77,90,.30);
+  color:#ffd6da;border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
+}
+.pill{
+  display:inline-block;padding:6px 10px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(78,168,255,.08);color:var(--accent);
+  font-weight:900;font-size:12px;
+}
+.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+.boardBox{
+  width:80%;height:250px;border-radius:18px;
+  border:1px solid rgba(255,255,255,.12);
+  background:radial-gradient(circle at 50% 40%, rgba(78,168,255,.10), rgba(0,0,0,.12) 55%, rgba(0,0,0,.22));
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  box-shadow: inset 0 0 40px rgba(0,0,0,.35);
+}
+.hitRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.hitBtn{
+  border-radius:16px;padding:14px 10px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(78,168,255,.16); color:var(--text);
+  font-weight:1000;font-size:16px; box-shadow:0 10px 24px rgba(0,0,0,.25);
+}
+.hitBtn:active{transform:translateY(1px)}
+.hitBtn.miss{background:rgba(255,77,90,.18);border-color:rgba(255,77,90,.30)}
+.hitBtn.undo{background:rgba(255,255,255,.08);color:var(--muted)}
+.hitBtn.next{background:rgba(43,213,118,.18);border-color:rgba(43,213,118,.30)}
+.small{font-size:12px;color:var(--muted)}
+table{border-collapse:collapse;width:100%;min-width:0;background:rgba(0,0,0,.14)}
+th,td{padding:6px 6px;border-bottom:1px solid rgba(255,255,255,.08);text-align:center;font-size:12px}
+th{font-size:12px;color:var(--muted);font-weight:1000;background:rgba(255,255,255,.05)}
+td.l{text-align:left}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12px;color:var(--muted)}
+.activeCell{outline:2px solid rgba(78,168,255,.55);outline-offset:-2px;border-radius:10px}
+.kpi{display:flex;gap:10px;flex-wrap:wrap}
+.kpi .box{flex:1;min-width:150px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:10px}
+.kpi .box .v{font-weight:1000;font-size:20px}
+.kpi .box .l{font-size:12px;color:var(--muted)}
+.barRow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.10)}
+.barRow:last-child{border-bottom:none}
+.barLabel{width:56px;font-weight:1000;color:#dfe9ff}
+.barOuter{flex:1;height:12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);overflow:hidden}
+.barInner{height:100%;background:rgba(78,168,255,.55)}
+.barVal{width:70px;text-align:right;color:var(--muted);font-size:12px}
+</style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <div class="t">Game Night Darts</div>
-      <div class="s">The Dart Room presents • Developed & designed by Steve’s Graphic Designs</div>
-    </div>
-    <div>
-      <button class="btn ghost" id="homeBtn" type="button">Home</button>
-      <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
-    </div>
+<div class="topbar">
+  <div class="brand">
+    <div class="t">Game Night Darts</div>
+    <div class="s">The Dart Room presents • Developed & designed by Steve’s Graphic Designs</div>
   </div>
-  <div class="wrap" id="app"></div>
-  <script>
-  // ===== Firebase Initialization =====
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_ID",
-    appId: "YOUR_APP_ID"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+  <div>
+    <button class="btn ghost" id="homeBtn" type="button">Home</button>
+    <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
+  </div>
+</div>
 
-  // ===== Utility =====
-  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function now(){ return new Date().getTime(); }
-  function pts(hit){ return hit==="T"?3:hit==="D"?2:hit==="S"?1:0; }
-  function targetLabel(t){ return t==="B"?"BULL":String(t); }
+<div class="wrap" id="app"></div>
 
-  // ===== DOM Elements =====
-  const appEl = document.getElementById("app");
-  const homeBtn = document.getElementById("homeBtn");
-  const signOutBtn = document.getElementById("signOutBtn");
+<script>
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_ID",
+  appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(); const db=firebase.firestore();
 
-  let toastMsg="", screen="auth", meUser=null, match=null;
+const appEl=document.getElementById("app");
+const homeBtn=document.getElementById("homeBtn");
+const signOutBtn=document.getElementById("signOutBtn");
 
-  // ===== Firebase Operations =====
-  async function getPlayers(){
-    const snapshot = await db.collection("players").get();
-    return snapshot.docs.map(d=>d.data());
+let toastMsg=""; let screen="auth"; let meUser=null; let match=null;
+
+function esc(s){s=String(s||"");return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function now(){return new Date().getTime();}
+function pts(hit){return hit==="T"?3:hit==="D"?2:hit==="S"?1:0;}
+function targetLabel(t){return t==="B"?"BULL":String(t);}
+
+async function getPlayers(){ const snapshot=await db.collection("players").get(); return snapshot.docs.map(d=>d.data()); }
+async function upsertPlayer(name,email){ await db.collection("players").doc(email).set({name,email,createdAt:now()},{merge:true}); }
+async function getStats(email){ const doc=await db.collection("stats").doc(email).get(); return doc.exists?doc.data():{}; }
+async function saveStats(email,data){ await db.collection("stats").doc(email).set(data,{merge:true}); }
+async function getHistory(email){ const snapshot=await db.collection("history").where("players","array-contains",email).orderBy("endedAt","desc").limit(60).get(); return snapshot.docs.map(d=>d.data()); }
+async function saveHistoryEntry(entry){ await db.collection("history").add(entry); }
+
+auth.onAuthStateChanged(user=>{ meUser=user; screen=user?"home":"auth"; render(); });
+
+async function signUp(name,email){
+  try{ 
+    const res = await auth.signInAnonymously(); // no password, just sign in
+    meUser={email,name}; 
+    await upsertPlayer(name,email); 
+    screen="home"; render();
+  }catch(e){ toastMsg=e.message; render(); }
+}
+async function signIn(email){
+  const snapshot=await db.collection("players").doc(email).get();
+  if(snapshot.exists){ meUser={email:snapshot.data().email,name:snapshot.data().name}; screen="home"; render(); }
+  else{ screen="signup"; render(); }
+}
+async function signOutF(){ await auth.signOut(); meUser=null; screen="auth"; render(); }
+
+homeBtn.onclick=()=>{screen=meUser?"home":"auth"; render();}
+signOutBtn.onclick=async()=>{await signOutF();};
+
+function dartboardSVG(activeNumber){
+  const cx=100,cy=100; const outer=90; const r=80; const seg=360/20;
+  const nums=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+  let paths=""; for(let i=0;i<20;i++){
+    const a0=i*seg; const a1=(i+1)*seg;
+    const highlight=(activeNumber===nums[i])?"rgba(255,255,0,.6)":"rgba(78,168,255,.16)";
+    const rad0=(Math.PI/180)*a0; const rad1=(Math.PI/180)*a1;
+    paths+='<path d="M100,100 L'+(100+r*Math.cos(rad0))+','+(100+r*Math.sin(rad0))+' L'+(100+r*Math.cos(rad1))+','+(100+r*Math.sin(rad1))+' Z" fill="'+highlight+'"/>';
   }
-  async function upsertPlayer(name,email){
-    await db.collection("players").doc(email).set({name,email,createdAt:now()},{merge:true});
-  }
-  async function getStats(email){
-    const doc = await db.collection("stats").doc(email).get();
-    return doc.exists?doc.data():{};
-  }
-  async function saveStats(email,data){
-    await db.collection("stats").doc(email).set(data,{merge:true});
-  }
-  async function getHistory(email){
-    const snapshot = await db.collection("history")
-      .where("players","array-contains",email)
-      .orderBy("endedAt","desc").limit(60).get();
-    return snapshot.docs.map(d=>d.data());
-  }
-  async function saveHistoryEntry(entry){
-    await db.collection("history").add(entry);
-  }
+  let numText=""; for(let i=0;i<20;i++){ const ang=i*seg+seg/2; const rad=(Math.PI/180)*ang; const x=100+r*Math.cos(rad); const y=100+r*Math.sin(rad); numText+='<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900">'+nums[i]+'</text>'; }
+  return '<svg viewBox="0 0 200 200" width="94%">'+paths+'<circle cx="100" cy="100" r="10" fill="#c63a3a"/>'+numText+'</svg>';
+}
 
-  // ===== Auth =====
-  auth.onAuthStateChanged(user=>{
-    meUser=user;
-    screen = user?"home":"auth";
-    render();
-  });
+async function render(){
+  let html=""; if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
 
-  async function signUp(name,email,password){
-    try{
-      const res = await auth.createUserWithEmailAndPassword(email,password);
-      await upsertPlayer(name,email);
-      meUser = res.user;
-    }catch(e){ toastMsg=e.message; render(); }
-  }
-  async function signIn(email,password){
-    try{ await auth.signInWithEmailAndPassword(email,password); }catch(e){ toastMsg=e.message; render(); }
-  }
-  async function signOut(){ await auth.signOut(); }
-
-  // ===== Game logic =====
-  const TARGETS=[20,19,18,17,16,15,"B"];
-  function newMatch(players){
-    let m={gameId:"shanghai",players:[],turnIndex:0,targetIndex:0,dartInTurn:0,grid:{},finished:false,startedAt:now(),endedAt:null,snaps:[]};
-    for(const pl of players){
-      m.players.push({name:pl.name,email:pl.email,total:0});
-      m.grid[pl.email]={};
-      for(const t of TARGETS) m.grid[pl.email][String(t)]={throws:[],points:0,shanghai:false};
-    }
-    return m;
-  }
-
-  function pushSnap(){ if(!match) return; match.snaps.push(JSON.stringify(match)); if(match.snaps.length>60) match.snaps.shift(); }
-  function popSnap(){ if(!match || match.snaps.length<2) return false; match.snaps.pop(); let prev=match.snaps.pop(); if(!prev) return false; match=JSON.parse(prev); return true; }
-
-  function addThrow(m,hit){
-    if(m.finished) return;
-    let p=m.players[m.turnIndex];
-    let t=TARGETS[m.targetIndex];
-    let cell=m.grid[p.email][String(t)];
-    cell.throws.push(hit);
-    cell.points+=pts(hit); p.total+=pts(hit);
-
-    if(cell.throws.length===3){
-      const [hasS,hasD,hasT] = [cell.throws.includes("S"), cell.throws.includes("D"), cell.throws.includes("T")];
-      if(hasS && hasD && hasT && cell.throws[2]==="D"){ cell.shanghai=true; cell.points+=5; p.total+=5; }
-    }
-
-    m.dartInTurn++;
-    if(m.dartInTurn>=3){ m.dartInTurn=0; m.turnIndex=(m.turnIndex+1)%m.players.length;
-      if(m.turnIndex===0){ m.targetIndex++; if(m.targetIndex>=TARGETS.length){ m.finished=true; m.endedAt=now(); } }
-    }
+  if(screen==="auth"){
+    html+='<div class="card"><div class="h1">Enter Email</div></div>'+
+    '<div class="card"><input type="email" id="inEmail" placeholder="you@email.com"/>'+
+    '<button class="btn" id="goBtn">Go</button></div>';
+    appEl.innerHTML=html;
+    document.getElementById("goBtn").onclick=()=>signIn(document.getElementById("inEmail").value.trim());
+    return;
   }
 
-  async function saveCompletedMatch(){
-    if(!match || !match.finished) return;
-    const summaryParts = match.players.map(p=>p.name+": "+p.total);
-    await saveHistoryEntry({gameId:"shanghai",startedAt:match.startedAt,endedAt:match.endedAt||now(),players:match.players.map(p=>p.email),summary:"Shanghai • "+summaryParts.join(" | ")});
-    for(const pl of match.players){
-      const stats = await getStats(pl.email);
-      stats.shanghai=stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
-      const sh=stats.shanghai; sh.games++; sh.totalPoints+=pl.total; if(pl.total>sh.best) sh.best=pl.total;
-      for(const t of TARGETS){
-        const key=String(t); sh.byTarget[key]=sh.byTarget[key]||{S:0,D:0,T:0,M:0,points:0};
-        const cell=match.grid[pl.email][key];
-        for(const h of cell.throws){ if(["S","D","T","M"].includes(h)) sh.byTarget[key][h]+=1; sh.byTarget[key].points+=pts(h); }
-        if(cell.shanghai) sh.byTarget[key].points+=5;
-      }
-      await saveStats(pl.email,stats);
-    }
+  if(screen==="signup"){
+    html+='<div class="card"><div class="h1">Create Player</div></div>'+
+    '<div class="card"><input type="text" id="inName" placeholder="Your Name"/>'+
+    '<button class="btn ok" id="createBtn">Create Player</button></div>';
+    appEl.innerHTML=html;
+    document.getElementById("createBtn").onclick=()=>signUp(document.getElementById("inName").value,document.getElementById("inEmail").value);
+    return;
   }
 
-  // ===== Dartboard SVG =====
-  const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-  function polar(cx,cy,r,deg){ const rad=(deg-90)*Math.PI/180; return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)}; }
-  function arcWedgePath(cx,cy,r0,r1,a0,a1){
-    const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1), p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
-    const large=((a1-a0)>180)?1:0;
-    function f(n){ return (Math.round(n*1000)/1000).toFixed(3); }
-    return "M "+f(p1.x)+" "+f(p1.y)+" A "+r1+" "+r1+" 0 "+large+" 1 "+f(p2.x)+" "+f(p2.y)+" L "+f(p3.x)+" "+f(p3.y)+" A "+r0+" "+r0+" 0 "+large+" 0 "+f(p4.x)+" "+f(p4.y)+" Z";
+  if(screen==="home"){
+    const p=meUser;
+    html+='<div class="card"><span class="pill">Signed in</span><div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>'+
+    '<div class="row"><button class="btn" id="playNowBtn">Play Now</button></div>';
+    appEl.innerHTML=html;
+    document.getElementById("playNowBtn").onclick=()=>{screen="match"; render();};
+    signOutBtn.style.display="inline-block";
+    return;
   }
-  function dartboardSVG(activeNumber){
-    const cx=100,cy=100; const outer=80, rDoubleOuter=72, rDoubleInner=66, rTripleOuter=50, rTripleInner=44, rSingleInner=16;
-    const seg=360/20; let idx=-1;
-    if(typeof activeNumber==="number"){ for(let i=0;i<BOARD_NUMS.length;i++) if(BOARD_NUMS[i]===activeNumber){ idx=i; break; } }
-    let activePath=""; if(idx>=0){ const a0=idx*seg+1.2,a1=(idx+1)*seg-1.2; activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1); }
 
-    function ringWedges(r0,r1,fillA,fillB){ let out=""; for(let i=0;i<20;i++){ const a0=i*seg+0.8,a1=(i+1)*seg-0.8; out+='<path d="'+arcWedgePath(cx,cy,r0,r1,a0,a1)+'" fill="'+(i%2===0?fillA:fillB)+'" opacity="0.95"/>'; } return out; }
+  if(screen==="match"){
+    html+='<div class="card"><span class="pill">Match Setup</span><div class="sub">Select Opponent (current implementation uses dropdown)</div></div>'+
+    '<div class="card"><select id="oppSel"><option value="">Select opponent…</option></select>'+
+    '<button class="btn ok" id="startBtn">Start Game</button></div>';
+    appEl.innerHTML=html;
 
-    let numText=""; for(let i=0;i<20;i++){ const ang=i*seg+seg/2,p=polar(cx,cy,95,ang); numText+='<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>'; }
+    // populate opponents
+    const allPlayers=await getPlayers();
+    const sel=document.getElementById("oppSel");
+    allPlayers.forEach(pl=>{if(pl.email!==meUser.email){let opt=document.createElement("option"); opt.value=pl.email; opt.textContent=pl.name; sel.appendChild(opt);}});
 
-    return ''+
-    '<svg viewBox="0 0 200 200" width="94%" aria-label="dartboard">'+
-      '<circle cx="100" cy="100" r="'+outer+'" fill="#0d1a2e" stroke="#2a3f5f" stroke-width="2"/>'+
-      (activePath?'<path d="'+activePath+'" fill="rgba(78,168,255,.32)" stroke="rgba(78,168,255,.65)" stroke-width="2"/>':'')+
-      ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")+
-      ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")+
-      ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")+
-      ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
-      '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
-      '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+
-      numText+
-      '</svg>';
+    document.getElementById("startBtn").onclick=()=>{
+      const oppEmail=sel.value; if(!oppEmail){toastMsg="Select opponent"; render(); return;}
+      const opp=allPlayers.find(p=>p.email===oppEmail);
+      match={players:[meUser,opp],turnIndex:0,targetIndex:0,dartInTurn:0,grid:{},finished:false,snaps:[]};
+      const targets=[20,19,18,17,16,15,"B"];
+      match.players.forEach(pl=>{match.grid[pl.email]={}; targets.forEach(t=>{match.grid[pl.email][t]={throws:[],points:0,shanghai:false};});});
+      screen="play"; render();
+    };
+    return;
   }
+
+  if(screen==="play"){
+    const targets=[20,19,18,17,16,15,"B"];
+    const t=targets[match.targetIndex]; const active=match.players[match.turnIndex];
+    html+='<div class="card"><div class="sub">Target: '+esc(targetLabel(t))+' • Turn: '+esc(active.name)+' • Dart '+(match.dartInTurn+1)+'/3</div>'+
+    '<div class="boardBox">'+dartboardSVG(t)+'</div></div>';
+    appEl.innerHTML=html;
+    return;
+  }
+}
+
+render();
 </script>
-  <script>
-  // ===== UI Render and Interaction =====
-  homeBtn.onclick = ()=>{ screen = meUser ? "home" : "auth"; render(); };
-  signOutBtn.onclick = async ()=>{ await signOut(); screen="auth"; render(); };
-
-  async function render(){
-    let html="";
-    if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
-
-    // ===== AUTH SCREEN =====
-    if(screen==="auth"){
-      html += '<div class="card"><div class="h1">Sign In / Sign Up</div></div>'+
-              '<div class="card">'+
-              '<label>Email</label><input type="email" id="inEmail"/>'+
-              '<label>Password</label><input type="password" id="inPass"/>'+
-              '<label>Name (for sign up)</label><input type="text" id="inName"/>'+
-              '<button class="btn" id="signInBtn">Sign In</button>'+
-              '<button class="btn ok" id="signUpBtn">Sign Up</button>'+
-              '</div>';
-      appEl.innerHTML = html;
-      document.getElementById("signInBtn").onclick = ()=>signIn(
-        document.getElementById("inEmail").value,
-        document.getElementById("inPass").value
-      );
-      document.getElementById("signUpBtn").onclick = ()=>signUp(
-        document.getElementById("inName").value,
-        document.getElementById("inEmail").value,
-        document.getElementById("inPass").value
-      );
-      return;
-    }
-
-    // ===== HOME SCREEN =====
-    if(screen==="home"){
-      const p = {name:meUser.displayName||meUser.email,email:meUser.email};
-      html += '<div class="card"><span class="pill">Signed in</span><div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>';
-      html += '<div class="row"><button class="btn" id="playNowBtn">Play Now</button><button class="btn ghost" id="statsBtn">My Stats</button></div>';
-      appEl.innerHTML = html;
-      document.getElementById("playNowBtn").onclick = ()=>{ screen="match"; render(); };
-      document.getElementById("statsBtn").onclick = ()=>{ screen="stats"; render(); };
-      return;
-    }
-
-    // ===== MATCH SCREEN =====
-    if(screen==="match"){
-      const allPlayers = await getPlayers();
-      const meEmail = meUser.email;
-      const opponents = allPlayers.filter(p=>p.email!==meEmail);
-      html='<div class="card"><span class="pill">Add Opponents</span><div class="sub">Add 1–3 opponents</div></div>';
-      html+='<div class="card"><label>Select Opponent</label><input type="text" id="oppSearch" placeholder="Type name..." list="oppList"/>'+
-            '<datalist id="oppList">'+opponents.map(p=>`<option value="${esc(p.name)}">${esc(p.email)}</option>`).join("")+'</datalist>'+
-            '<div id="pickedWrap" class="small">No opponents added yet (solo allowed).</div>'+
-            '<div class="row" style="margin-top:10px;">'+
-            '<button class="btn ok" id="startBtn">Start Shanghai</button>'+
-            '<button class="btn danger" id="clearBtn">Clear</button>'+
-            '</div></div>';
-      appEl.innerHTML=html;
-      let picked=[];
-      const redrawPicked = ()=>{
-        const wrap=document.getElementById("pickedWrap");
-        if(!picked.length){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
-        wrap.innerHTML = picked.map(n=>{
-          const pl = allPlayers.find(p=>p.name===n);
-          return `<div class="li"><div class="meta"><div class="nm">${esc(pl.name)}</div><div class="em">${esc(pl.email)}</div></div><button class="btn danger" data-rem="${esc(pl.name)}">Remove</button></div>`;
-        }).join("");
-        wrap.querySelectorAll("[data-rem]").forEach(b=>{
-          b.onclick = ()=>{ picked=picked.filter(x=>x!==b.dataset.rem); redrawPicked(); };
-        });
-      };
-      document.getElementById("oppSearch").onchange = ()=>{
-        const name=document.getElementById("oppSearch").value;
-        if(name && !picked.includes(name)) picked.push(name); redrawPicked();
-      };
-      document.getElementById("clearBtn").onclick = ()=>{ picked=[]; redrawPicked(); };
-      document.getElementById("startBtn").onclick = ()=>{
-        const players=[{name:meUser.displayName||meEmail,email:meEmail}];
-        picked.forEach(n=>{
-          const pl = allPlayers.find(p=>p.name===n);
-          if(pl) players.push({name:pl.name,email:pl.email});
-        });
-        match=newMatch(players); match.snaps=[]; pushSnap(); screen="play"; render();
-      };
-      redrawPicked();
-      return;
-    }
-
-    // ===== PLAY SCREEN =====
-    if(screen==="play"){
-      if(!match){ screen="home"; render(); return; }
-      const t = TARGETS[match.targetIndex];
-      const active = match.players[match.turnIndex];
-      let thead='<tr><th>Target</th>'+match.players.map(p=>'<th>'+esc(p.name)+'<div class="small">'+p.total+' pts</div></th>').join("")+'</tr>';
-      let tbody='';
-      for(const r of TARGETS){
-        const key=String(r);
-        tbody+='<tr><td class="l"><span class="badge">'+esc(targetLabel(r))+'</span></td>';
-        for(const p of match.players){
-          const cell=match.grid[p.email][key];
-          let txt = cell.throws.length?cell.throws.join(" "):"—";
-          const bonus = cell.shanghai?" ✨":"";
-          const cls = (String(t)===key)?' class="activeCell"':'';
-          tbody+='<td'+cls+'>'+esc(txt)+bonus+'<div class="small">'+cell.points+'</div></td>';
-        }
-        tbody+='</tr>';
-      }
-
-      html='<div class="card"><div class="row">'+
-           '<button class="btn ghost" id="backHome">Back</button><button class="btn danger" id="resetBtn">Reset</button></div></div>'+
-           '<div class="card"><span class="pill">Shanghai (Accuracy)</span><div class="divider"></div>'+
-           '<div class="sub">Target: <b>'+esc(targetLabel(t))+'</b> • Turn: <b>'+esc(active.name)+'</b> • Dart '+(match.dartInTurn+1)+'/3</div>'+
-           '<div class="divider"></div>'+
-           '<div class="boardBox">'+dartboardSVG(t)+'</div>'+
-           '<div class="divider"></div>'+
-           '<div class="hitRow">'+
-           '<button class="hitBtn" id="hitT">T</button>'+
-           '<button class="hitBtn" id="hitS">S</button>'+
-           '<button class="hitBtn" id="hitD">D</button>'+
-           '<button class="hitBtn miss" id="hitM">M</button>'+
-           '</div>'+
-           '<div class="divider"></div>'+
-           '<div class="hitRow">'+
-           '<button class="hitBtn undo" id="undoBtn">Undo</button>'+
-           '<button class="hitBtn next" id="nextBtn">Next</button></div>'+
-           '<div class="divider"></div>'+
-           '<div class="card"><table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table></div>';
-      appEl.innerHTML=html;
-
-      const onHit = async (h)=>{
-        if(match.finished) return; pushSnap(); addThrow(match,h);
-        if(match.finished) await saveCompletedMatch(); render();
-      };
-      document.getElementById("hitT").onclick=()=>onHit("T");
-      document.getElementById("hitS").onclick=()=>onHit("S");
-      document.getElementById("hitD").onclick=()=>onHit("D");
-      document.getElementById("hitM").onclick=()=>onHit("M");
-      document.getElementById("undoBtn").onclick=()=>{ popSnap(); render(); };
-      document.getElementById("nextBtn").onclick=()=>{
-        while(match.dartInTurn<3){ pushSnap(); addThrow(match,"M"); }
-        if(match.finished) saveCompletedMatch(); render();
-      };
-      document.getElementById("resetBtn").onclick=()=>{ const pls=match.players.map(p=>({name:p.name,email:p.email})); match=newMatch(pls); match.snaps=[]; pushSnap(); render(); };
-      document.getElementById("backHome").onclick=()=>{ match=null; screen="home"; render(); };
-      return;
-    }
-
-    // ===== STATS SCREEN =====
-    if(screen==="stats"){
-      const stats = await getStats(meUser.email);
-      const sh = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
-      let avg = sh.games?Math.round(sh.totalPoints/sh.games*10)/10:0;
-      let bars='';
-      for(const t of TARGETS){
-        const key=String(t); const bt=sh.byTarget[key]||{points:0};
-        let w=Math.round((bt.points/sh.games)/Math.max(1,Math.max(...TARGETS.map(t2=>sh.byTarget[String(t2)]?sh.byTarget[String(t2)].points:0)))*100);
-        bars+='<div class="barRow"><div class="barLabel">'+esc(targetLabel(t))+'</div><div class="barOuter"><div class="barInner" style="width:'+w+'%"></div></div><div class="barVal">'+bt.points+' pts</div></div>';
-      }
-      html='<div class="card"><div class="kpi"><div class="box"><div class="v">'+sh.games+'</div><div class="l">Games played</div></div>'+
-           '<div class="box"><div class="v">'+sh.best+'</div><div class="l">Best score</div></div>'+
-           '<div class="box"><div class="v">'+avg+'</div><div class="l">Average score</div></div></div></div><div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
-      appEl.innerHTML=html;
-    }
-  }
-
-  render();
-</script>
+</body>
+</html>
