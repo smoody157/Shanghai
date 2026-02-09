@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shanghai – Game Night Darts</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0d1b2a;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      padding: 10px;
+      margin: 0;
+      background: #1b263b;
+    }
+
+    #board {
+      width: 90vw;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 12px 18px;
+      margin: 6px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: #415a77;
+      color: white;
+    }
+
+    button:active {
+      background: #778da9;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Game Night Darts – Shanghai</h1>
+
+<div id="board">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Dartboard.svg" width="100%">
+</div>
+
+<div class="section">
+  <button onclick="hit('T')">Triple</button>
+  <button onclick="hit('D')">Double</button>
+  <button onclick="hit('S')">Single</button>
+  <button onclick="hit('M')">Miss</button>
+</div>
+
+<script>
+  function hit(type) {
+    alert("You hit: " + type);
+  }
+</script>
+
+</body>
+</html>
