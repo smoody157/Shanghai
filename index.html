@@ -14,15 +14,24 @@
     }
 
     h1 {
-      padding: 10px;
+      padding: 12px;
       margin: 0;
       background: #1b263b;
+      font-size: 20px;
     }
 
     #board {
-      width: 90vw;
-      max-width: 400px;
-      margin: 20px auto;
+      width: 92vw;
+      max-width: 420px;
+      margin: 20px auto 10px auto;
+    }
+
+    #status {
+      font-size: 18px;
+      margin-top: 10px;
+      padding: 8px;
+      background: #1b263b;
+      border-radius: 10px;
     }
 
     .section {
@@ -30,17 +39,23 @@
     }
 
     button {
-      padding: 12px 18px;
+      padding: 14px 18px;
       margin: 6px;
       font-size: 18px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #415a77;
       color: white;
+      width: 120px;
     }
 
     button:active {
       background: #778da9;
+    }
+
+    .turnBtn {
+      margin-top: 14px;
+      background: #e63946;
     }
   </style>
 </head>
@@ -53,6 +68,10 @@
   <img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Dartboard.svg" width="100%">
 </div>
 
+<div id="status">
+  Round: 20 | Dart: 0 | Score: 0
+</div>
+
 <div class="section">
   <button onclick="hit('T')">Triple</button>
   <button onclick="hit('D')">Double</button>
@@ -60,10 +79,59 @@
   <button onclick="hit('M')">Miss</button>
 </div>
 
+<button class="turnBtn" onclick="nextTurn()">Next Turn</button>
+
 <script>
-  function hit(type) {
-    alert("You hit: " + type);
+
+let rounds = [20,19,18,17,16,15,"BULL"];
+let roundIndex = 0;
+
+let dartCount = 0;
+let totalScore = 0;
+
+function updateStatus() {
+  document.getElementById("status").innerHTML =
+    "Round: " + rounds[roundIndex] +
+    " | Dart: " + dartCount +
+    " | Score: " + totalScore;
+}
+
+function hit(type) {
+
+  if (dartCount >= 3) {
+    alert("Turn complete — press Next Turn");
+    return;
   }
+
+  dartCount++;
+
+  let points = 0;
+
+  if (type === "T") points = 3;
+  if (type === "D") points = 2;
+  if (type === "S") points = 1;
+  if (type === "M") points = 0;
+
+  totalScore += points;
+
+  updateStatus();
+}
+
+function nextTurn() {
+
+  dartCount = 0;
+
+  if (roundIndex < rounds.length - 1) {
+    roundIndex++;
+  } else {
+    alert("Game complete!");
+  }
+
+  updateStatus();
+}
+
+updateStatus();
+
 </script>
 
 </body>
