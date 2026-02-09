@@ -18,185 +18,78 @@
       --line:#2f3f5e;
     }
     *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+    body{ margin:0; font-family:Arial, sans-serif; background:var(--bg); color:var(--text); }
     .topbar{
-      padding:10px 12px;
-      background:var(--panel);
-      border-bottom:1px solid var(--line);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      padding:10px 12px; background:var(--panel); border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
     }
-    .brand{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      line-height:1.1;
-    }
-    .brand .title{ font-weight:700; font-size:16px; }
+    .brand{ display:flex; flex-direction:column; gap:2px; line-height:1.1; }
+    .brand .title{ font-weight:800; font-size:16px; }
     .brand .sub{ font-size:12px; color:var(--muted); }
-    .container{
-      max-width:520px;
-      margin:0 auto;
-      padding:14px 12px 30px 12px;
-    }
+    .container{ max-width:520px; margin:0 auto; padding:14px 12px 30px; }
     .card{
-      background:var(--panel);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:14px;
-      margin-bottom:12px;
+      background:var(--panel); border:1px solid var(--line); border-radius:14px;
+      padding:14px; margin-bottom:12px;
     }
     .row{ display:flex; gap:10px; }
     .row > *{ flex:1; }
     .stack{ display:flex; flex-direction:column; gap:10px; }
-    label{
-      font-size:12px;
-      color:var(--muted);
-      display:block;
-      margin-bottom:6px;
-      text-align:left;
-    }
-    input{
-      width:100%;
-      padding:12px 12px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:var(--panel2);
-      color:var(--text);
-      font-size:16px;
-      outline:none;
+    label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; text-align:left; }
+    input, select{
+      width:100%; padding:12px 12px; border-radius:10px; border:1px solid var(--line);
+      background:var(--panel2); color:var(--text); font-size:16px; outline:none;
     }
     input::placeholder{ color:#9fb2c9; }
     button{
-      padding:12px 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:var(--btn);
-      color:var(--text);
-      font-size:16px;
-      font-weight:700;
+      padding:12px 12px; border-radius:12px; border:1px solid var(--line);
+      background:var(--btn); color:var(--text); font-size:16px; font-weight:800;
     }
     button:active{ background:var(--btn2); }
-    button.ghost{
-      background:transparent;
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-weight:600;
-    }
-    button.danger{
-      background:var(--danger);
-      border-color:#b62b36;
-    }
-    button.ok{
-      background:var(--ok);
-      border-color:#1fb55d;
-      color:#062012;
-    }
+    button.ghost{ background:transparent; color:var(--muted); font-weight:700; }
+    button.danger{ background:var(--danger); border-color:#b62b36; }
+    button.ok{ background:var(--ok); border-color:#1fb55d; color:#062012; }
     .muted{ color:var(--muted); }
     .small{ font-size:12px; }
-    .big{
-      font-size:28px;
-      font-weight:900;
-      letter-spacing:0.5px;
-    }
+    .big{ font-size:28px; font-weight:900; letter-spacing:.3px; }
     .center{ text-align:center; }
     .pill{
-      display:inline-block;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(78,168,255,0.12);
-      color:var(--accent);
-      font-weight:800;
-      font-size:12px;
+      display:inline-block; padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(78,168,255,.12);
+      color:var(--accent); font-weight:900; font-size:12px;
     }
-    .divider{
-      height:1px;
-      background:var(--line);
-      margin:12px 0;
+    .divider{ height:1px; background:var(--line); margin:12px 0; }
+
+    .toast{
+      margin-bottom:12px; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+      background:rgba(230,57,70,0.10); color:#ffd0d5; font-weight:800;
+    }
+    .note{
+      margin-bottom:12px; padding:10px 12px; border-radius:12px; border:1px solid var(--line);
+      background:rgba(78,168,255,0.10); color:#d7ecff; font-weight:800;
     }
 
-    /* Player list */
-    .list{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
+    .list{ display:flex; flex-direction:column; gap:10px; }
     .listItem{
-      background:var(--panel2);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
+      background:var(--panel2); border:1px solid var(--line); border-radius:14px;
+      padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;
     }
-    .listItem .meta{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      text-align:left;
-    }
-    .listItem .meta .name{
-      font-weight:900;
-      font-size:16px;
-    }
-    .listItem .meta .email{
-      font-size:12px;
-      color:var(--muted);
-    }
+    .listItem .meta{ display:flex; flex-direction:column; gap:2px; text-align:left; }
+    .listItem .meta .name{ font-weight:900; font-size:16px; }
+    .listItem .meta .email{ font-size:12px; color:var(--muted); }
 
-    /* Game menu cards */
-    .gameGrid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:10px;
-    }
+    .gameGrid{ display:grid; grid-template-columns:1fr; gap:10px; }
     .gameCard{
-      background:var(--panel2);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
+      background:var(--panel2); border:1px solid var(--line); border-radius:14px;
+      padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;
     }
-    .gameCard .gmeta{
-      text-align:left;
-      display:flex;
-      flex-direction:column;
-      gap:3px;
-    }
-    .gameCard .gmeta .gname{
-      font-weight:900;
-      font-size:16px;
-    }
-    .gameCard .gmeta .gdesc{
-      font-size:12px;
-      color:var(--muted);
-    }
+    .gameCard .gmeta{ text-align:left; display:flex; flex-direction:column; gap:3px; }
+    .gameCard .gmeta .gname{ font-weight:900; font-size:16px; }
+    .gameCard .gmeta .gdesc{ font-size:12px; color:var(--muted); }
 
-    /* Shanghai play */
-    .scoreRow{
-      display:flex;
-      gap:10px;
-    }
+    .scoreRow{ display:flex; gap:10px; }
     .scoreBox{
-      flex:1;
-      background:var(--panel2);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px;
-      text-align:left;
+      flex:1; background:var(--panel2); border:1px solid var(--line);
+      border-radius:14px; padding:10px; text-align:left;
     }
     .scoreBox.active{
       border-color:var(--accent);
@@ -204,112 +97,40 @@
     }
     .scoreBox .pname{ font-weight:900; font-size:14px; }
     .scoreBox .pscore{ font-weight:900; font-size:22px; margin-top:4px; }
-    .boardWrap{
-      margin:12px auto 8px auto;
-      width:92%;
-      max-width:420px;
-    }
+    .boardWrap{ margin:12px auto 8px; width:92%; max-width:420px; }
     .boardWrap img{
-      width:100%;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:#0b1522;
+      width:100%; border-radius:14px; border:1px solid var(--line); background:#0b1522;
     }
     .controlsGrid{
-      display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:10px;
-      margin-top:10px;
+      display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:10px;
     }
-    .controlsGrid button{
-      font-size:16px;
-      padding:14px 10px;
-    }
-    .subControls{
-      display:flex;
-      gap:10px;
-      margin-top:10px;
-    }
+    .controlsGrid button{ font-size:16px; padding:14px 10px; }
+    .subControls{ display:flex; gap:10px; margin-top:10px; }
     .subControls button{ flex:1; }
 
-    /* Centered round list with left/right hits */
-    .roundList{
-      margin-top:12px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      overflow:hidden;
-    }
+    .roundList{ margin-top:12px; border:1px solid var(--line); border-radius:14px; overflow:hidden; }
     .roundRow{
-      display:grid;
-      grid-template-columns: 1fr 90px 1fr;
-      gap:6px;
-      align-items:center;
-      padding:10px 10px;
-      border-bottom:1px solid var(--line);
-      background:rgba(255,255,255,0.02);
+      display:grid; grid-template-columns: 1fr 90px 1fr; gap:6px; align-items:center;
+      padding:10px 10px; border-bottom:1px solid var(--line); background:rgba(255,255,255,0.02);
     }
     .roundRow:last-child{ border-bottom:none; }
-    .roundRow.active{
-      background:rgba(78,168,255,0.10);
-    }
-    .hits{
-      font-weight:900;
-      letter-spacing:1px;
-      min-height:18px;
-      font-size:14px;
-    }
+    .roundRow.active{ background:rgba(78,168,255,0.10); }
+    .hits{ font-weight:900; letter-spacing:1px; min-height:18px; font-size:14px; }
     .hits.left{ text-align:right; }
     .hits.right{ text-align:left; }
-    .rk{
-      text-align:center;
-      font-weight:900;
-      font-size:14px;
-    }
-    .rk .glow{
-      color:var(--accent);
-      text-shadow:0 0 10px rgba(78,168,255,0.45);
-    }
+    .rk{ text-align:center; font-weight:900; font-size:14px; }
+    .rk .glow{ color:var(--accent); text-shadow:0 0 10px rgba(78,168,255,0.45); }
 
-    /* Simple bar chart */
     .barRow{
-      display:grid;
-      grid-template-columns:60px 1fr 52px;
-      gap:10px;
-      align-items:center;
-      padding:8px 0;
-      border-bottom:1px solid rgba(47,63,94,0.6);
+      display:grid; grid-template-columns:60px 1fr 52px; gap:10px; align-items:center;
+      padding:8px 0; border-bottom:1px solid rgba(47,63,94,0.6);
     }
     .barRow:last-child{ border-bottom:none; }
     .bar{
-      height:10px;
-      background:rgba(255,255,255,0.08);
-      border-radius:999px;
-      overflow:hidden;
+      height:10px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden;
       border:1px solid rgba(47,63,94,0.7);
     }
-    .bar > div{
-      height:100%;
-      width:0%;
-      background:var(--accent);
-    }
-    .toast{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:rgba(230,57,70,0.10);
-      color:#ffd0d5;
-      font-weight:700;
-    }
-    .note{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:rgba(78,168,255,0.10);
-      color:#d7ecff;
-      font-weight:700;
-    }
+    .bar > div{ height:100%; width:0%; background:var(--accent); }
   </style>
 </head>
 <body>
@@ -319,202 +140,191 @@
       <div class="title">Game Night Darts</div>
       <div class="sub">The Dart Room presents • Developed & designed by Steve’s Graphic Designs</div>
     </div>
-    <button class="ghost small" id="btnHome" onclick="goHome()">Home</button>
+    <button class="ghost small" onclick="goHome()">Home</button>
   </div>
 
   <div class="container" id="app"></div>
 
 <script>
 /* ---------------------------
-   Storage helpers
+   Storage (with safety)
 ---------------------------- */
-const LS_PLAYERS = "gnd_players_v1";      // [{name,email,createdAt}]
-const LS_STATS   = "gnd_stats_v1";        // { [email]: { [gameKey]: { byTarget: { '20':{T,D,S,M,darts,points}, ... }, gamesPlayed } } }
-const LS_LAST    = "gnd_last_player_v1";  // email
+const LS_PLAYERS = "gnd_players_v2";
+const LS_STATS   = "gnd_stats_v2";
+const LS_LAST    = "gnd_last_player_v2";
+
+let storageOK = true;
+
+function storageTest(){
+  try{
+    const k = "__gnd_test__";
+    localStorage.setItem(k, "1");
+    localStorage.removeItem(k);
+    storageOK = true;
+  } catch(e){
+    storageOK = false;
+  }
+}
+storageTest();
 
 function loadPlayers(){
   try { return JSON.parse(localStorage.getItem(LS_PLAYERS) || "[]"); } catch { return []; }
 }
 function savePlayers(players){
-  localStorage.setItem(LS_PLAYERS, JSON.stringify(players));
+  if (!storageOK) return false;
+  try { localStorage.setItem(LS_PLAYERS, JSON.stringify(players)); return true; }
+  catch(e){ return false; }
 }
 function loadStats(){
   try { return JSON.parse(localStorage.getItem(LS_STATS) || "{}"); } catch { return {}; }
 }
 function saveStats(stats){
-  localStorage.setItem(LS_STATS, JSON.stringify(stats));
+  if (!storageOK) return false;
+  try { localStorage.setItem(LS_STATS, JSON.stringify(stats)); return true; }
+  catch(e){ return false; }
 }
-function setLastPlayer(email){ localStorage.setItem(LS_LAST, email); }
-function getLastPlayer(){ return localStorage.getItem(LS_LAST) || ""; }
+function setLastPlayer(email){
+  if (!storageOK) return;
+  try { localStorage.setItem(LS_LAST, email); } catch {}
+}
+function getLastPlayer(){
+  try { return localStorage.getItem(LS_LAST) || ""; } catch { return ""; }
+}
 
 /* ---------------------------
-   App state / navigation
+   App state
 ---------------------------- */
 let appState = {
-  screen: "playerHub",      // playerHub | mainMenu | gameMenu | statsHub | shanghaiSetup | shanghaiPlay
+  screen: "playerHub", // playerHub | createPlayer | mainMenu | gameMenu | statsHub | shanghaiSetup | shanghaiPlay
   activePlayerEmail: "",
-  activeOpponentEmail: "",
-  toast: "",
+  toast: ""
 };
-
-function goHome(){
-  // Home always means: if player selected -> main menu, else player hub
-  appState.toast = "";
-  if (appState.activePlayerEmail) {
-    appState.screen = "mainMenu";
-  } else {
-    appState.screen = "playerHub";
-  }
-  render();
-}
 
 function setToast(msg){
   appState.toast = msg || "";
   render();
 }
 
+function goHome(){
+  appState.toast = "";
+  if (appState.activePlayerEmail) appState.screen = "mainMenu";
+  else appState.screen = "playerHub";
+  render();
+}
+
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;")
+    .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function escapeJs(s){
+  return String(s ?? "").replaceAll("\\","\\\\").replaceAll("'","\\'");
+}
+
 /* ---------------------------
-   Games catalog
+   Games
 ---------------------------- */
 const GAMES = [
-  { key:"shanghai_accuracy", name:"Shanghai", active:true, desc:"Accuracy Mode • T=3 D=2 S=1 M=0 • 20–15 + Bull" },
-  { key:"killer", name:"Killer", active:false, desc:"Not available yet" },
-  { key:"baseball", name:"Baseball", active:false, desc:"Not available yet" },
-  { key:"halve_it", name:"Halve-It", active:false, desc:"Not available yet" },
-  { key:"around_clock", name:"Around the Clock", active:false, desc:"Not available yet" },
+  { key:"shanghai_accuracy", name:"Shanghai", active:true,  desc:"Accuracy Mode • T=3 D=2 S=1 M=0 • 20–15 + Bull" },
+  { key:"killer",           name:"Killer",   active:false, desc:"Not available yet" },
+  { key:"baseball",         name:"Baseball", active:false, desc:"Not available yet" },
+  { key:"halve_it",         name:"Halve-It", active:false, desc:"Not available yet" },
+  { key:"around_clock",     name:"Around the Clock", active:false, desc:"Not available yet" },
 ];
 
 /* ---------------------------
-   Shanghai engine (local 2-player)
+   Shanghai engine
 ---------------------------- */
 const SH_ROUNDS = ["20","19","18","17","16","15","BULL"];
-function hitPoints(hit){
-  if (hit === "T") return 3;
-  if (hit === "D") return 2;
-  if (hit === "S") return 1;
-  return 0; // M
-}
+function hitPoints(hit){ if(hit==="T")return 3; if(hit==="D")return 2; if(hit==="S")return 1; return 0; }
 
-// Match state lives in memory
 let match = null;
 
-/*
-match = {
-  gameKey,
-  players: [ {email,name}, {email,name} ],
-  status: "active" | "ended",
-  roundIndex: 0,
-  turnIndex: 0,       // 0 or 1
-  dartIndex: 0,       // 0..2 count of darts already thrown this turn
-  totals: [0,0],
-  perRound: { '20': {p0:[], p1:[]}, ... },
-  actionLog: [ {p, roundKey, hit, ts} ],
-  committed: false
-}
-*/
-
-function newShanghaiMatch(p0, p1){
+function newShanghaiMatch(p0,p1){
   const perRound = {};
-  for (const r of SH_ROUNDS){
-    perRound[r] = { p0:[], p1:[] };
-  }
-  return {
-    gameKey: "shanghai_accuracy",
-    players: [p0, p1],
-    status: "active",
-    roundIndex: 0,
-    turnIndex: 0,
-    dartIndex: 0,
-    totals: [0,0],
-    perRound,
-    actionLog: [],
-    committed: false,
-  };
+  for (const r of SH_ROUNDS) perRound[r] = { p0:[], p1:[] };
+  return { gameKey:"shanghai_accuracy", players:[p0,p1], status:"active",
+           roundIndex:0, turnIndex:0, dartIndex:0, totals:[0,0], perRound,
+           actionLog:[], committed:false };
 }
-
 function currentRoundKey(m){ return SH_ROUNDS[m.roundIndex] || "BULL"; }
 
-function applyHit(m, hit){
-  if (!m || m.status !== "active") return m;
-  if (m.dartIndex >= 3) return m;
+function clone(obj){
+  // safer than structuredClone for older phones
+  return JSON.parse(JSON.stringify(obj));
+}
 
-  const next = structuredClone(m);
+function applyHit(m, hit){
+  if (!m || m.status!=="active") return m;
+  if (m.dartIndex>=3) return m;
+
+  const next = clone(m);
   const rk = currentRoundKey(next);
   const p = next.turnIndex;
-  const ts = Date.now();
 
-  // log per round
-  if (p === 0) next.perRound[rk].p0.push(hit);
+  if (p===0) next.perRound[rk].p0.push(hit);
   else next.perRound[rk].p1.push(hit);
 
-  next.actionLog.push({ p, roundKey: rk, hit, ts });
-
-  // scoring
+  next.actionLog.push({ p, roundKey: rk, hit, ts: Date.now() });
   next.totals[p] += hitPoints(hit);
 
-  // advance dart
   next.dartIndex += 1;
 
-  // after 3 darts -> switch player
-  if (next.dartIndex >= 3){
-    next.dartIndex = 0;
-    next.turnIndex = (next.turnIndex === 0) ? 1 : 0;
+  if (next.dartIndex>=3){
+    next.dartIndex=0;
+    next.turnIndex = (next.turnIndex===0) ? 1 : 0;
 
-    // if we switched back to player 0, round completed
-    if (next.turnIndex === 0){
-      if (next.roundIndex < SH_ROUNDS.length - 1){
-        next.roundIndex += 1;
-      } else {
-        next.status = "ended";
-      }
+    if (next.turnIndex===0){
+      if (next.roundIndex < SH_ROUNDS.length-1) next.roundIndex += 1;
+      else next.status = "ended";
     }
   }
-
   return next;
 }
 
 function replayFromActions(basePlayers, actions){
   let m = newShanghaiMatch(basePlayers[0], basePlayers[1]);
   for (const a of actions){
-    // Force state to match actor before applying (safety)
+    // force correct turn/round
     m.turnIndex = a.p;
-    // Ensure currentRound aligns with action roundKey
     const idx = SH_ROUNDS.indexOf(a.roundKey);
-    if (idx >= 0) m.roundIndex = idx;
-    // Apply via normal hit flow:
+    if (idx>=0) m.roundIndex = idx;
     m = applyHit(m, a.hit);
-  }
-  // If actions ended the game, keep ended state; else active
-  if (m.roundIndex === SH_ROUNDS.length - 1 && m.turnIndex === 0 && m.status === "ended") {
-    // ok
   }
   return m;
 }
 
 function undoLast(){
   if (!match || !match.actionLog.length) return;
-  const actions = match.actionLog.slice(0, -1);
-  const basePlayers = match.players;
-  match = replayFromActions(basePlayers, actions);
+  const actions = match.actionLog.slice(0,-1);
+  match = replayFromActions(match.players, actions);
+  render();
+}
+
+function resetMatch(){
+  if (!match) return;
+  const p0 = match.players[0], p1 = match.players[1];
+  match = newShanghaiMatch(p0,p1);
   render();
 }
 
 function clearGameNoStats(){
   if (!match) return;
-  match.status = "ended";
-  match.committed = true; // block save
-  appState.screen = "mainMenu";
+  match.status="ended";
+  match.committed=true;
+  appState.screen="mainMenu";
   render();
 }
 
 function saveStatsAndExit(){
-  if (!match || match.committed) {
-    appState.screen = "mainMenu";
-    render();
-    return;
+  if (!match || match.committed){
+    appState.screen="mainMenu"; render(); return;
   }
-  // Commit match into lifetime stats for BOTH players
+  if (!storageOK) { setToast("Storage is blocked. Turn off Private Browsing and reload."); return; }
+
   const stats = loadStats();
+
   for (let pi=0; pi<2; pi++){
     const email = match.players[pi].email;
     if (!stats[email]) stats[email] = {};
@@ -526,28 +336,42 @@ function saveStatsAndExit(){
     for (const rk of SH_ROUNDS){
       if (!store.byTarget[rk]) store.byTarget[rk] = { T:0,D:0,S:0,M:0,darts:0,points:0 };
       const rec = store.byTarget[rk];
-
-      const hits = (pi === 0) ? match.perRound[rk].p0 : match.perRound[rk].p1;
+      const hits = (pi===0) ? match.perRound[rk].p0 : match.perRound[rk].p1;
       for (const h of hits){
-        rec[h] += 1;
-        rec.darts += 1;
-        rec.points += hitPoints(h);
+        rec[h]+=1; rec.darts+=1; rec.points += hitPoints(h);
       }
     }
   }
   saveStats(stats);
   match.committed = true;
-  appState.screen = "mainMenu";
+  appState.screen="mainMenu";
   setToast("Saved match stats.");
 }
 
 /* ---------------------------
-   UI rendering
+   Navigation actions
 ---------------------------- */
-function htm(strings, ...vals){
-  return strings.map((s,i)=>s + (vals[i] ?? "")).join("");
+function selectPlayer(email){
+  appState.activePlayerEmail = email;
+  setLastPlayer(email);
+  appState.screen = "mainMenu";
+  appState.toast = "";
+  render();
+}
+function openGameMenu(){ appState.screen="gameMenu"; appState.toast=""; render(); }
+function openStatsHub(){ appState.screen="statsHub"; appState.toast=""; render(); }
+function switchPlayer(){ appState.activePlayerEmail=""; appState.screen="playerHub"; appState.toast=""; render(); }
+
+function notAvailable(){ setToast("Not available at this time."); }
+
+function openGame(key){
+  if (key==="shanghai_accuracy"){ appState.screen="shanghaiSetup"; appState.toast=""; render(); return; }
+  notAvailable();
 }
 
+/* ---------------------------
+   Render
+---------------------------- */
 function render(){
   const app = document.getElementById("app");
   const players = loadPlayers();
@@ -555,182 +379,350 @@ function render(){
 
   let html = "";
 
+  if (!storageOK){
+    html += `<div class="toast">Storage is blocked on this browser. If you’re in Private Browsing, turn it off, then reload the page.</div>`;
+  }
+
   if (appState.toast){
-    html += `<div class="toast">${escapeHtml(appState.toast)}</div>`;
+    html += `<div class="note">${escapeHtml(appState.toast)}</div>`;
   }
 
   if (appState.screen === "playerHub"){
-    html += renderPlayerHub(players);
-  }
-  else if (appState.screen === "mainMenu"){
-    if (!activePlayer) { appState.screen = "playerHub"; return render(); }
-    html += renderMainMenu(activePlayer);
-  }
-  else if (appState.screen === "gameMenu"){
-    if (!activePlayer) { appState.screen = "playerHub"; return render(); }
-    html += renderGameMenu(activePlayer);
-  }
-  else if (appState.screen === "statsHub"){
-    if (!activePlayer) { appState.screen = "playerHub"; return render(); }
-    html += renderStatsHub(players);
-  }
-  else if (appState.screen === "shanghaiSetup"){
-    if (!activePlayer) { appState.screen = "playerHub"; return render(); }
-    html += renderShanghaiSetup(players, activePlayer);
-  }
-  else if (appState.screen === "shanghaiPlay"){
-    if (!match) { appState.screen = "mainMenu"; return render(); }
-    html += renderShanghaiPlay();
-  }
-  else {
-    html += `<div class="card">Unknown screen.</div>`;
-  }
-
-  app.innerHTML = html;
-}
-
-function renderPlayerHub(players){
-  const last = getLastPlayer();
-  let list = "";
-  const sorted = players.slice().sort((a,b)=>a.name.localeCompare(b.name));
-  for (const p of sorted){
-    list += `
-      <div class="listItem">
-        <div class="meta">
-          <div class="name">${escapeHtml(p.name)}</div>
-          <div class="email">${escapeHtml(p.email)}</div>
-        </div>
-        <button onclick="selectPlayer('${escapeJs(p.email)}')">Select</button>
+    html += `
+      <div class="card center">
+        <div class="big">Select Player</div>
+        <div class="muted" style="margin-top:6px;">Name + Email (no passwords). Stats attach to email.</div>
+        <div class="muted small" style="margin-top:10px;">Players saved: <b>${players.length}</b></div>
       </div>
-    `;
-  }
 
-  return `
-    <div class="card center">
-      <div class="big">Select Player</div>
-      <div class="muted" style="margin-top:6px;">Name + Email (no passwords). Stats attach to email.</div>
-    </div>
-
-    <div class="card">
-      <div class="row">
-        <button onclick="showCreatePlayer()">Create Player</button>
-        <button class="ghost" onclick="quickSelectLast()">Last Player</button>
-      </div>
-      ${players.length ? `<div class="divider"></div>` : ``}
-      ${players.length ? `<div class="list">${list}</div>` : `<div class="muted">No players yet. Create one.</div>`}
-      ${last ? `<div class="note small">Last player: ${escapeHtml(last)}</div>` : ``}
-    </div>
-  `;
-}
-
-function renderCreatePlayerForm(){
-  return `
-    <div class="card">
-      <div class="big center">Create Player</div>
-      <div class="divider"></div>
-      <div class="stack">
-        <div>
-          <label>Name</label>
-          <input id="newName" placeholder="Steve Moody" />
-        </div>
-        <div>
-          <label>Email (unique)</label>
-          <input id="newEmail" placeholder="steve@email.com" />
-        </div>
+      <div class="card">
         <div class="row">
-          <button onclick="createPlayer()">Save</button>
-          <button class="ghost" onclick="cancelCreatePlayer()">Cancel</button>
+          <button onclick="goCreatePlayer()">Create Player</button>
+          <button class="ghost" onclick="quickSelectLast()">Last Player</button>
         </div>
-        <div class="muted small">No passwords. Email is only used to prevent duplicates and attach stats.</div>
-      </div>
-    </div>
-  `;
-}
 
-function renderMainMenu(activePlayer){
-  return `
-    <div class="card">
-      <div class="pill">Active Player</div>
-      <div class="big" style="margin-top:6px;">${escapeHtml(activePlayer.name)}</div>
-      <div class="muted">${escapeHtml(activePlayer.email)}</div>
-    </div>
+        <div class="divider"></div>
 
-    <div class="card">
-      <div class="stack">
-        <button onclick="openGameMenu()">Play</button>
-        <button onclick="openStatsHub()">Stats</button>
-        <button class="ghost" onclick="switchPlayer()">Switch Player</button>
-      </div>
-    </div>
-  `;
-}
-
-function renderGameMenu(activePlayer){
-  let grid = "";
-  for (const g of GAMES){
-    grid += `
-      <div class="gameCard">
-        <div class="gmeta">
-          <div class="gname">${escapeHtml(g.name)} ${g.active ? `<span class="pill">Active</span>` : ``}</div>
-          <div class="gdesc">${escapeHtml(g.desc)}</div>
-        </div>
-        <button ${g.active ? `onclick="openGame('${escapeJs(g.key)}')"` : `onclick="notAvailable()"`} >
-          ${g.active ? `Open` : `Info`}
-        </button>
+        ${players.length ? `
+          <div class="list">
+            ${players.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p => `
+              <div class="listItem">
+                <div class="meta">
+                  <div class="name">${escapeHtml(p.name)}</div>
+                  <div class="email">${escapeHtml(p.email)}</div>
+                </div>
+                <button onclick="selectPlayer('${escapeJs(p.email)}')">Select</button>
+              </div>
+            `).join("")}
+          </div>
+        ` : `
+          <div class="muted">No players yet. Create one.</div>
+        `}
       </div>
     `;
+    app.innerHTML = html;
+    return;
   }
 
-  return `
-    <div class="card center">
-      <div class="big">Choose Game</div>
-      <div class="muted" style="margin-top:6px;">Games are practice-first: accuracy over luck.</div>
-    </div>
+  if (appState.screen === "createPlayer"){
+    html += `
+      <div class="card center">
+        <div class="big">Create Player</div>
+        <div class="muted" style="margin-top:6px;">No passwords. Email is your unique ID.</div>
+      </div>
 
-    <div class="card">
-      <div class="gameGrid">${grid}</div>
-      <div class="divider"></div>
-      <button class="ghost" onclick="goHome()">Back</button>
-    </div>
-  `;
-}
-
-function renderStatsHub(players){
-  const sorted = players.slice().sort((a,b)=>a.name.localeCompare(b.name));
-  let list = "";
-  for (const p of sorted){
-    list += `
-      <div class="listItem">
-        <div class="meta">
-          <div class="name">${escapeHtml(p.name)}</div>
-          <div class="email">${escapeHtml(p.email)}</div>
+      <div class="card">
+        <div class="stack">
+          <div>
+            <label>Name</label>
+            <input id="newName" placeholder="Steve Moody">
+          </div>
+          <div>
+            <label>Email (unique)</label>
+            <input id="newEmail" placeholder="steve@email.com">
+          </div>
+          <div class="row">
+            <button onclick="createPlayer()">Save</button>
+            <button class="ghost" onclick="goHome()">Cancel</button>
+          </div>
         </div>
-        <button onclick="viewStats('${escapeJs(p.email)}')">View</button>
       </div>
     `;
+    app.innerHTML = html;
+    return;
   }
-  return `
-    <div class="card center">
-      <div class="big">Stats</div>
-      <div class="muted" style="margin-top:6px;">Pick any player to view their stats.</div>
-    </div>
-    <div class="card">
-      <div class="list">${list}</div>
-      <div class="divider"></div>
-      <button class="ghost" onclick="goHome()">Back</button>
-    </div>
-  `;
+
+  if (appState.screen === "mainMenu"){
+    if (!activePlayer){ appState.screen="playerHub"; render(); return; }
+    html += `
+      <div class="card">
+        <div class="pill">Active Player</div>
+        <div class="big" style="margin-top:6px;">${escapeHtml(activePlayer.name)}</div>
+        <div class="muted">${escapeHtml(activePlayer.email)}</div>
+      </div>
+
+      <div class="card">
+        <div class="stack">
+          <button onclick="openGameMenu()">Play</button>
+          <button onclick="openStatsHub()">Stats</button>
+          <button class="ghost" onclick="switchPlayer()">Switch Player</button>
+        </div>
+      </div>
+    `;
+    app.innerHTML = html;
+    return;
+  }
+
+  if (appState.screen === "gameMenu"){
+    html += `
+      <div class="card center">
+        <div class="big">Choose Game</div>
+        <div class="muted" style="margin-top:6px;">Games are practice-first: accuracy over luck.</div>
+      </div>
+
+      <div class="card">
+        <div class="gameGrid">
+          ${GAMES.map(g => `
+            <div class="gameCard">
+              <div class="gmeta">
+                <div class="gname">${escapeHtml(g.name)} ${g.active ? `<span class="pill">Active</span>` : ``}</div>
+                <div class="gdesc">${escapeHtml(g.desc)}</div>
+              </div>
+              <button ${g.active ? `onclick="openGame('${escapeJs(g.key)}')"` : `onclick="notAvailable()"`} >
+                ${g.active ? `Open` : `Info`}
+              </button>
+            </div>
+          `).join("")}
+        </div>
+        <div class="divider"></div>
+        <button class="ghost" onclick="goHome()">Back</button>
+      </div>
+    `;
+    app.innerHTML = html;
+    return;
+  }
+
+  if (appState.screen === "statsHub"){
+    html += `
+      <div class="card center">
+        <div class="big">Stats</div>
+        <div class="muted" style="margin-top:6px;">Pick any player to view their stats.</div>
+      </div>
+
+      <div class="card">
+        <div class="list">
+          ${players.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p => `
+            <div class="listItem">
+              <div class="meta">
+                <div class="name">${escapeHtml(p.name)}</div>
+                <div class="email">${escapeHtml(p.email)}</div>
+              </div>
+              <button onclick="viewStats('${escapeJs(p.email)}')">View</button>
+            </div>
+          `).join("")}
+        </div>
+        <div class="divider"></div>
+        <button class="ghost" onclick="goHome()">Back</button>
+      </div>
+    `;
+    app.innerHTML = html;
+    return;
+  }
+
+  if (appState.screen === "shanghaiSetup"){
+    if (!activePlayer){ appState.screen="playerHub"; render(); return; }
+    const others = players.filter(p => p.email !== activePlayer.email);
+    html += `
+      <div class="card center">
+        <div class="big">Shanghai</div>
+        <div class="muted" style="margin-top:6px;">Accuracy Mode • 2-player local match (same device)</div>
+      </div>
+
+      <div class="card">
+        <div class="stack">
+          <div>
+            <label>You</label>
+            <input value="${escapeHtml(activePlayer.name)}" disabled>
+          </div>
+
+          <div>
+            <label>Opponent</label>
+            <select id="oppSelect">
+              <option value="">Select opponent…</option>
+              ${others.map(p => `<option value="${escapeHtml(p.email)}">${escapeHtml(p.name)} (${escapeHtml(p.email)})</option>`).join("")}
+            </select>
+            <div class="muted small" style="margin-top:6px;">If opponent isn’t listed, create them as a player first.</div>
+          </div>
+
+          <div class="row">
+            <button onclick="startShanghai()">Start</button>
+            <button class="ghost" onclick="openGameMenu()">Back</button>
+          </div>
+
+          <div class="divider"></div>
+          <button class="ghost" onclick="notAvailable()">Remote play (coming next)</button>
+        </div>
+      </div>
+    `;
+    app.innerHTML = html;
+    return;
+  }
+
+  if (appState.screen === "shanghaiPlay"){
+    if (!match){ appState.screen="mainMenu"; render(); return; }
+    const p0 = match.players[0], p1 = match.players[1];
+    const activeRound = currentRoundKey(match);
+    const isEnded = match.status==="ended";
+    const activeTurn = match.turnIndex;
+    const dartHuman = match.dartIndex + 1;
+
+    const listRows = SH_ROUNDS.map(rk => {
+      const left = match.perRound[rk].p0.join(" ");
+      const right = match.perRound[rk].p1.join(" ");
+      const isActive = (!isEnded && rk===activeRound);
+      return `
+        <div class="roundRow ${isActive ? "active":""}">
+          <div class="hits left">${escapeHtml(left)}</div>
+          <div class="rk">${isActive ? `<span class="glow">${rk}</span>` : rk}</div>
+          <div class="hits right">${escapeHtml(right)}</div>
+        </div>
+      `;
+    }).join("");
+
+    const winnerText = (() => {
+      if (!isEnded) return "";
+      const s0 = match.totals[0], s1 = match.totals[1];
+      if (s0===s1) return "Tie game.";
+      return (s0>s1 ? p0.name : p1.name) + " wins.";
+    })();
+
+    html += `
+      <div class="card center">
+        <div class="pill">Shanghai • Accuracy Mode</div>
+        <div class="muted" style="margin-top:6px;">Record 3 darts each turn. Auto-switch turns.</div>
+      </div>
+
+      <div class="card">
+        <div class="scoreRow">
+          <div class="scoreBox ${activeTurn===0 && !isEnded ? "active":""}">
+            <div class="pname">${escapeHtml(p0.name)}</div>
+            <div class="muted small">${escapeHtml(p0.email)}</div>
+            <div class="pscore">${match.totals[0]}</div>
+          </div>
+          <div class="scoreBox ${activeTurn===1 && !isEnded ? "active":""}">
+            <div class="pname">${escapeHtml(p1.name)}</div>
+            <div class="muted small">${escapeHtml(p1.email)}</div>
+            <div class="pscore">${match.totals[1]}</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="center">
+          <div class="big" style="margin-bottom:4px;">
+            ${isEnded ? "Game Over" : `ROUND: <span style="color:var(--accent);text-shadow:0 0 12px rgba(78,168,255,0.45);">${activeRound}</span>`}
+          </div>
+          <div class="muted">
+            ${isEnded ? escapeHtml(winnerText) : `${escapeHtml(match.players[activeTurn].name)} • Dart ${dartHuman} of 3`}
+          </div>
+        </div>
+
+        <div class="boardWrap">
+          <img alt="dartboard" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Dartboard.svg">
+        </div>
+
+        ${isEnded ? `<div class="note center">${escapeHtml(winnerText)}</div>` : ``}
+
+        <div class="controlsGrid">
+          <button ${isEnded?"disabled":""} onclick="pressHit('T')">T (+3)</button>
+          <button ${isEnded?"disabled":""} onclick="pressHit('S')">S (+1)</button>
+          <button ${isEnded?"disabled":""} onclick="pressHit('D')">D (+2)</button>
+          <button ${isEnded?"disabled":""} onclick="pressHit('M')">M (+0)</button>
+        </div>
+
+        <div class="subControls">
+          <button class="ghost" onclick="undoLast()">Undo</button>
+          <button class="danger" onclick="resetMatch()">Reset Match</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="roundList">${listRows}</div>
+
+        <div class="divider"></div>
+
+        <div class="stack">
+          <button class="ok" onclick="saveStatsAndExit()">Save Stats & Exit</button>
+          <button class="ghost" onclick="clearGameNoStats()">Clear Game (no stats)</button>
+        </div>
+      </div>
+    `;
+    app.innerHTML = html;
+    return;
+  }
 }
 
-function renderStatsDetail(player){
+/* ---------------------------
+   Player actions
+---------------------------- */
+function goCreatePlayer(){ appState.screen="createPlayer"; appState.toast=""; render(); }
+
+function quickSelectLast(){
+  const last = getLastPlayer();
+  if (!last) return setToast("No last player yet.");
+  const players = loadPlayers();
+  const found = players.find(p => p.email === last);
+  if (!found) return setToast("Last player not found. Create/select a player.");
+  selectPlayer(last);
+}
+
+function createPlayer(){
+  if (!storageOK){ setToast("Storage blocked. Turn off Private Browsing and reload."); return; }
+
+  const name = (document.getElementById("newName")?.value || "").trim();
+  const email = (document.getElementById("newEmail")?.value || "").trim().toLowerCase();
+
+  if (!name) return setToast("Enter a name.");
+  if (!email || !email.includes("@")) return setToast("Enter a valid email.");
+
+  const players = loadPlayers();
+  const exists = players.find(p => p.email === email);
+
+  if (exists){
+    // Select existing player
+    selectPlayer(email);
+    setToast("That email already exists. Selected existing player.");
+    return;
+  }
+
+  players.push({ name, email, createdAt: Date.now() });
+
+  const ok = savePlayers(players);
+  if (!ok){
+    setToast("Could not save. Storage may be blocked.");
+    return;
+  }
+
+  // Auto-enter app
+  selectPlayer(email);
+}
+
+/* ---------------------------
+   Stats views
+---------------------------- */
+function viewStats(email){
+  const players = loadPlayers();
+  const p = players.find(x => x.email === email);
+  if (!p) return setToast("Player not found.");
+
   const stats = loadStats();
-  const sh = (stats[player.email] && stats[player.email]["shanghai_accuracy"]) ? stats[player.email]["shanghai_accuracy"] : null;
+  const sh = stats[p.email]?.["shanghai_accuracy"] || null;
 
   let content = `
     <div class="card">
       <div class="pill">Player</div>
-      <div class="big" style="margin-top:6px;">${escapeHtml(player.name)}</div>
-      <div class="muted">${escapeHtml(player.email)}</div>
+      <div class="big" style="margin-top:6px;">${escapeHtml(p.name)}</div>
+      <div class="muted">${escapeHtml(p.email)}</div>
     </div>
   `;
 
@@ -742,16 +734,11 @@ function renderStatsDetail(player){
       </div>
     `;
   } else {
-    // Bar chart: average points per dart (0..3) per target
     content += `
       <div class="card">
-        <div class="row" style="align-items:center;">
-          <div style="text-align:left;">
-            <div class="big">Shanghai</div>
-            <div class="muted small">Games played: <b>${sh.gamesPlayed || 0}</b></div>
-            <div class="muted small">Metric: Avg points per dart (0.0–3.0)</div>
-          </div>
-        </div>
+        <div class="big">Shanghai</div>
+        <div class="muted small">Games played: <b>${sh.gamesPlayed || 0}</b></div>
+        <div class="muted small">Avg points per dart (0.0–3.0)</div>
         <div class="divider"></div>
         ${SH_ROUNDS.map(rk => {
           const rec = sh.byTarget?.[rk] || { darts:0, points:0 };
@@ -766,300 +753,36 @@ function renderStatsDetail(player){
             </div>
           `;
         }).join("")}
-        <div class="divider"></div>
-        <div class="muted small">
-          Tip: lower numbers on this chart are your weak targets — practice those.
-        </div>
       </div>
     `;
   }
 
-  content += `
-    <div class="card">
-      <button class="ghost" onclick="openStatsHub()">Back</button>
-    </div>
-  `;
-  return content;
-}
-
-function renderShanghaiSetup(players, activePlayer){
-  // pick opponent (must exist or create)
-  const others = players.filter(p => p.email !== activePlayer.email);
-  let oppOptions = `<option value="">Select opponent…</option>`;
-  for (const p of others){
-    oppOptions += `<option value="${escapeHtml(p.email)}">${escapeHtml(p.name)} (${escapeHtml(p.email)})</option>`;
-  }
-
-  return `
-    <div class="card center">
-      <div class="big">Shanghai</div>
-      <div class="muted" style="margin-top:6px;">Accuracy Mode • 2-player local match (same device)</div>
-    </div>
-
-    <div class="card">
-      <div class="stack">
-        <div>
-          <label>You</label>
-          <input value="${escapeHtml(activePlayer.name)}" disabled />
-        </div>
-
-        <div>
-          <label>Opponent (select existing)</label>
-          <select id="oppSelect" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:16px;">
-            ${oppOptions}
-          </select>
-          <div class="muted small" style="margin-top:6px;">No opponent listed? Create a player first.</div>
-        </div>
-
-        <div class="row">
-          <button onclick="startShanghai()">Start</button>
-          <button class="ghost" onclick="openGameMenu()">Back</button>
-        </div>
-
-        <div class="divider"></div>
-        <button class="ghost" onclick="notAvailable()">Remote play (coming next)</button>
-        <div class="muted small">Remote play will use a game code so your brother can join from his phone.</div>
-      </div>
-    </div>
-  `;
-}
-
-function renderShanghaiPlay(){
-  const p0 = match.players[0];
-  const p1 = match.players[1];
-
-  const activeRound = currentRoundKey(match);
-  const isEnded = match.status === "ended";
-  const activeTurn = match.turnIndex; // 0 or 1
-  const dartHuman = match.dartIndex + 1; // next dart number
-
-  // hits for centered list
-  const listRows = SH_ROUNDS.map(rk => {
-    const left = match.perRound[rk].p0.join(" ");
-    const right = match.perRound[rk].p1.join(" ");
-    const isActive = (!isEnded && rk === activeRound);
-    return `
-      <div class="roundRow ${isActive ? "active" : ""}">
-        <div class="hits left">${escapeHtml(left)}</div>
-        <div class="rk">${isActive ? `<span class="glow">${rk}</span>` : rk}</div>
-        <div class="hits right">${escapeHtml(right)}</div>
-      </div>
-    `;
-  }).join("");
-
-  const winnerText = (() => {
-    if (!isEnded) return "";
-    const s0 = match.totals[0], s1 = match.totals[1];
-    if (s0 === s1) return "Tie game.";
-    const win = (s0 > s1) ? p0.name : p1.name;
-    return `${win} wins.`;
-  })();
-
-  return `
-    <div class="card center">
-      <div class="pill">Shanghai • Accuracy Mode</div>
-      <div class="muted" style="margin-top:6px;">Active target glows (round number). Record 3 darts each turn.</div>
-    </div>
-
-    <div class="card">
-      <div class="scoreRow">
-        <div class="scoreBox ${activeTurn===0 && !isEnded ? "active" : ""}">
-          <div class="pname">${escapeHtml(p0.name)}</div>
-          <div class="muted small">${escapeHtml(p0.email)}</div>
-          <div class="pscore">${match.totals[0]}</div>
-        </div>
-        <div class="scoreBox ${activeTurn===1 && !isEnded ? "active" : ""}">
-          <div class="pname">${escapeHtml(p1.name)}</div>
-          <div class="muted small">${escapeHtml(p1.email)}</div>
-          <div class="pscore">${match.totals[1]}</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="center">
-        <div class="big" style="margin-bottom:4px;">
-          ${isEnded ? "Game Over" : `ROUND: <span style="color:var(--accent);text-shadow:0 0 12px rgba(78,168,255,0.45);">${activeRound}</span>`}
-        </div>
-        <div class="muted">
-          ${isEnded ? escapeHtml(winnerText) : `${escapeHtml(match.players[activeTurn].name)} • Dart ${dartHuman} of 3`}
-        </div>
-      </div>
-
-      <div class="boardWrap">
-        <img alt="dartboard" src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Dartboard.svg">
-      </div>
-
-      ${isEnded ? `
-        <div class="note center">${escapeHtml(winnerText)}</div>
-      ` : ``}
-
-      <div class="controlsGrid">
-        <button ${isEnded ? "disabled" : ""} onclick="pressHit('T')">T (+3)</button>
-        <button ${isEnded ? "disabled" : ""} onclick="pressHit('S')">S (+1)</button>
-        <button ${isEnded ? "disabled" : ""} onclick="pressHit('D')">D (+2)</button>
-        <button ${isEnded ? "disabled" : ""} onclick="pressHit('M')">M (+0)</button>
-      </div>
-
-      <div class="subControls">
-        <button class="ghost" onclick="undoLast()">Undo</button>
-        <button class="danger" onclick="resetMatch()">Reset Match</button>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="roundList">
-        ${listRows}
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="stack">
-        <button class="ok" onclick="saveStatsAndExit()">Save Stats & Exit</button>
-        <button class="ghost" onclick="clearGameNoStats()">Clear Game (no stats)</button>
-      </div>
-    </div>
-  `;
+  content += `<div class="card"><button class="ghost" onclick="openStatsHub()">Back</button></div>`;
+  document.getElementById("app").innerHTML = content;
 }
 
 /* ---------------------------
-   Actions (buttons)
+   Shanghai actions
 ---------------------------- */
-function escapeHtml(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-function escapeJs(s){
-  return String(s ?? "").replaceAll("\\","\\\\").replaceAll("'","\\'");
-}
-
-function selectPlayer(email){
-  appState.activePlayerEmail = email;
-  setLastPlayer(email);
-  appState.screen = "mainMenu";
-  appState.toast = "";
-  render();
-}
-
-function quickSelectLast(){
-  const last = getLastPlayer();
-  if (!last) return setToast("No last player yet.");
-  const players = loadPlayers();
-  const found = players.find(p => p.email === last);
-  if (!found) return setToast("Last player not found. Create/select a player.");
-  selectPlayer(last);
-}
-
-function showCreatePlayer(){
-  const app = document.getElementById("app");
-  app.innerHTML = renderCreatePlayerForm();
-}
-
-function cancelCreatePlayer(){
-  appState.toast = "";
-  appState.screen = "playerHub";
-  render();
-}
-
-function createPlayer(){
-  const name = (document.getElementById("newName")?.value || "").trim();
-  const email = (document.getElementById("newEmail")?.value || "").trim().toLowerCase();
-
-  if (!name) return setToast("Enter a name.");
-  if (!email || !email.includes("@")) return setToast("Enter a valid email (used as your unique ID).");
-
-  const players = loadPlayers();
-  const exists = players.find(p => p.email === email);
-  if (exists){
-    // Don’t block—just allow selecting the existing player
-    appState.toast = "That email already exists. Selected existing player.";
-    selectPlayer(email);
-    return;
-  }
-
-  players.push({ name, email, createdAt: Date.now() });
-  savePlayers(players);
-  appState.toast = "Player created.";
-  selectPlayer(email);
-}
-
-function switchPlayer(){
-  appState.activePlayerEmail = "";
-  appState.screen = "playerHub";
-  appState.toast = "";
-  render();
-}
-
-function openGameMenu(){
-  appState.screen = "gameMenu";
-  appState.toast = "";
-  render();
-}
-
-function openStatsHub(){
-  appState.screen = "statsHub";
-  appState.toast = "";
-  render();
-}
-
-function viewStats(email){
-  const players = loadPlayers();
-  const p = players.find(x => x.email === email);
-  if (!p) return setToast("Player not found.");
-  const app = document.getElementById("app");
-  app.innerHTML = renderStatsDetail(p);
-}
-
-function notAvailable(){
-  setToast("Not available at this time.");
-}
-
-function openGame(gameKey){
-  appState.toast = "";
-  if (gameKey === "shanghai_accuracy"){
-    appState.screen = "shanghaiSetup";
-    render();
-    return;
-  }
-  notAvailable();
-}
-
 function startShanghai(){
   const players = loadPlayers();
   const me = players.find(p => p.email === appState.activePlayerEmail);
   if (!me) return setToast("Active player missing.");
-  const sel = document.getElementById("oppSelect");
-  const oppEmail = sel ? sel.value : "";
+
+  const oppEmail = document.getElementById("oppSelect")?.value || "";
   if (!oppEmail) return setToast("Select an opponent.");
+
   const opp = players.find(p => p.email === oppEmail);
   if (!opp) return setToast("Opponent not found.");
 
-  appState.activeOpponentEmail = opp.email;
-
-  match = newShanghaiMatch(
-    { email: me.email, name: me.name },
-    { email: opp.email, name: opp.name }
-  );
-
+  match = newShanghaiMatch({email:me.email, name:me.name}, {email:opp.email, name:opp.name});
   appState.screen = "shanghaiPlay";
+  appState.toast = "";
   render();
 }
-
 function pressHit(hit){
-  if (!match || match.status !== "active") return;
+  if (!match || match.status!=="active") return;
   match = applyHit(match, hit);
-  render();
-}
-
-function resetMatch(){
-  if (!match) return;
-  const p0 = match.players[0];
-  const p1 = match.players[1];
-  match = newShanghaiMatch(p0, p1);
   render();
 }
 
@@ -1067,12 +790,6 @@ function resetMatch(){
    Init
 ---------------------------- */
 (function init(){
-  // default screen
-  const players = loadPlayers();
-  const last = getLastPlayer();
-  if (players.length && last && players.find(p => p.email === last)){
-    // stay on player hub but "Last Player" button works; no auto-select
-  }
   appState.screen = "playerHub";
   appState.toast = "";
   render();
