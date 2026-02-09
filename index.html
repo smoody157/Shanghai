@@ -528,3 +528,226 @@ async function renderPlayScreen(){
   document.getElementById("backHome").onclick = ()=>{ match=null; screen="home"; render(); };
 }
 </script>
+<script>
+// ===== Stats Screen =====
+async function renderStatsScreen(){
+  const p = me();
+  const allStats = await getStats(p.email);
+  const sh = allStats.shanghai || {games:0,best:0,totalPoints:0,byTarget:{}};
+  const avg = sh.games ? Math.round((sh.totalPoints/sh.games)*10)/10 : 0;
+
+  let maxPts = 0;
+  for(const t of TARGETS){
+    const bt = sh.byTarget[t] || {points:0,S:0,D:0,T:0,M:0};
+    if(bt.points>maxPts) maxPts=bt.points;
+  }
+  if(maxPts<1) maxPts=1;
+
+  let bars = '';
+  for(const t of TARGETS){
+    const bt = sh.byTarget[t] || {points:0,S:0,D:0,T:0,M:0};
+    const w = Math.round((bt.points/maxPts)*100);
+    bars += '<div class="barRow">'+
+            `<div class="barLabel">${esc(targetLabel(t))}</div>`+
+            `<div class="barOuter"><div class="barInner" style="width:${w}%"></div></div>`+
+            `<div class="barVal">${bt.points} pts</div>`+
+            '</div>';
+  }
+
+  let html = '<div class="card"><div class="row">'+
+             '<button class="btn ghost" id="backHome1">Back</button>'+
+             '<button class="btn danger" id="clearStatsBtn">Clear My Stats</button>'+
+             '</div></div>'+
+             '<div class="card">'+
+             '<span class="pill">My Stats</span>'+
+             `<div class="h1">Shanghai</div>`+
+             '<div class="sub">T=3, D=2, S=1, M=0 • Shanghai bonus +5</div>'+
+             '<div class="divider"></div>'+
+             '<div class="kpi">'+
+             `<div class="box"><div class="v">${sh.games}</div><div class="l">Games played</div></div>`+
+             `<div class="box"><div class="v">${sh.best}</div><div class="l">Best score</div></div>`+
+             `<div class="box"><div class="v">${avg}</div><div class="l">Average score</div></div>`+
+             '</div></div>'+
+             '<div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
+
+  appEl.innerHTML = html;
+
+  document.getElementById("backHome1").onclick = ()=>{ screen="home"; render(); };
+  document.getElementById("clearStatsBtn").onclick = async ()=>{
+    const s = await getStats(p.email);
+    if(s.shanghai) delete s.shanghai;
+    await saveStats(p.email, s);
+    toastMsg="Stats cleared.";
+    renderStatsScreen();
+  };
+}
+
+// ===== History Screen =====
+async function renderHistoryScreen(){
+  const p = me();
+  const hist = await getHistory(p.email);
+  const mine = hist.filter(h=>h.players.includes(p.email)).slice(0,60);
+
+  let list = '';
+  if(mine.length===0) list='<div class="sub">No matches yet.</div>';
+  else{
+    for(const h of mine){
+      list += '<div class="li"><div class="meta">'+
+              `<div class="nm">${esc(h.summary)}</div>`+
+              `<div class="em">${esc(new Date(h.endedAt).toLocaleString())}</div>`+
+              '</div></div>';
+    }
+  }
+
+  let html = '<div class="card"><div class="row">'+
+             '<button class="btn ghost" id="backHome2">Back</button>'+
+             '<button class="btn danger" id="clearHistBtn">Clear My History</button>'+
+             '</div></div>'+
+             '<div class="card"><span class="pill">Match History</span>'+
+             '<div class="h1">Your recent games</div><div class="divider"></div>'+list+'</div>';
+
+  appEl.innerHTML = html;
+
+  document.getElementById("backHome2").onclick = ()=>{ screen="home"; render(); };
+  document.getElementById("clearHistBtn").onclick = async ()=>{
+    const allHist = await getHistory(p.email);
+    const keep = allHist.filter(h=>!h.players.includes(p.email));
+    // Re-save history excluding current player's matches
+    for(const h of allHist){
+      if(h.players.includes(p.email)){
+        await db.collection("history").doc(h.id).delete().catch(()=>{});
+      }
+    }
+    toastMsg="History cleared.";
+    renderHistoryScreen();
+  };
+}
+</script>
+<script>
+// ===== Helper Functions =====
+
+// Normalize email (trim, lowercase)
+function normalizeEmail(s){
+  try{
+    return String(s||"").trim().toLowerCase();
+  }catch(e){
+    return "";
+  }
+}
+
+// Find player object by email
+async function findPlayer(email){
+  email = normalizeEmail(email);
+  if(!email) return null;
+  const playerDoc = await db.collection("players").doc(email).get();
+  if(playerDoc.exists){
+    return { name: playerDoc.data().name, email: email };
+  }
+  return null;
+}
+
+// Return current signed in player
+function me(){
+  if(!meUser) return null;
+  return { name: meUser.name || meUser.email, email: meUser.email };
+}
+
+// ===== Sign Out Flow =====
+async function signOutUser(){
+  try{
+    await auth.signOut();
+  }catch(e){
+    // ignore
+  }
+  meUser=null;
+  screen="auth";
+  render();
+}
+
+// ===== Unified Render Dispatch =====
+async function render(){
+  // if authenticated and on first screen, go to home
+  if(meUser && screen === "auth") screen="home";
+
+  // show/hide sign out button
+  signOutBtn.style.display = meUser ? "inline-block" : "none";
+
+  // dispatch to correct screen
+  if(screen === "auth"){
+    await renderAuthScreen();
+  } else if(screen === "signup"){
+    await renderSignupScreen();
+  } else if(screen === "home"){
+    await renderHomeScreen();
+  } else if(screen === "match"){
+    await renderMatchScreen();
+  } else if(screen === "play"){
+    await renderPlayScreen();
+  } else if(screen === "stats"){
+    await renderStatsScreen();
+  } else if(screen === "history"){
+    await renderHistoryScreen();
+  }
+}
+
+// ===== Refactored Render Subscreens =====
+
+async function renderAuthScreen(){
+  let html="";
+  if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
+  html += '<div class="card"><div class="h1">Enter your email</div></div>'+
+          '<div class="card"><input type="email" id="inEmail" placeholder="you@email.com"/>'+
+          '<button class="btn" id="goBtn">Go</button></div>';
+  appEl.innerHTML = html;
+
+  document.getElementById("goBtn").onclick = async ()=>{
+    const emailInput = document.getElementById("inEmail").value;
+    const emailNorm = normalizeEmail(emailInput);
+    if(!emailNorm || emailNorm.indexOf("@") < 0){
+      toastMsg = "Enter a valid email";
+      renderAuthScreen();
+      return;
+    }
+    await signInEmail(emailNorm);
+  };
+}
+
+async function renderSignupScreen(){
+  let html = '<div class="card"><div class="h1">Create account</div></div>'+
+             '<div class="card"><input type="text" id="upName" placeholder="Your Name"/>'+
+             '<button class="btn ok" id="createBtn">Create Player</button></div>';
+  appEl.innerHTML = html;
+
+  document.getElementById("createBtn").onclick = async ()=>{
+    const nameVal = document.getElementById("upName").value.trim();
+    const emailVal = normalizeEmail(document.getElementById("inEmail").value);
+    if(!nameVal){
+      toastMsg="Enter a name";
+      renderSignupScreen();
+      return;
+    }
+    await signUp(nameVal,emailVal);
+  };
+}
+
+async function renderHomeScreen(){
+  const p = me();
+  let html = '<div class="card"><span class="pill">Signed in</span>'+
+             '<div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>'+
+             '<div class="row"><button class="btn" id="playNowBtn">Play Now</button>'+
+             '<button class="btn ghost" id="statsBtn">My Stats</button></div>'+
+             '<div class="row" style="margin-top:10px;"><button class="btn ghost" id="histBtn">Match History</button></div>';
+  appEl.innerHTML = html;
+
+  document.getElementById("playNowBtn").onclick = ()=>{ screen="match"; render(); };
+  document.getElementById("statsBtn").onclick = ()=>{ screen="stats"; render(); };
+  document.getElementById("histBtn").onclick = ()=>{ screen="history"; render(); };
+}
+
+// attach global actions
+homeBtn.onclick = ()=>{ screen = meUser ? "home" : "auth"; render(); };
+signOutBtn.onclick = ()=>{ signOutUser(); };
+
+// initial render
+render();
+</script>
