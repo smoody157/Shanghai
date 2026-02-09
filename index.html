@@ -8,42 +8,41 @@
     :root{
       --bg:#0b1a2e;
       --panel:#122746;
-      --panel2:#163155;
-      --line:#244266;
+      --line:rgba(255,255,255,.12);
       --text:#eaf2ff;
       --muted:#b9cbe5;
       --accent:#4ea8ff;
-      --accent2:#2b7bff;
       --danger:#ff4d5a;
       --ok:#2bd576;
-      --btn:#2a4f7a;
-      --btn2:#1f4166;
       --shadow: rgba(0,0,0,.25);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);color:var(--text)}
-    a{color:var(--accent)}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
+      color:var(--text);
+    }
     .topbar{
       position:sticky;top:0;z-index:10;
       display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:12px 14px;background:rgba(10,20,35,.75);backdrop-filter:blur(10px);
+      padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
       border-bottom:1px solid rgba(255,255,255,.08);
     }
     .brand{display:flex;flex-direction:column;line-height:1.05}
-    .brand .t{font-weight:900;font-size:16px;letter-spacing:.02em}
+    .brand .t{font-weight:900;font-size:16px}
     .brand .s{font-size:12px;color:var(--muted)}
-    .top-actions{display:flex;gap:10px;align-items:center}
     .btn{
-      border:1px solid rgba(255,255,255,.12);
-      background:linear-gradient(180deg,var(--btn),var(--btn2));
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.08);
       color:var(--text);border-radius:14px;padding:10px 12px;font-weight:900;
       box-shadow:0 6px 16px var(--shadow);
     }
     .btn:active{transform:translateY(1px)}
     .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
-    .btn.danger{background:linear-gradient(180deg,#ff5966,#d73643)}
-    .btn.ok{background:linear-gradient(180deg,#3be39a,#1fb55d);color:#041b11}
-    .wrap{max-width:720px;margin:0 auto;padding:14px}
+    .btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
+    .btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
+    .wrap{max-width:760px;margin:0 auto;padding:14px}
     .card{
       background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
       border:1px solid rgba(255,255,255,.10);
@@ -51,8 +50,7 @@
       box-shadow:0 10px 28px rgba(0,0,0,.28);
       margin-bottom:12px;
     }
-    .center{display:flex;flex-direction:column;align-items:center;text-align:center}
-    .h1{font-size:26px;font-weight:1000;margin:2px 0 6px}
+    .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
     .sub{color:var(--muted);font-size:13px}
     label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
     input, select{
@@ -62,7 +60,7 @@
       color:var(--text);
       border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
     }
-    .row{display:flex;gap:10px;align-items:stretch}
+    .row{display:flex;gap:10px}
     .row > *{flex:1}
     .stack{display:flex;flex-direction:column;gap:10px}
     .toast{
@@ -71,44 +69,24 @@
       color:#ffd6da;
       border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
     }
-    .note{
-      background:rgba(78,168,255,.10);
-      border:1px solid rgba(78,168,255,.26);
-      color:#d7ecff;
-      border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
-    }
     .pill{
-      display:inline-block;
-      padding:6px 10px;border-radius:999px;
+      display:inline-block;padding:6px 10px;border-radius:999px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(78,168,255,.08);
-      color:var(--accent);
-      font-weight:900;font-size:12px;
+      color:var(--accent);font-weight:900;font-size:12px;
     }
     .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .small{font-size:12px;color:var(--muted)}
-    .big{font-size:28px;font-weight:1000}
-    .muted{color:var(--muted)}
-    .kpi{display:flex;gap:10px;flex-wrap:wrap}
-    .kpi .box{flex:1;min-width:140px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:10px}
-    .kpi .box .v{font-weight:1000;font-size:20px}
-    .kpi .box .l{font-size:12px;color:var(--muted)}
-    .list{display:flex;flex-direction:column;gap:10px}
-    .li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border-radius:16px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.10)}
-    .li .meta{display:flex;flex-direction:column;gap:2px}
-    .li .meta .nm{font-weight:1000}
-    .li .meta .em{font-size:12px;color:var(--muted)}
-    .li .right{display:flex;gap:8px}
-    /* Play layout */
-    .playWrap{display:grid;grid-template-columns:1fr;gap:12px}
-    @media(min-width:720px){ .playWrap{grid-template-columns:1.1fr .9fr} }
-    .boardCard{padding:12px}
-    .boardHeader{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
-    .turnPill{background:rgba(43,123,255,.14);border:1px solid rgba(43,123,255,.30);color:#d7ecff;padding:6px 10px;border-radius:999px;font-weight:1000;font-size:12px}
-    .dartboardBox{
+    .li{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:12px;border-radius:16px;background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .meta{display:flex;flex-direction:column;gap:2px}
+    .meta .nm{font-weight:1000}
+    .meta .em{font-size:12px;color:var(--muted)}
+    .boardBox{
       width:100%;
-      aspect-ratio:1/1;
+      height:320px;
       border-radius:18px;
       border:1px solid rgba(255,255,255,.12);
       background:radial-gradient(circle at 50% 40%, rgba(78,168,255,.10), rgba(0,0,0,.12) 55%, rgba(0,0,0,.22));
@@ -116,41 +94,23 @@
       overflow:hidden;
       box-shadow: inset 0 0 40px rgba(0,0,0,.35);
     }
-    .controlsCard{padding:12px}
     .hitRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
     .hitBtn{
-      border-radius:16px;
-      padding:14px 10px;
+      border-radius:16px;padding:14px 10px;
       border:1px solid rgba(255,255,255,.14);
-      background:linear-gradient(180deg,rgba(78,168,255,.18),rgba(20,35,60,.35));
+      background:rgba(78,168,255,.16);
       color:var(--text);
-      font-weight:1000;
-      font-size:16px;
+      font-weight:1000;font-size:16px;
       box-shadow:0 10px 24px rgba(0,0,0,.25);
     }
     .hitBtn:active{transform:translateY(1px)}
-    .hitBtn.miss{background:linear-gradient(180deg,rgba(255,77,90,.18),rgba(20,35,60,.35))}
-    .hitBtn.undo{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(20,35,60,.35));color:var(--muted)}
-    .hitBtn.next{background:linear-gradient(180deg,rgba(43,213,118,.22),rgba(20,35,60,.35))}
-    .log{
-      margin-top:10px;
-      background:rgba(0,0,0,.20);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:16px;
-      padding:10px;
-      min-height:84px;
-    }
-    .logLine{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);padding:4px 0;border-bottom:1px dashed rgba(255,255,255,.08)}
-    .logLine:last-child{border-bottom:none}
-    .scoreTable{
-      margin-top:10px;
-      overflow:auto;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.10);
-    }
+    .hitBtn.miss{background:rgba(255,77,90,.18);border-color:rgba(255,77,90,.30)}
+    .hitBtn.undo{background:rgba(255,255,255,.08);color:var(--muted)}
+    .hitBtn.next{background:rgba(43,213,118,.18);border-color:rgba(43,213,118,.30)}
+    .small{font-size:12px;color:var(--muted)}
     table{border-collapse:collapse;width:100%;min-width:520px;background:rgba(0,0,0,.14)}
     th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08);text-align:center}
-    th{font-size:12px;color:var(--muted);font-weight:1000;background:rgba(255,255,255,.05);position:sticky;top:0}
+    th{font-size:12px;color:var(--muted);font-weight:1000;background:rgba(255,255,255,.05)}
     td.l{text-align:left}
     .badge{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.14);font-size:12px;color:var(--muted)}
     .activeCell{outline:2px solid rgba(78,168,255,.55);outline-offset:-2px;border-radius:10px}
@@ -162,7 +122,7 @@
       <div class="t">Game Night Darts</div>
       <div class="s">The Dart Room presents • Developed & designed by Steve’s Graphic Designs</div>
     </div>
-    <div class="top-actions">
+    <div>
       <button class="btn ghost" id="homeBtn" type="button">Home</button>
       <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
     </div>
@@ -171,441 +131,556 @@
   <div class="wrap" id="app"></div>
 
 <script>
-/* ========= STORAGE (LOCAL ONLY) =========
-   This file runs fully without Firebase.
-   If you later want global players across devices, you’ll need to wire Firestore.
-*/
-const LS = {
-  players: "gnd_players_v1",
-  sessionEmail: "gnd_session_email_v1",
-  stats: "gnd_stats_v1",
-  history: "gnd_history_v1"
-};
-
-function readJSON(key, fallback){
-  try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }catch{ return fallback; }
+/* ========= SAFE HELPERS (no replaceAll, no optional chaining) ========= */
+function esc(s){
+  s = String(s === undefined || s === null ? "" : s);
+  return s
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
-function writeJSON(key, value){
-  localStorage.setItem(key, JSON.stringify(value));
+function normEmail(s){ return String(s||"").trim().toLowerCase(); }
+function now(){ return new Date().getTime(); }
+function readJSON(k, fallback){
+  try{
+    var v = localStorage.getItem(k);
+    return v ? JSON.parse(v) : fallback;
+  }catch(e){ return fallback; }
 }
-function now(){ return Date.now(); }
-function normEmail(s){ return (s||"").trim().toLowerCase(); }
-function esc(s){ return String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+function writeJSON(k, v){
+  try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){}
+}
 
-function getPlayers(){ return readJSON(LS.players, []); }
-function savePlayers(players){ writeJSON(LS.players, players); }
-function getSessionEmail(){ return localStorage.getItem(LS.sessionEmail)||""; }
-function setSessionEmail(e){ localStorage.setItem(LS.sessionEmail, e); }
-function clearSession(){ localStorage.removeItem(LS.sessionEmail); }
+/* ========= STORAGE (LOCAL) ========= */
+var LS_PLAYERS="gnd_players_v2";
+var LS_SESSION="gnd_session_email_v2";
 
-function getStats(){ return readJSON(LS.stats, {}); }      // { email: { shanghai: {...} } }
-function saveStats(s){ writeJSON(LS.stats, s); }
-function getHistory(){ return readJSON(LS.history, []); }  // [{gameId, players, startedAt, endedAt, summary}]
-function saveHistory(h){ writeJSON(LS.history, h); }
+/* ========= STATE ========= */
+var appEl = document.getElementById("app");
+var homeBtn = document.getElementById("homeBtn");
+var signOutBtn = document.getElementById("signOutBtn");
 
-/* ========= APP STATE ========= */
-const app = document.getElementById("app");
-const homeBtn = document.getElementById("homeBtn");
-const signOutBtn = document.getElementById("signOutBtn");
+var toastMsg="";
+var screen="auth";     // auth | home | match | play
+var meEmail = "";
+try{ meEmail = localStorage.getItem(LS_SESSION) || ""; }catch(e){ meEmail=""; }
 
-let toastMsg = "";
-let screen = "auth";          // auth | home | matchBuilder | game
-let meEmail = getSessionEmail();
-let currentGameId = null;
-let match = null;             // active match state
+var match = null;
 
-homeBtn.onclick = () => {
-  toastMsg = "";
-  if(meEmail) { screen = "home"; match = null; currentGameId = null; }
-  else { screen = "auth"; }
-  render();
-};
-signOutBtn.onclick = () => {
-  clearSession();
-  meEmail = "";
-  screen = "auth";
-  match = null;
-  currentGameId = null;
-  toastMsg = "";
-  render();
-};
-
-/* ========= GAMES REGISTRY (INSERTS) ========= */
-const GAMES = {
-  shanghai: {
-    id: "shanghai",
-    name: "Shanghai (Accuracy)",
-    description: "Points: T=3, S=1, D=2, Miss=0. Target rotates 20→15→Bull. Shanghai bonus if you hit S+T+D with D as the 3rd dart.",
-    targets: [20,19,18,17,16,15,"B"],
-    initMatch(players){
-      return {
-        gameId:"shanghai",
-        players: players.map(p=>({email:p.email, name:p.name, total:0})),
-        turnIndex: 0,
-        targetIndex: 0,
-        dartInTurn: 0,         // 0..2
-        // per player, per target: { throws: ["T","S","D" ...], points: n, shanghai: bool }
-        grid: Object.fromEntries(players.map(p => [p.email, Object.fromEntries(GAMES.shanghai.targets.map(t => [String(t), {throws:[], points:0, shanghai:false}]))])),
-        log: [],
-        startedAt: now(),
-        endedAt: null,
-        finished: false
-      };
-    },
-    pointsFor(hit){ return hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0; },
-    displayTarget(t){ return t==="B" ? "BULL" : String(t); },
-
-    addThrow(state, hit){
-      if(state.finished) return;
-      const p = state.players[state.turnIndex];
-      const tKey = String(GAMES.shanghai.targets[state.targetIndex]);
-      const cell = state.grid[p.email][tKey];
-
-      // record
-      cell.throws.push(hit);
-      cell.points += GAMES.shanghai.pointsFor(hit);
-      p.total += GAMES.shanghai.pointsFor(hit);
-
-      // shanghai check: must be exactly 3 darts, and D must be 3rd, and includes S+T+D
-      if(cell.throws.length === 3){
-        const a = cell.throws.slice();
-        const hasS = a.includes("S");
-        const hasT = a.includes("T");
-        const hasD = a.includes("D");
-        const dLast = a[2]==="D";
-        if(hasS && hasT && hasD && dLast){
-          cell.shanghai = true;
-          // bonus
-          cell.points += 5;
-          p.total += 5;
-          state.log.push({ts:now(), text:`${p.name} hit SHANGHAI on ${GAMES.shanghai.displayTarget(GAMES.shanghai.targets[state.targetIndex])}! (+5)`});
-        }
-      }
-
-      state.log.push({ts:now(), text:`${p.name} @ ${GAMES.shanghai.displayTarget(GAMES.shanghai.targets[state.targetIndex])}: ${hit}`});
-
-      state.dartInTurn++;
-      if(state.dartInTurn >= 3){
-        // end turn
-        state.dartInTurn = 0;
-        state.turnIndex = (state.turnIndex + 1) % state.players.length;
-
-        // after everyone plays this target once, advance target
-        // "round complete" when we wrap back to player 0
-        if(state.turnIndex === 0){
-          state.targetIndex++;
-          if(state.targetIndex >= GAMES.shanghai.targets.length){
-            state.finished = true;
-            state.endedAt = now();
-          }
-        }
-      }
-    },
-
-    undo(state){
-      // Undo last logged throw (simple)
-      if(state.finished && state.log.length===0) return;
-      // Find last throw entry (not bonus line)
-      for(let i=state.log.length-1;i>=0;i--){
-        const txt = state.log[i].text || "";
-        if(txt.includes(": T") || txt.includes(": S") || txt.includes(": D") || txt.includes(": M")){
-          // parse
-          const hit = txt.endsWith(" T") ? "T" : txt.endsWith(" S") ? "S" : txt.endsWith(" D") ? "D" : "M";
-          // Determine which player/target it belonged to by reconstructing state:
-          // We store enough to reverse by keeping a stack snapshot.
-          // We will keep an internal stack for robust undo:
-          break;
-        }
-      }
-    }
+/* ========= PLAYERS ========= */
+function getPlayers(){ return readJSON(LS_PLAYERS, []); }
+function savePlayers(a){ writeJSON(LS_PLAYERS, a); }
+function findPlayer(email){
+  email = normEmail(email);
+  var a = getPlayers();
+  for(var i=0;i<a.length;i++) if(a[i].email===email) return a[i];
+  return null;
+}
+function upsertPlayer(name,email){
+  name = String(name||"").trim();
+  email = normEmail(email);
+  var a = getPlayers();
+  var found=null;
+  for(var i=0;i<a.length;i++){
+    if(a[i].email===email){ found=a[i]; break; }
   }
-};
+  if(found){ if(name) found.name=name; }
+  else { a.push({name:name,email:email,createdAt:now()}); }
+  savePlayers(a);
+  return findPlayer(email);
+}
+function me(){ return meEmail ? findPlayer(meEmail) : null; }
 
-// Robust undo via snapshots
-function pushSnap(){
-  if(!match) return;
-  match._snaps = match._snaps || [];
-  // light snapshot (JSON)
-  match._snaps.push(JSON.stringify(match));
-  if(match._snaps.length > 60) match._snaps.shift();
-}
-function popSnap(){
-  if(!match || !match._snaps || match._snaps.length===0) return false;
-  // current snapshot includes _snaps; restore last prior state
-  match._snaps.pop(); // remove current
-  const prev = match._snaps.pop();
-  if(!prev) return false;
-  const restored = JSON.parse(prev);
-  // keep history stack
-  restored._snaps = (restored._snaps || []).concat([]); // ensure array
-  match = restored;
-  return true;
-}
-
-/* ========= AUTH + HOME FLOW ========= */
-function findPlayerByEmail(email){
-  const players = getPlayers();
-  return players.find(p => p.email === normEmail(email)) || null;
-}
-function upsertPlayer(name, email){
-  const e = normEmail(email);
-  const players = getPlayers();
-  const existing = players.find(p => p.email === e);
-  if(existing){
-    existing.name = name.trim() || existing.name;
-  }else{
-    players.push({name: name.trim(), email: e, createdAt: now()});
-  }
-  savePlayers(players);
-  return players.find(p => p.email === e);
-}
-
-function signIn(email){
-  const e = normEmail(email);
-  if(!e || !e.includes("@")) { toastMsg = "Enter a valid email."; render(); return; }
-  const p = findPlayerByEmail(e);
-  if(!p){
-    toastMsg = "No account found. Use Sign Up.";
-    render();
-    return;
-  }
-  meEmail = e;
-  setSessionEmail(e);
-  screen = "home";
-  toastMsg = "";
-  render();
-}
-
-function signUp(name,email){
-  const n = (name||"").trim();
-  const e = normEmail(email);
-  if(!n){ toastMsg="Enter your name."; render(); return; }
-  if(!e || !e.includes("@")) { toastMsg="Enter a valid email."; render(); return; }
-  upsertPlayer(n,e);
-  meEmail = e;
-  setSessionEmail(e);
-  screen = "home";
-  toastMsg = "";
-  render();
-}
-
-function me(){
-  if(!meEmail) return null;
-  return findPlayerByEmail(meEmail);
-}
-
-/* ========= MATCH BUILDER (1–4 PLAYERS) ========= */
-function startPracticeSolo(){
-  const p = me();
-  if(!p){ toastMsg="Sign in first."; screen="auth"; render(); return; }
-  const players = [{name:p.name,email:p.email}];
-  startGame("shanghai", players);
-}
-
-function startPlayNow(){
-  const p = me();
-  if(!p){ toastMsg="Sign in first."; screen="auth"; render(); return; }
-  screen = "matchBuilder";
-  toastMsg = "";
-  render();
-}
-
-function startGame(gameId, players){
-  currentGameId = gameId;
-  const mod = GAMES[gameId];
-  match = mod.initMatch(players);
-  // snapshots for undo
-  match._snaps = [];
-  pushSnap();
-  screen = "game";
-  toastMsg = "";
-  render();
-}
-
-function endAndSaveMatch(){
-  if(!match) return;
-  // Save history + stats (local)
-  const gameId = match.gameId;
-  const stats = getStats();
-  for(const p of match.players){
-    stats[p.email] = stats[p.email] || {};
-    stats[p.email][gameId] = stats[p.email][gameId] || {
-      games:0,
-      best:0,
-      totalPoints:0,
-      byTarget: {} // { "20": {S:0,D:0,T:0,M:0,points:0} ... }
-    };
-    const st = stats[p.email][gameId];
-    st.games += 1;
-    st.totalPoints += p.total;
-    st.best = Math.max(st.best, p.total);
-
-    // target breakdown
-    const targets = GAMES[gameId].targets || [];
-    for(const t of targets){
-      const key = String(t);
-      st.byTarget[key] = st.byTarget[key] || {S:0,D:0,T:0,M:0,points:0};
-      const cell = match.grid[p.email][key];
-      for(const h of cell.throws){
-        if(h==="S"||h==="D"||h==="T"||h==="M") st.byTarget[key][h] += 1;
-        st.byTarget[key].points += (h==="T"?3:h==="D"?2:h==="S"?1:0);
-      }
-      // include bonus if any
-      if(cell.shanghai){ st.byTarget[key].points += 5; }
-    }
-  }
-  saveStats(stats);
-
-  const history = getHistory();
-  history.unshift({
-    gameId: match.gameId,
-    players: match.players.map(p=>({name:p.name,email:p.email,total:p.total})),
-    startedAt: match.startedAt,
-    endedAt: match.endedAt || now(),
-    summary: `${GAMES[match.gameId].name} • ${match.players.map(p=>`${p.name}: ${p.total}`).join(" | ")}`
-  });
-  if(history.length>100) history.length=100;
-  saveHistory(history);
-}
-
-/* ========= GAME UI HANDLERS ========= */
-function hit(h){
-  if(!match) return;
-  if(match.finished){ toastMsg="Game is finished."; render(); return; }
-  pushSnap();
-  GAMES[match.gameId].addThrow(match, h);
-  if(match.finished){
-    endAndSaveMatch();
-  }
-  render();
-}
-function undo(){
-  if(!match) return;
-  const ok = popSnap();
-  if(!ok){ toastMsg="Nothing to undo."; }
-  render();
-}
-function resetMatch(){
-  if(!match) return;
-  const players = match.players.map(p=>({name:p.name,email:p.email}));
-  startGame(match.gameId, players);
-}
-
-/* ========= DARTBOARD SVG (REAL LOOK + ACTIVE WEDGE GLOW) ========= */
-const BOARD_NUMS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5]; // standard dartboard order
+/* ========= DARTBOARD SVG (real look + active wedge glow) ========= */
+var BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 function polar(cx,cy,r,deg){
-  const rad = (deg-90)*Math.PI/180;
+  var rad=(deg-90)*Math.PI/180;
   return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)};
 }
 function arcWedgePath(cx,cy,r0,r1,a0,a1){
-  const p1 = polar(cx,cy,r1,a0), p2 = polar(cx,cy,r1,a1);
-  const p3 = polar(cx,cy,r0,a1), p4 = polar(cx,cy,r0,a0);
-  const large = (a1-a0) > 180 ? 1 : 0;
-  return [
-    `M ${p1.x.toFixed(3)} ${p1.y.toFixed(3)}`,
-    `A ${r1} ${r1} 0 ${large} 1 ${p2.x.toFixed(3)} ${p2.y.toFixed(3)}`,
-    `L ${p3.x.toFixed(3)} ${p3.y.toFixed(3)}`,
-    `A ${r0} ${r0} 0 ${large} 0 ${p4.x.toFixed(3)} ${p4.y.toFixed(3)}`,
-    "Z"
-  ].join(" ");
+  var p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1);
+  var p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
+  var large=((a1-a0)>180)?1:0;
+  function f(n){ return (Math.round(n*1000)/1000).toFixed(3); }
+  return "M "+f(p1.x)+" "+f(p1.y)
+    +" A "+r1+" "+r1+" 0 "+large+" 1 "+f(p2.x)+" "+f(p2.y)
+    +" L "+f(p3.x)+" "+f(p3.y)
+    +" A "+r0+" "+r0+" 0 "+large+" 0 "+f(p4.x)+" "+f(p4.y)
+    +" Z";
 }
 function dartboardSVG(activeNumber){
-  // activeNumber: 20/19/18/17/16/15 or "B" (bull)
-  const cx=100, cy=100;
-  const outer=98, rDoubleOuter=92, rDoubleInner=84, rTripleOuter=62, rTripleInner=54, rSingleInner=16;
-  const seg = 360/20;
+  var cx=100,cy=100;
+  var outer=98, rDoubleOuter=92, rDoubleInner=84, rTripleOuter=62, rTripleInner=54, rSingleInner=16;
+  var seg=360/20;
 
-  // find segment index
-  const idx = (typeof activeNumber === "number") ? BOARD_NUMS.indexOf(activeNumber) : -1;
-  const aMid = idx>=0 ? (idx*seg + seg/2) : null;
-
-  // active highlight wedge on the big single area (between double inner and triple outer)
-  let activePath = "";
+  var idx=-1;
+  if(typeof activeNumber==="number"){
+    for(var i=0;i<BOARD_NUMS.length;i++){ if(BOARD_NUMS[i]===activeNumber){ idx=i; break; } }
+  }
+  var activePath="";
   if(idx>=0){
-    const a0 = idx*seg + 1.2;
-    const a1 = (idx+1)*seg - 1.2;
-    activePath = arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
+    var a0=idx*seg+1.2, a1=(idx+1)*seg-1.2;
+    activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
   }
 
-  const ringColorA = "#0b1220";
-  const ringColorB = "#1a2338";
+  function ringWedges(r0,r1,fillA,fillB){
+    var out="";
+    for(var i=0;i<20;i++){
+      var a0=i*seg+0.8, a1=(i+1)*seg-0.8;
+      var p=arcWedgePath(cx,cy,r0,r1,a0,a1);
+      out += '<path d="'+p+'" fill="'+(i%2===0?fillA:fillB)+'" opacity="0.95"/>';
+    }
+    return out;
+  }
 
-  return `
-  <svg viewBox="0 0 200 200" width="94%" aria-label="dartboard">
-    <defs>
-      <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
-        <stop offset="0%" stop-color="#203a62"/>
-        <stop offset="55%" stop-color="#0d1a2e"/>
-        <stop offset="100%" stop-color="#060d18"/>
-      </radialGradient>
+  return ''+
+  '<svg viewBox="0 0 200 200" width="94%" aria-label="dartboard">'+
+    '<defs>'+
+      '<radialGradient id="bgG" cx="50%" cy="42%" r="65%">'+
+        '<stop offset="0%" stop-color="#203a62"/>'+
+        '<stop offset="55%" stop-color="#0d1a2e"/>'+
+        '<stop offset="100%" stop-color="#060d18"/>'+
+      '</radialGradient>'+
+      '<filter id="glow" x="-30%" y="-30%" width="160%" height="160%">'+
+        '<feGaussianBlur stdDeviation="3.5" result="b"/>'+
+        '<feColorMatrix in="b" type="matrix" values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 .9 0" result="c"/>'+
+        '<feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>'+
+      '</filter>'+
+    '</defs>'+
+    '<circle cx="100" cy="100" r="'+outer+'" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>'+
+    (activePath ? '<path d="'+activePath+'" fill="rgba(78,168,255,.16)" stroke="rgba(78,168,255,.55)" stroke-width="1.4" filter="url(#glow)"/>' : '')+
+    ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")+
+    ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")+
+    ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")+
+    ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
+    '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
+    '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+
+    (function(){
+      var out="";
+      for(var i=0;i<20;i++){
+        var ang=i*seg+seg/2;
+        var p=polar(cx,cy,95,ang);
+        out += '<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>';
+      }
+      return out;
+    })()+
+    '<g>'+
+      '<rect x="60" y="8" rx="8" ry="8" width="80" height="18" fill="rgba(0,0,0,.35)" stroke="rgba(255,255,255,.12)"/>'+
+      '<text x="100" y="21" text-anchor="middle" font-size="9.5" fill="#cfe4ff" font-weight="900">TARGET: '+(activeNumber==="B"?"BULL":activeNumber)+'</text>'+
+    '</g>'+
+  '</svg>';
+}
 
-      <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="3.5" result="b"/>
-        <feColorMatrix in="b" type="matrix"
-          values="0 0 0 0 0.30
-                  0 0 0 0 0.66
-                  0 0 0 0 1.00
-                  0 0 0 .9 0" result="c"/>
-        <feMerge>
-          <feMergeNode in="c"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
-      </filter>
+/* ========= SHANGHAI ENGINE (1–4 players, buttons input) ========= */
+var TARGETS=[20,19,18,17,16,15,"B"];
+function pts(hit){ return hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0; }
+function targetLabel(t){ return t==="B" ? "BULL" : String(t); }
 
-      <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
-        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity=".55"/>
-      </filter>
-    </defs>
+function newMatch(players){
+  var m={
+    players: [],
+    turnIndex:0,
+    targetIndex:0,
+    dartInTurn:0,
+    grid:{},
+    finished:false
+  };
+  for(var i=0;i<players.length;i++){
+    m.players.push({name:players[i].name,email:players[i].email,total:0});
+    m.grid[players[i].email]={};
+    for(var j=0;j<TARGETS.length;j++){
+      var k=String(TARGETS[j]);
+      m.grid[players[i].email][k]={throws:[],points:0,shanghai:false};
+    }
+  }
+  return m;
+}
 
-    <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
+function addThrow(m, hit){
+  if(m.finished) return;
+  var p=m.players[m.turnIndex];
+  var t=TARGETS[m.targetIndex];
+  var key=String(t);
+  var cell=m.grid[p.email][key];
 
-    ${activePath ? `<path d="${activePath}" fill="rgba(78,168,255,.16)" stroke="rgba(78,168,255,.55)" stroke-width="1.4" filter="url(#glow)"/>` : ""}
+  cell.throws.push(hit);
+  cell.points += pts(hit);
+  p.total += pts(hit);
 
-    <!-- base segments (simple alternating dark rings like a real board vibe) -->
-    ${BOARD_NUMS.map((n,i)=>{
-      const a0=i*seg, a1=(i+1)*seg;
-      const fill = (i%2===0) ? ringColorA : ringColorB;
-      const p = arcWedgePath(cx,cy,rTripleOuter,rDoubleInner,a0+0.7,a1-0.7);
-      return `<path d="${p}" fill="${fill}" opacity="0.95"/>`;
-    }).join("")}
+  // Shanghai bonus (S+T+D with D last)
+  if(cell.throws.length===3){
+    var a=cell.throws;
+    var hasS=false,hasT=false,hasD=false;
+    for(var i=0;i<a.length;i++){
+      if(a[i]==="S") hasS=true;
+      if(a[i]==="T") hasT=true;
+      if(a[i]==="D") hasD=true;
+    }
+    if(hasS && hasT && hasD && a[2]==="D"){
+      cell.shanghai=true;
+      cell.points += 5;
+      p.total += 5;
+    }
+  }
 
-    <!-- triple ring -->
-    ${BOARD_NUMS.map((n,i)=>{
-      const a0=i*seg, a1=(i+1)*seg;
-      const fill = (i%2===0) ? "#2aa84a" : "#c63a3a";
-      const p = arcWedgePath(cx,cy,rTripleInner,rTripleOuter,a0+0.9,a1-0.9);
-      return `<path d="${p}" fill="${fill}" opacity="0.95"/>`;
-    }).join("")}
+  m.dartInTurn++;
+  if(m.dartInTurn>=3){
+    m.dartInTurn=0;
+    m.turnIndex = (m.turnIndex+1) % m.players.length;
 
-    <!-- double ring -->
-    ${BOARD_NUMS.map((n,i)=>{
-      const a0=i*seg, a1=(i+1)*seg;
-      const fill = (i%2===0) ? "#2aa84a" : "#c63a3a";
-      const p = arcWedgePath(cx,cy,rDoubleInner,rDoubleOuter,a0+0.9,a1-0.9);
-      return `<path d="${p}" fill="${fill}" opacity="0.95"/>`;
-    }).join("")}
+    if(m.turnIndex===0){
+      m.targetIndex++;
+      if(m.targetIndex>=TARGETS.length){
+        m.finished=true;
+      }
+    }
+  }
+}
 
-    <!-- inner single area -->
-    ${BOARD_NUMS.map((n,i)=>{
-      const a0=i*seg, a1=(i+1)*seg;
-      const fill = (i%2===0) ? ringColorB : ringColorA;
-      const p = arcWedgePath(cx,cy,rSingleInner,rTripleInner,a0+0.7,a1-0.7);
-      return `<path d="${p}" fill="${fill}" opacity="0.95"/>`;
-    }).join("")}
+/* ========= NAV ========= */
+homeBtn.onclick=function(){
+  toastMsg="";
+  if(meEmail) screen="home";
+  else screen="auth";
+  match=null;
+  render();
+};
+signOutBtn.onclick=function(){
+  try{ localStorage.removeItem(LS_SESSION); }catch(e){}
+  meEmail="";
+  match=null;
+  screen="auth";
+  toastMsg="";
+  render();
+};
 
-    <!-- bull -->
-    <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
-    <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
+/* ========= RENDER ========= */
+function render(){
+  signOutBtn.style.display = meEmail ? "inline-block" : "none";
 
-    <!-- number ring text -->
-    ${BOARD_NUMS.map((n,i)=>{
-      const ang=i*seg + seg/2;
-      const p=polar(cx,cy,95,ang);
-      return `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
-        font-size="8.5" fill="#dfe9ff" font-weight="900"
-        transform="rotate(${ang} ${p.x.toFixed(2)} ${p.y.toFixed(2)}) rotate(${90-ang} ${p.x.toFixed(2)} ${p.y.toFixed(2)})"
-        style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${n}</text>`;
-    }).join("")}
+  var html="";
+  if(toastMsg) html += '<div class="toast">'+esc(toastMsg)+'</div>';
 
-    <!-- outer rim -->
-    <circle cx="100
+  if(!meEmail) screen="auth";
+
+  if(screen==="auth"){
+    html += ''+
+    '<div class="card">'+
+      '<div class="h1">Sign in</div>'+
+      '<div class="sub">Enter your email. If you’re new, create an account.</div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="stack">'+
+        '<div><label>Email</label><input id="inEmail" inputmode="email" placeholder="you@email.com"/></div>'+
+        '<div class="row">'+
+          '<button class="btn" id="signInBtn" type="button">Sign in</button>'+
+          '<button class="btn ghost" id="showUpBtn" type="button">Sign up</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card" id="upCard" style="display:none;">'+
+      '<span class="pill">Create account</span>'+
+      '<div class="divider"></div>'+
+      '<div class="stack">'+
+        '<div><label>Name</label><input id="upName" placeholder="Steve Moody"/></div>'+
+        '<div><label>Email</label><input id="upEmail" inputmode="email" placeholder="you@email.com"/></div>'+
+        '<div class="row">'+
+          '<button class="btn ok" id="createBtn" type="button">Create</button>'+
+          '<button class="btn ghost" id="cancelBtn" type="button">Cancel</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+    appEl.innerHTML = html;
+
+    document.getElementById("signInBtn").onclick=function(){
+      toastMsg="";
+      var e=normEmail(document.getElementById("inEmail").value);
+      if(!e || e.indexOf("@")<0){ toastMsg="Enter a valid email."; render(); return; }
+      var p=findPlayer(e);
+      if(!p){ toastMsg="No account found. Use Sign up."; render(); return; }
+      meEmail=e;
+      try{ localStorage.setItem(LS_SESSION,e); }catch(err){}
+      screen="home";
+      render();
+    };
+    document.getElementById("showUpBtn").onclick=function(){
+      document.getElementById("upCard").style.display="block";
+    };
+    document.getElementById("cancelBtn").onclick=function(){
+      document.getElementById("upCard").style.display="none";
+    };
+    document.getElementById("createBtn").onclick=function(){
+      toastMsg="";
+      var n=String(document.getElementById("upName").value||"").trim();
+      var e=normEmail(document.getElementById("upEmail").value);
+      if(!n){ toastMsg="Enter your name."; render(); return; }
+      if(!e || e.indexOf("@")<0){ toastMsg="Enter a valid email."; render(); return; }
+      upsertPlayer(n,e);
+      meEmail=e;
+      try{ localStorage.setItem(LS_SESSION,e); }catch(err){}
+      screen="home";
+      render();
+    };
+    return;
+  }
+
+  if(screen==="home"){
+    var p=me();
+    html += ''+
+    '<div class="card">'+
+      '<span class="pill">Signed in</span>'+
+      '<div class="h1" style="margin-top:8px;">'+esc(p?p.name:"")+'</div>'+
+      '<div class="sub">'+esc(p?p.email:"")+'</div>'+
+      '<div class="divider"></div>'+
+      '<div class="row">'+
+        '<button class="btn" id="playNowBtn" type="button">Play Now</button>'+
+        '<button class="btn" id="soloBtn" type="button">Practice Solo</button>'+
+      '</div>'+
+    '</div>';
+    appEl.innerHTML=html;
+
+    document.getElementById("soloBtn").onclick=function(){
+      toastMsg="";
+      var p=me();
+      match=newMatch([{name:p.name,email:p.email}]);
+      screen="play";
+      render();
+    };
+    document.getElementById("playNowBtn").onclick=function(){
+      toastMsg="";
+      screen="match";
+      render();
+    };
+    return;
+  }
+
+  if(screen==="match"){
+    var p=me();
+    var all=getPlayers();
+    // filter out me
+    var opp=[];
+    for(var i=0;i<all.length;i++){
+      if(all[i].email!==p.email) opp.push(all[i]);
+    }
+
+    html += ''+
+    '<div class="card">'+
+      '<span class="pill">Play Now</span>'+
+      '<div class="h1" style="margin-top:8px;">Add players (1–4)</div>'+
+      '<div class="sub">You are already added. Add up to 3 opponents.</div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="li"><div class="meta"><div class="nm">'+esc(p.name)+'</div><div class="em">'+esc(p.email)+'</div></div><span class="badge">You</span></div>'+
+      '<div class="divider"></div>'+
+      '<label>Add opponent</label>'+
+      '<select id="oppSel"><option value="">Select opponent…</option>'+
+        (function(){
+          var s="";
+          for(var i=0;i<opp.length;i++){
+            s += '<option value="'+esc(opp[i].email)+'">'+esc(opp[i].name)+' • '+esc(opp[i].email)+'</option>';
+          }
+          return s;
+        })()+
+      '</select>'+
+      '<div class="row" style="margin-top:10px;">'+
+        '<button class="btn" id="addBtn" type="button">Add</button>'+
+        '<button class="btn ghost" id="backBtn" type="button">Back</button>'+
+      '</div>'+
+      '<div class="divider"></div>'+
+      '<div id="pickedWrap" class="small"></div>'+
+      '<div class="row" style="margin-top:10px;">'+
+        '<button class="btn ok" id="startBtn" type="button">Start Shanghai</button>'+
+        '<button class="btn danger" id="clearBtn" type="button">Clear</button>'+
+      '</div>'+
+    '</div>';
+
+    appEl.innerHTML=html;
+
+    var picked=[];
+
+    function redrawPicked(){
+      var wrap=document.getElementById("pickedWrap");
+      if(picked.length===0){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
+      var out="";
+      for(var i=0;i<picked.length;i++){
+        var pl=findPlayer(picked[i]);
+        out += '<div class="li" style="margin-top:10px;">'+
+          '<div class="meta"><div class="nm">'+esc(pl.name)+'</div><div class="em">'+esc(pl.email)+'</div></div>'+
+          '<button class="btn danger" data-rem="'+esc(pl.email)+'" type="button">Remove</button>'+
+        '</div>';
+      }
+      wrap.innerHTML=out;
+      var btns=wrap.querySelectorAll("[data-rem]");
+      for(var j=0;j<btns.length;j++){
+        btns[j].onclick=function(){
+          var e=this.getAttribute("data-rem");
+          var n=[];
+          for(var k=0;k<picked.length;k++) if(picked[k]!==e) n.push(picked[k]);
+          picked=n; redrawPicked();
+        };
+      }
+    }
+    redrawPicked();
+
+    document.getElementById("backBtn").onclick=function(){ screen="home"; render(); };
+    document.getElementById("clearBtn").onclick=function(){ picked=[]; redrawPicked(); };
+    document.getElementById("addBtn").onclick=function(){
+      toastMsg="";
+      var e=document.getElementById("oppSel").value;
+      if(!e){ toastMsg="Pick an opponent."; render(); return; }
+      // already?
+      for(var i=0;i<picked.length;i++){ if(picked[i]===e){ toastMsg="Already added."; render(); return; } }
+      if(picked.length>=3){ toastMsg="Max 4 players total."; render(); return; }
+      picked.push(e);
+      document.getElementById("oppSel").value="";
+      redrawPicked();
+    };
+    document.getElementById("startBtn").onclick=function(){
+      var players=[{name:p.name,email:p.email}];
+      for(var i=0;i<picked.length;i++){
+        var pl=findPlayer(picked[i]);
+        if(pl) players.push({name:pl.name,email:pl.email});
+      }
+      match=newMatch(players);
+      screen="play";
+      render();
+    };
+    return;
+  }
+
+  if(screen==="play"){
+    if(!match){ screen="home"; render(); return; }
+    var t=TARGETS[match.targetIndex];
+    var active=match.players[match.turnIndex];
+
+    // table
+    var thead='<tr><th>Target</th>';
+    for(var i=0;i<match.players.length;i++){
+      thead+='<th>'+esc(match.players[i].name)+'<div class="small">'+match.players[i].total+' pts</div></th>';
+    }
+    thead+='</tr>';
+
+    var tbody='';
+    for(var r=0;r<TARGETS.length;r++){
+      var key=String(TARGETS[r]);
+      tbody+='<tr><td class="l"><span class="badge">'+esc(targetLabel(TARGETS[r]))+'</span></td>';
+      for(var c=0;c<match.players.length;c++){
+        var p=match.players[c];
+        var cell=match.grid[p.email][key];
+        var txt = cell.throws.length ? cell.throws.join(" ") : "—";
+        var bonus = cell.shanghai ? " ✨" : "";
+        var cls = (String(t)===key) ? ' class="activeCell"' : "";
+        tbody+='<td'+cls+'>'+esc(txt)+bonus+'<div class="small">'+cell.points+'</div></td>';
+      }
+      tbody+='</tr>';
+    }
+
+    html += ''+
+    '<div class="card">'+
+      '<div class="row">'+
+        '<button class="btn ghost" id="backHome" type="button">Back</button>'+
+        '<button class="btn danger" id="resetBtn" type="button">Reset</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="card">'+
+      '<span class="pill">Shanghai (Accuracy)</span>'+
+      '<div class="divider"></div>'+
+      '<div class="sub">Target: <b>'+esc(targetLabel(t))+'</b> • Turn: <b>'+esc(active.name)+'</b> • Dart '+(match.dartInTurn+1)+'/3</div>'+
+      '<div class="divider"></div>'+
+      '<div class="boardBox">'+dartboardSVG(t)+'</div>'+
+      '<div class="divider"></div>'+
+      '<div class="hitRow">'+
+        '<button class="hitBtn" id="hitT" type="button">T</button>'+
+        '<button class="hitBtn" id="hitS" type="button">S</button>'+
+        '<button class="hitBtn" id="hitD" type="button">D</button>'+
+        '<button class="hitBtn miss" id="hitM" type="button">M</button>'+
+      '</div>'+
+      '<div class="divider"></div>'+
+      '<div class="hitRow">'+
+        '<button class="hitBtn undo" id="undoBtn" type="button">Undo</button>'+
+        '<button class="hitBtn" disabled type="button"></button>'+
+        '<button class="hitBtn" disabled type="button"></button>'+
+        '<button class="hitBtn next" id="nextBtn" type="button">Next</button>'+
+      '</div>'+
+      (match.finished ? '<div class="divider"></div><div class="pill">Finished</div>' : '')+
+    '</div>'+
+    '<div class="card">'+
+      '<div class="pill">Round table</div>'+
+      '<div class="divider"></div>'+
+      '<div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">'+
+        '<table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table>'+
+      '</div>'+
+    '</div>';
+
+    appEl.innerHTML=html;
+
+    function onHit(h){
+      if(match.finished) return;
+      addThrow(match,h);
+      render();
+    }
+    document.getElementById("hitT").onclick=function(){ onHit("T"); };
+    document.getElementById("hitS").onclick=function(){ onHit("S"); };
+    document.getElementById("hitD").onclick=function(){ onHit("D"); };
+    document.getElementById("hitM").onclick=function(){ onHit("M"); };
+
+    // Simple undo: reload match from a snapshot stack
+    // (Lightweight: keep last 40 states)
+    if(!match._snaps){ match._snaps=[]; }
+    function snap(){
+      try{
+        match._snaps.push(JSON.stringify(match));
+        if(match._snaps.length>40) match._snaps.shift();
+      }catch(e){}
+    }
+    // take a snapshot before each hit
+    // (we can’t intercept earlier now, so snapshot current state here)
+    // We'll snapshot on each render if not finished:
+    if(!match.finished) snap();
+
+    document.getElementById("undoBtn").onclick=function(){
+      if(!match._snaps || match._snaps.length<2) return;
+      // pop current
+      match._snaps.pop();
+      var prev=match._snaps.pop();
+      if(!prev) return;
+      try{ match=JSON.parse(prev); }catch(e){}
+      render();
+    };
+
+    document.getElementById("nextBtn").onclick=function(){
+      // fill remaining darts as miss
+      if(match.finished) return;
+      while(match.dartInTurn<3){
+        addThrow(match,"M");
+      }
+      render();
+    };
+
+    document.getElementById("resetBtn").onclick=function(){
+      // restart same players
+      var pls=[];
+      for(var i=0;i<match.players.length;i++){
+        pls.push({name:match.players[i].name,email:match.players[i].email});
+      }
+      match=newMatch(pls);
+      render();
+    };
+
+    document.getElementById("backHome").onclick=function(){
+      match=null;
+      screen="home";
+      render();
+    };
+
+    return;
+  }
+}
+
+/* boot */
+render();
+</script>
+</body>
+</html>
