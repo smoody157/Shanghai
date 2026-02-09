@@ -1,590 +1,672 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Midnight Games</title>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <style>
-    :root{
-      --bg:#0b1a2e;
-      --text:#eaf2ff;
-      --muted:#b9cbe5;
-      --accent:#4ea8ff;
-      --danger:#ff4d5a;
-      --ok:#2bd576;
-      --shadow: rgba(0,0,0,.25);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
-      color:var(--text);
-    }
-    .topbar{
-      position:sticky;top:0;z-index:10;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .brand{display:flex;flex-direction:column;line-height:1.05}
-    .brand .t{font-weight:900;font-size:16px}
-    .brand .s{font-size:12px;color:var(--muted)}
-    .btn{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.08);
-      color:var(--text);border-radius:14px;padding:10px 12px;font-weight:900;
-      box-shadow:0 6px 16px var(--shadow);
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
-    .btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
-    .btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
-    .wrap{max-width:920px;margin:0 auto;padding:14px}
-    .card{
-      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;padding:14px;
-      box-shadow:0 10px 28px rgba(0,0,0,.28);
-      margin-bottom:12px;
-    }
-    .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
-    .sub{color:var(--muted);font-size:13px}
-    label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
-    input, select{
-      width:100%;
-      background:rgba(10,20,35,.65);
-      border:1px solid rgba(255,255,255,.14);
-      color:var(--text);
-      border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
-    }
-    .row{display:flex;gap:10px}
-    .row > *{flex:1}
-    .stack{display:flex;flex-direction:column;gap:10px}
-    .toast{
-      background:rgba(255,77,90,.12);
-      border:1px solid rgba(255,77,90,.30);
-      color:#ffd6da;
-      border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
-    }
-    .pill{
-      display:inline-block;padding:6px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(78,168,255,.08);
-      color:var(--accent);font-weight:900;font-size:12px;
-    }
-    .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Midnight Games</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<style>
+:root{
+--bg:#0b1a2e;
+--text:#eaf2ff;
+--muted:#b9cbe5;
+--accent:#4ea8ff;
+--danger:#ff4d5a;
+--ok:#2bd576;
+--shadow: rgba(0,0,0,.25);
+}
+*{box-sizing:border-box;}
+body{
+margin:0;
+font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
+color:var(--text);
+}
+.topbar{
+position:sticky; top:0; z-index:10;
+display:flex; align-items:center; justify-content:space-between; gap:12px;
+padding:12px 14px; background:rgba(10,20,35,.78); backdrop-filter:blur(10px);
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+.brand{display:flex; flex-direction:column; line-height:1.05}
+.brand .t{font-weight:900; font-size:16px}
+.brand .s{font-size:12px; color:var(--muted)}
+.btn{
+border:1px solid rgba(255,255,255,.14);
+background:rgba(255,255,255,.08);
+color:var(--text); border-radius:14px; padding:10px 12px; font-weight:900;
+box-shadow:0 6px 16px var(--shadow);
+}
+.btn:active{transform:translateY(1px);}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--muted);}
+.btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35);}
+.btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35);}
+.wrap{max-width:920px;margin:0 auto;padding:14px;}
+.card{
+background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+border:1px solid rgba(255,255,255,.10);
+border-radius:18px;padding:14px;
+box-shadow:0 10px 28px rgba(0,0,0,.28);
+margin-bottom:12px;
+}
+.h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
+.sub{color:var(--muted);font-size:13px}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+input, select{
+width:100%;
+background:rgba(10,20,35,.65);
+border:1px solid rgba(255,255,255,.14);
+color:var(--text);
+border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
+}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.stack{display:flex;flex-direction:column;gap:10px}
+.toast{
+background:rgba(255,77,90,.12);
+border:1px solid rgba(255,77,90,.30);
+color:#ffd6da;
+border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
+}
+.pill{
+display:inline-block;padding:6px 10px;border-radius:999px;
+border:1px solid rgba(255,255,255,.14);
+background:rgba(78,168,255,.08);
+color:var(--accent);font-weight:900;font-size:12px;
+}
+.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+</style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand">
-      <div class="t">Midnight Games</div>
-      <div class="s">The Dart Room • Steve’s Graphic Designs</div>
-    </div>
-    <div>
-      <button class="btn ghost" id="homeBtn" type="button">Home</button>
-      <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
-    </div>
-  </div>
+<div class="topbar">
+<div class="brand">
+<div class="t">Midnight Games</div>
+<div class="s">The Dart Room presents • Developed & Designed by Steve’s Graphic Designs</div>
+</div>
+<div>
+<button class="btn ghost" id="homeBtn" type="button">Home</button>
+<button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
+</div>
+</div>
 
-  <div class="wrap" id="app"></div>
+<div class="wrap" id="app"></div>
 
 <script>
-  // ===== Firebase Initialization =====
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_ID",
-    appId: "YOUR_APP_ID"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+// ===== Firebase Initialization =====
+const firebaseConfig = {
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+projectId: "YOUR_PROJECT_ID",
+storageBucket: "YOUR_PROJECT_ID.appspot.com",
+messagingSenderId: "YOUR_MESSAGING_ID",
+appId: "YOUR_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  // ===== Utility functions =====
-  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function now(){ return new Date().getTime(); }
+// ===== Utility =====
+function esc(s){ s=String(s||""); return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function now(){ return new Date().getTime(); }
 
-  // ===== DOM Elements =====
-  const appEl=document.getElementById("app");
-  const homeBtn=document.getElementById("homeBtn");
-  const signOutBtn=document.getElementById("signOutBtn");
+// ===== DOM elements =====
+const appEl = document.getElementById("app");
+const homeBtn = document.getElementById("homeBtn");
+const signOutBtn = document.getElementById("signOutBtn");
 
-  let toastMsg="";
-  let screen="auth"; // auth | home | match | play | stats | history
-  let meEmail="";
-  let match=null;
+let toastMsg = "";
+let screen = "auth"; // auth | home | match | play | stats | history
+let meUser = null;
+let match = null;
 
-  // ===== Firebase Player Functions =====
-  async function getPlayers(){
-    const snapshot = await db.collection("players").get();
-    return snapshot.docs.map(d=>d.data());
-  }
-  async function findPlayer(email){
-    const players = await getPlayers();
-    return players.find(p=>p.email===email);
-  }
-  async function upsertPlayer(name,email){
-    await db.collection("players").doc(email).set({name,email,createdAt:now()},{merge:true});
-  }
+// ===== Firebase Operations =====
+async function getPlayers(){
+const snapshot = await db.collection("players").get();
+return snapshot.docs.map(d=>d.data());
+}
 
-  // ===== Authentication =====
-  async function signInEmail(email){
-    meEmail=email;
-    let p = await findPlayer(email);
-    if(!p){
-      screen="signup";
-    } else {
-      screen="home";
-    }
-    render();
-  }
-  async function createAccount(name,email){
-    await upsertPlayer(name,email);
-    meEmail=email;
-    screen="home";
-    render();
-  }
+async function upsertPlayer(name,email){
+await db.collection("players").doc(email).set({name,email,createdAt:now()},{merge:true});
+}
 
-  // ===== Render =====
-  async function render(){
-    let html="";
-    if(toastMsg){ html += '<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
+async function getStats(email){
+const doc = await db.collection("stats").doc(email).get();
+return doc.exists ? doc.data() : {};
+}
 
-    if(screen==="auth"){
-      html+='<div class="card"><div class="h1">Enter your email</div></div>'+
-            '<div class="card"><div class="stack">'+
-            '<input type="email" id="inEmail" placeholder="you@email.com"/>'+
-            '<button class="btn ok" id="goBtn">Go</button>'+
-            '</div></div>';
-      appEl.innerHTML=html;
-      document.getElementById("goBtn").onclick=()=>signInEmail(document.getElementById("inEmail").value.trim());
-      return;
-    }
+async function saveStats(email,data){
+await db.collection("stats").doc(email).set(data,{merge:true});
+}
 
-    if(screen==="signup"){
-      html+='<div class="card"><div class="h1">Create Account</div></div>'+
-            '<div class="card"><div class="stack">'+
-            '<input type="text" id="upName" placeholder="Your Name"/>'+
-            '<button class="btn ok" id="createBtn">Create Player</button>'+
-            '</div></div>';
-      appEl.innerHTML=html;
-      document.getElementById("createBtn").onclick=()=>createAccount(document.getElementById("upName").value.trim(),document.getElementById("inEmail").value.trim());
-      return;
-    }
+async function getHistory(email){
+const snapshot = await db.collection("history").where("players","array-contains",email).orderBy("endedAt","desc").limit(60).get();
+return snapshot.docs.map(d=>d.data());
+}
 
-    if(screen==="home"){
-      html+='<div class="card"><span class="pill">Signed in</span>'+
-            '<div class="h1">'+esc(meEmail)+'</div>'+
-            '<div class="row">'+
-            '<button class="btn" id="playBtn">Play Now</button>'+
-            '<button class="btn ghost" id="statsBtn">Stats</button>'+
-            '</div></div>';
-      appEl.innerHTML=html;
-      document.getElementById("playBtn").onclick=()=>{screen="match"; render();};
-      document.getElementById("statsBtn").onclick=()=>{screen="stats"; render();};
-      signOutBtn.style.display="inline-block";
-      return;
-    }
-  }
+async function saveHistoryEntry(entry){
+await db.collection("history").add(entry);
+}
 
-  homeBtn.onclick=()=>{ screen=meEmail?"home":"auth"; render(); };
-  signOutBtn.onclick=()=>{ meEmail=""; screen="auth"; render(); };
+// ===== Auth =====
+auth.onAuthStateChanged(user=>{
+meUser=user;
+screen=user?"home":"auth";
+render();
+});
 
-  render();
+async function signUp(name,email){
+try{
+await upsertPlayer(name,email);
+}catch(e){ toastMsg=e.message; render(); }
+}
+
+async function signIn(email){
+try{
+const pDoc = await db.collection("players").doc(email).get();
+if(!pDoc.exists){
+toastMsg="No account found.";
+render();
+return;
+}
+meUser = {email,pDoc:pDoc.data()};
+screen="home";
+render();
+}catch(e){ toastMsg=e.message; render(); }
+}
+
+async function signOut(){
+await auth.signOut();
+meUser=null;
+screen="auth";
+render();
+}
+
+// ===== Initial Render =====
+async function render(){
+let html="";
+if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
+
+if(screen==="auth"){
+html+='<div class="card"><div class="h1">Sign in</div><div class="sub">Enter your email. If new, provide a name next step.</div></div>';
+html+='<div class="card"><div class="stack">';
+html+='<div><label>Email</label><input id="inEmail" placeholder="you@email.com"/></div>';
+html+='<div class="row"><button class="btn" id="signInBtn" type="button">Go</button></div>';
+html+='</div></div>';
+appEl.innerHTML=html;
+
+document.getElementById("signInBtn").onclick = async ()=>{
+const email = String(document.getElementById("inEmail").value||"").trim().toLowerCase();
+if(!email){ toastMsg="Enter a valid email."; render(); return; }
+const pDoc = await db.collection("players").doc(email).get();
+if(!pDoc.exists){
+screen="signup"; render(email);
+return;
+}
+meUser = {email,name:pDoc.data().name};
+screen="home"; render();
+};
+return;
+}
+
+if(screen==="signup"){
+const email = arguments[0];
+html+='<div class="card"><div class="h1">Create Player</div></div>';
+html+='<div class="card"><label>Name</label><input id="upName" placeholder="Your Name"/>';
+html+='<div class="row"><button class="btn ok" id="createBtn">Create</button></div></div>';
+appEl.innerHTML=html;
+
+document.getElementById("createBtn").onclick = async ()=>{
+const name = String(document.getElementById("upName").value||"").trim();
+if(!name){ toastMsg="Enter your name."; render(); return; }
+await signUp(name,email);
+meUser = {email,name};
+screen="home"; render();
+};
+return;
+}
+
+// ===== Home placeholder =====
+if(screen==="home"){
+const p = {name:meUser.name||meUser.email,email:meUser.email};
+html+='<div class="card"><span class="pill">Signed in</span><div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>';
+html+='<div class="row"><button class="btn" id="playNowBtn">Play Now</button><button class="btn ghost" id="statsBtn">My Stats</button></div>';
+appEl.innerHTML=html;
+
+document.getElementById("playNowBtn").onclick=()=>{ screen="match"; render(); };
+document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
+return;
+}
+}
+
+render();
 </script>
 </body>
 </html>
 <script>
-  // ===== Match Setup and Player Selection =====
-  async function renderMatchSetup(){
-    const players = await getPlayers();
-    const currentPlayer = await findPlayer(meEmail);
-    let html = '<div class="card"><span class="pill">Play Now</span>'+
-               '<div class="h1">Add Opponents</div>'+
-               '<div class="sub">You are already added. Add up to 3 opponents.</div></div>'+
-               '<div class="card">' +
-               '<div class="li"><div class="meta"><div class="nm">'+esc(currentPlayer.name)+'</div><div class="em">'+esc(currentPlayer.email)+'</div></div><span class="badge">You</span></div>'+
-               '<div class="divider"></div>'+
-               '<label>Add opponent</label>'+
-               '<select id="oppSel"><option value="">Select opponent…</option>';
-    for(const p of players){
-      if(p.email !== meEmail) html += '<option value="'+esc(p.email)+'">'+esc(p.name)+'</option>';
+// ===== Game Setup & Targets =====
+const TARGETS = [20,19,18,17,16,15,'B'];
+function pts(hit){ return hit==='T'?3 : hit==='D'?2 : hit==='S'?1:0; }
+function targetLabel(t){ return t==='B'?'BULL':String(t); }
+
+function newMatch(players){
+  const m = {
+    gameId:"shanghai",
+    players:players.map(p=>({name:p.name,email:p.email,total:0})),
+    turnIndex:0,
+    targetIndex:0,
+    dartInTurn:0,
+    grid:{},
+    finished:false,
+    startedAt:now(),
+    endedAt:null,
+    snaps:[]
+  };
+  players.forEach(p=>{
+    m.grid[p.email]={};
+    TARGETS.forEach(t=>{
+      m.grid[p.email][String(t)]={throws:[],points:0,shanghai:false};
+    });
+  });
+  return m;
+}
+
+// ===== Snapshots for Undo =====
+function pushSnap(){
+  if(!match) return;
+  match.snaps.push(JSON.stringify(match));
+  if(match.snaps.length>60) match.snaps.shift();
+}
+function popSnap(){
+  if(!match || match.snaps.length<2) return false;
+  match.snaps.pop();
+  const prev = match.snaps.pop();
+  if(!prev) return false;
+  match = JSON.parse(prev);
+  return true;
+}
+
+// ===== Add Throw =====
+function addThrow(m,hit){
+  if(m.finished) return;
+  const p = m.players[m.turnIndex];
+  const t = TARGETS[m.targetIndex];
+  const cell = m.grid[p.email][String(t)];
+  cell.throws.push(hit);
+  cell.points += pts(hit);
+  p.total += pts(hit);
+
+  if(cell.throws.length===3){
+    const hasS=cell.throws.includes('S');
+    const hasD=cell.throws.includes('D');
+    const hasT=cell.throws.includes('T');
+    if(hasS && hasD && hasT && cell.throws[2]==='D'){
+      cell.shanghai=true;
+      cell.points+=5;
+      p.total+=5;
     }
-    html += '</select>'+
-            '<div class="row" style="margin-top:10px;">'+
-            '<button class="btn" id="addBtn">Add</button>'+
-            '<button class="btn ghost" id="backBtn">Back</button></div>'+
-            '<div class="divider"></div>'+
-            '<div id="pickedWrap" class="small">No opponents added yet (solo allowed).</div>'+
-            '<div class="row" style="margin-top:10px;">'+
-            '<button class="btn ok" id="startBtn">Start Game</button>'+
-            '<button class="btn danger" id="clearBtn">Clear</button>'+
-            '</div></div>';
-    appEl.innerHTML = html;
+  }
 
-    let picked = [];
-
-    function redrawPicked(){
-      const wrap = document.getElementById("pickedWrap");
-      if(picked.length === 0){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
-      let out="";
-      for(const e of picked){
-        const pl = players.find(p=>p.email===e);
-        out += '<div class="li" style="margin-top:10px;">'+
-               '<div class="meta"><div class="nm">'+esc(pl.name)+'</div><div class="em">'+esc(pl.email)+'</div></div>'+
-               '<button class="btn danger" data-rem="'+esc(pl.email)+'">Remove</button></div>';
+  m.dartInTurn++;
+  if(m.dartInTurn>=3){
+    m.dartInTurn=0;
+    m.turnIndex=(m.turnIndex+1)%m.players.length;
+    if(m.turnIndex===0){
+      m.targetIndex++;
+      if(m.targetIndex>=TARGETS.length){
+        m.finished=true;
+        m.endedAt=now();
       }
-      wrap.innerHTML = out;
-      wrap.querySelectorAll("[data-rem]").forEach(btn=>{
-        btn.onclick=()=>{
-          picked = picked.filter(x=>x!==btn.getAttribute("data-rem"));
-          redrawPicked();
-        };
+    }
+  }
+}
+
+// ===== Save Completed Match =====
+async function saveCompletedMatch(){
+  if(!match || !match.finished) return;
+
+  const summaryParts = match.players.map(p=>p.name+": "+p.total);
+  await saveHistoryEntry({
+    gameId:"shanghai",
+    startedAt:match.startedAt,
+    endedAt:match.endedAt||now(),
+    players:match.players.map(p=>p.email),
+    summary:"Shanghai • "+summaryParts.join(" | ")
+  });
+
+  for(const pl of match.players){
+    const stats = await getStats(pl.email);
+    stats.shanghai = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
+    const sh = stats.shanghai;
+    sh.games+=1;
+    sh.totalPoints+=pl.total;
+    if(pl.total>sh.best) sh.best=pl.total;
+
+    TARGETS.forEach(t=>{
+      const key=String(t);
+      sh.byTarget[key] = sh.byTarget[key]||{S:0,D:0,T:0,M:0,points:0};
+      const cell = match.grid[pl.email][key];
+      cell.throws.forEach(h=>{
+        if(['S','D','T','M'].includes(h)) sh.byTarget[key][h]+=1;
+        sh.byTarget[key].points+=pts(h);
       });
-    }
+      if(cell.shanghai) sh.byTarget[key].points+=5;
+    });
+    await saveStats(pl.email,stats);
+  }
+}
 
-    document.getElementById("addBtn").onclick=()=>{
-      const e = document.getElementById("oppSel").value;
-      if(!e){ toastMsg="Pick an opponent."; renderMatchSetup(); return; }
-      if(picked.includes(e)){ toastMsg="Already added."; renderMatchSetup(); return; }
-      if(picked.length>=3){ toastMsg="Max 4 players total."; renderMatchSetup(); return; }
-      picked.push(e);
-      document.getElementById("oppSel").value="";
-      redrawPicked();
-    };
+// ===== Dartboard Rendering =====
+const BOARD_NUMS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+function polar(cx,cy,r,deg){ const rad=(deg-90)*Math.PI/180; return {x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};}
+function arcWedgePath(cx,cy,r0,r1,a0,a1){
+  const p1=polar(cx,cy,r1,a0),p2=polar(cx,cy,r1,a1),p3=polar(cx,cy,r0,a1),p4=polar(cx,cy,r0,a0);
+  const large=(a1-a0>180)?1:0;
+  function f(n){ return (Math.round(n*1000)/1000).toFixed(3);}
+  return "M "+f(p1.x)+" "+f(p1.y)+" A "+r1+" "+r1+" 0 "+large+" 1 "+f(p2.x)+" "+f(p2.y)+" L "+f(p3.x)+" "+f(p3.y)+" A "+r0+" "+r0+" 0 "+large+" 0 "+f(p4.x)+" "+f(p4.y)+" Z";
+}
 
-    document.getElementById("backBtn").onclick=()=>{screen="home"; render();};
-    document.getElementById("clearBtn").onclick=()=>{picked=[]; redrawPicked();};
-
-    document.getElementById("startBtn").onclick=()=>{
-      const allPlayers = [currentPlayer, ...picked.map(e=>players.find(p=>p.email===e))];
-      startNewMatch(allPlayers);
-    };
-
-    redrawPicked();
+function dartboardSVG(activeNumber){
+  const cx=100,cy=100;
+  const outer=98,rDoubleOuter=92,rDoubleInner=84,rTripleOuter=62,rTripleInner=54,rSingleInner=16;
+  const seg=360/20;
+  let idx=-1;
+  if(typeof activeNumber==="number"){ BOARD_NUMS.forEach((v,i)=>{if(v===activeNumber) idx=i;}); }
+  let activePath="";
+  if(idx>=0){
+    const a0=idx*seg+1.2,a1=(idx+1)*seg-1.2;
+    activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
   }
 
-  // ===== New Match Logic =====
-  const TARGETS=[20,19,18,17,16,15,"B"];
-  function pts(hit){ return hit==="T"?3:hit==="D"?2:hit==="S"?1:0; }
-  function newMatch(players){
-    const m = {
-      gameId:"shanghai",
-      players: players.map(p=>({name:p.name,email:p.email,total:0})),
-      grid:{},
-      turnIndex:0,
-      targetIndex:0,
-      dartInTurn:0,
-      finished:false,
-      startedAt:now(),
-      endedAt:null,
-      snaps:[]
-    };
-    for(const p of players){
-      m.grid[p.email]={};
-      for(const t of TARGETS) m.grid[p.email][t]={throws:[],points:0,shanghai:false};
-    }
-    return m;
-  }
-
-  function pushSnap(){ if(!match) return; match.snaps.push(JSON.stringify(match)); if(match.snaps.length>60) match.snaps.shift();}
-  function popSnap(){ if(!match||match.snaps.length<2) return false; match.snaps.pop(); const prev=match.snaps.pop(); if(!prev) return false; try{match=JSON.parse(prev); return true;}catch(e){return false;}}
-
-  function startNewMatch(players){
-    match = newMatch(players);
-    match.snaps=[];
-    pushSnap();
-    screen="play";
-    renderPlay();
-  }
-
-</script>
-<script>
-  // ===== Play Screen Rendering =====
-  function renderPlay(){
-    if(!match){ screen="home"; render(); return; }
-
-    const t = TARGETS[match.targetIndex];
-    const activePlayer = match.players[match.turnIndex];
-
-    let thead = '<tr><th>Target</th>';
-    for(const p of match.players){
-      thead += '<th>'+esc(p.name)+'<div class="small">'+p.total+' pts</div></th>';
-    }
-    thead += '</tr>';
-
-    let tbody='';
-    for(const target of TARGETS){
-      tbody += '<tr><td class="l"><span class="badge">'+esc(targetLabel(target))+'</span></td>';
-      for(const p of match.players){
-        const cell = match.grid[p.email][target];
-        let txt = cell.throws.length ? cell.throws.join(" ") : "—";
-        let bonus = cell.shanghai ? " ✨" : "";
-        let cls = (String(t)===String(target)) ? ' class="activeCell"' : "";
-        tbody += '<td'+cls+'>'+esc(txt)+bonus+'<div class="small">'+cell.points+'</div></td>';
-      }
-      tbody += '</tr>';
-    }
-
-    let html = '<div class="card"><div class="row">'+
-               '<button class="btn ghost" id="backHome">Back</button>'+
-               '<button class="btn danger" id="resetBtn">Reset</button>'+
-               '</div></div>'+
-               '<div class="card">'+
-               '<span class="pill">Shanghai (Accuracy)</span>'+
-               '<div class="divider"></div>'+
-               '<div class="sub">Target: <b>'+esc(targetLabel(t))+'</b> • Turn: <b>'+esc(activePlayer.name)+'</b> • Dart '+(match.dartInTurn+1)+'/3</div>'+
-               '<div class="divider"></div>'+
-               '<div class="boardBox">'+dartboardSVG(t)+'</div>'+
-               '<div class="divider"></div>'+
-               '<div class="hitRow">'+
-               '<button class="hitBtn" id="hitT">T</button>'+
-               '<button class="hitBtn" id="hitS">S</button>'+
-               '<button class="hitBtn" id="hitD">D</button>'+
-               '<button class="hitBtn miss" id="hitM">M</button>'+
-               '</div>'+
-               '<div class="divider"></div>'+
-               '<div class="hitRow">'+
-               '<button class="hitBtn undo" id="undoBtn">Undo</button>'+
-               '<button class="hitBtn" disabled></button>'+
-               '<button class="hitBtn" disabled></button>'+
-               '<button class="hitBtn next" id="nextBtn">Next</button>'+
-               '</div>'+
-               (match.finished ? '<div class="divider"></div><div class="pill">Finished • Saved to stats + history</div>':'')+
-               '</div>'+
-               '<div class="card"><div class="pill">Round table</div><div class="divider"></div>'+
-               '<div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">'+
-               '<table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table>'+
-               '</div></div>';
-
-    appEl.innerHTML = html;
-
-    // ===== Throw Buttons =====
-    function onHit(h){
-      if(match.finished) return;
-      pushSnap();
-      addThrow(match,h);
-      if(match.finished) saveCompletedMatch();
-      renderPlay();
-    }
-
-    document.getElementById("hitT").onclick = ()=>onHit("T");
-    document.getElementById("hitS").onclick = ()=>onHit("S");
-    document.getElementById("hitD").onclick = ()=>onHit("D");
-    document.getElementById("hitM").onclick = ()=>onHit("M");
-    document.getElementById("undoBtn").onclick = ()=>{ popSnap(); renderPlay(); };
-    document.getElementById("nextBtn").onclick = ()=>{
-      if(match.finished) return;
-      while(match.dartInTurn<3){ pushSnap(); addThrow(match,"M"); }
-      if(match.finished) saveCompletedMatch();
-      renderPlay();
-    };
-
-    document.getElementById("resetBtn").onclick = ()=>{
-      const pls = match.players.map(p=>({name:p.name,email:p.email}));
-      match = newMatch(pls); match.snaps=[]; pushSnap(); renderPlay();
-    };
-    document.getElementById("backHome").onclick = ()=>{ match=null; screen="home"; render(); };
-  }
-
-  // ===== Add Throw Logic =====
-  function addThrow(m, hit){
-    if(m.finished) return;
-    const p = m.players[m.turnIndex];
-    const t = TARGETS[m.targetIndex];
-    const cell = m.grid[p.email][t];
-
-    cell.throws.push(hit);
-    cell.points += pts(hit);
-    p.total += pts(hit);
-
-    if(cell.throws.length===3){
-      let hasS=false,hasT=false,hasD=false;
-      for(const h of cell.throws){
-        if(h==="S") hasS=true;
-        if(h==="T") hasT=true;
-        if(h==="D") hasD=true;
-      }
-      if(hasS && hasT && hasD && cell.throws[2]==="D"){
-        cell.shanghai=true;
-        cell.points +=5;
-        p.total +=5;
-      }
-    }
-
-    m.dartInTurn++;
-    if(m.dartInTurn>=3){
-      m.dartInTurn=0;
-      m.turnIndex=(m.turnIndex+1)%m.players.length;
-      if(m.turnIndex===0){
-        m.targetIndex++;
-        if(m.targetIndex>=TARGETS.length){
-          m.finished=true;
-          m.endedAt=now();
-        }
-      }
-    }
-  }
-
-  // ===== Dartboard SVG =====
-  const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-  function polar(cx,cy,r,deg){ const rad=(deg-90)*Math.PI/180; return {x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)}; }
-  function arcWedgePath(cx,cy,r0,r1,a0,a1){
-    const p1=polar(cx,cy,r1,a0),p2=polar(cx,cy,r1,a1),p3=polar(cx,cy,r0,a1),p4=polar(cx,cy,r0,a0);
-    const large=((a1-a0)>180)?1:0;
-    function f(n){ return (Math.round(n*1000)/1000).toFixed(3); }
-    return "M "+f(p1.x)+" "+f(p1.y)+" A "+r1+" "+r1+" 0 "+large+" 1 "+f(p2.x)+" "+f(p2.y)+" L "+f(p3.x)+" "+f(p3.y)+" A "+r0+" "+r0+" 0 "+large+" 0 "+f(p4.x)+" "+f(p4.y)+" Z";
-  }
-
-  function dartboardSVG(activeNumber){
-    const cx=100,cy=100,outer=98,rDoubleOuter=92,rDoubleInner=84,rTripleOuter=62,rTripleInner=54,rSingleInner=16;
-    const seg=360/20;
-    let idx=-1;
-    if(typeof activeNumber==="number"){
-      for(let i=0;i<BOARD_NUMS.length;i++){ if(BOARD_NUMS[i]===activeNumber){ idx=i; break; } }
-    }
-    let activePath="";
-    if(idx>=0){
-      const a0=idx*seg+1.2,a1=(idx+1)*seg-1.2;
-      activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
-    }
-
-    function ringWedges(r0,r1,fillA,fillB){
-      let out="";
-      for(let i=0;i<20;i++){
-        const a0=i*seg+0.8,a1=(i+1)*seg-0.8;
-        const p=arcWedgePath(cx,cy,r0,r1,a0,a1);
-        out += '<path d="'+p+'" fill="'+(i%2===0?fillA:fillB)+'" opacity="0.95"/>';
-      }
-      return out;
-    }
-
-    let numText="";
+  function ringWedges(r0,r1,fillA,fillB){
+    let out="";
     for(let i=0;i<20;i++){
-      const ang=i*seg+seg/2,p=polar(cx,cy,95,ang);
-      numText += '<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>';
+      const a0=i*seg+0.8,a1=(i+1)*seg-0.8;
+      out+='<path d="'+arcWedgePath(cx,cy,r0,r1,a0,a1)+'" fill="'+(i%2===0?fillA:fillB)+'" opacity="0.95"/>';
     }
-
-    return '<svg viewBox="0 0 200 200" width="94%" aria-label="dartboard">'+
-           '<defs><radialGradient id="bgG" cx="50%" cy="42%" r="65%"><stop offset="0%" stop-color="#203a62"/><stop offset="55%" stop-color="#0d1a2e"/><stop offset="100%" stop-color="#060d18"/></radialGradient>'+
-           '<filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.5" result="b"/><feColorMatrix in="b" type="matrix" values="0 0 0 0 0.30 0 0 0 0 0.66 0 0 0 0 1.00 0 0 0 .9 0" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
-           '<circle cx="100" cy="100" r="'+outer+'" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>'+
-           (activePath ? '<path d="'+activePath+'" fill="rgba(78,168,255,.16)" stroke="rgba(78,168,255,.55)" stroke-width="1.4" filter="url(#glow)"/>' : '')+
-           ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")+
-           ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")+
-           ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")+
-           ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
-           '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
-           '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+numText+
-           '<g><rect x="60" y="8" rx="8" ry="8" width="80" height="18" fill="rgba(0,0,0,.35)" stroke="rgba(255,255,255,.12)"/>'+
-           '<text x="100" y="21" text-anchor="middle" font-size="9.5" fill="#cfe4ff" font-weight="900">TARGET: '+(activeNumber==="B"?"BULL":activeNumber)+'</text></g></svg>';
+    return out;
   }
+
+  let numText="";
+  for(let i=0;i<20;i++){
+    const ang=i*seg+seg/2;
+    const p=polar(cx,cy,95,ang);
+    numText+='<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>';
+  }
+
+  return ''+
+  '<svg viewBox="0 0 200 200" width="80%" aria-label="dartboard">'+
+    '<circle cx="100" cy="100" r="'+outer+'" fill="#0d1a2e" stroke="#2a3f5f" stroke-width="2"/>'+
+    (activePath?'<path d="'+activePath+'" fill="rgba(78,168,255,.16)" stroke="rgba(78,168,255,.55)" stroke-width="1.4"/>' :'')+
+    ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")+
+    ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")+
+    ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")+
+    ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
+    '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
+    '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+
+    numText+
+  '</svg>';
+}
 </script>
 <script>
-  // ===== Stats Screen =====
-  async function renderStats(){
-    const p = meUser;
-    if(!p){ screen="auth"; render(); return; }
+// ===== Play Screen UI =====
+async function renderPlayScreen(){
+  if(!match){ screen="home"; render(); return; }
 
-    const allStats = await getStats(p.email);
-    const sh = allStats.shanghai || {games:0,best:0,totalPoints:0,byTarget:{}};
-    const avg = sh.games ? Math.round((sh.totalPoints/sh.games)*10)/10 : 0;
+  const t = TARGETS[match.targetIndex];
+  const active = match.players[match.turnIndex];
 
-    let maxPts = 0;
-    for(const t of TARGETS){
-      const bt = sh.byTarget[t] || {S:0,D:0,T:0,M:0,points:0};
-      if(bt.points>maxPts) maxPts=bt.points;
-    }
-    if(maxPts<1) maxPts=1;
+  // Table Header
+  let thead='<tr><th>Target</th>';
+  match.players.forEach(p=>{
+    thead+='<th>'+esc(p.name)+'<div class="small">'+p.total+' pts</div></th>';
+  });
+  thead+='</tr>';
 
-    let bars="";
-    for(const t of TARGETS){
-      const k = String(t);
-      const bt = sh.byTarget[k] || {points:0,S:0,D:0,T:0,M:0};
-      const w = Math.round((bt.points/maxPts)*100);
-      bars += '<div class="barRow"><div class="barLabel">'+esc(targetLabel(t))+'</div>'+
-              '<div class="barOuter"><div class="barInner" style="width:'+w+'%"></div></div>'+
-              '<div class="barVal">'+bt.points+' pts</div></div>';
-    }
+  // Table Body
+  let tbody='';
+  TARGETS.forEach(r=>{
+    const key=String(r);
+    tbody+='<tr><td class="l"><span class="badge">'+esc(targetLabel(r))+'</span></td>';
+    match.players.forEach(p=>{
+      const cell = match.grid[p.email][key];
+      const txt = cell.throws.length ? cell.throws.join(' ') : '—';
+      const bonus = cell.shanghai ? ' ✨' : '';
+      const cls = (String(t)===key)?' class="activeCell"':'';
+      tbody+='<td'+cls+'>'+esc(txt)+bonus+'<div class="small">'+cell.points+'</div></td>';
+    });
+    tbody+='</tr>';
+  });
 
-    let html = '<div class="card"><div class="row">'+
-               '<button class="btn ghost" id="backHome1">Back</button>'+
-               '<button class="btn danger" id="clearStatsBtn">Clear My Stats</button></div></div>'+
-               '<div class="card"><span class="pill">My Stats</span>'+
-               '<div class="h1">Shanghai</div>'+
-               '<div class="sub">T=3, D=2, S=1, M=0 • Shanghai bonus +5</div>'+
-               '<div class="divider"></div>'+
-               '<div class="kpi"><div class="box"><div class="v">'+sh.games+'</div><div class="l">Games played</div></div>'+
-               '<div class="box"><div class="v">'+sh.best+'</div><div class="l">Best score</div></div>'+
-               '<div class="box"><div class="v">'+avg+'</div><div class="l">Average score</div></div></div></div>'+
-               '<div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
+  let html='<div class="card"><div class="row">'+
+           '<button class="btn ghost" id="backHome">Back</button>'+
+           '<button class="btn danger" id="resetBtn">Reset</button></div></div>'+
+           '<div class="card">'+
+           '<span class="pill">Shanghai (Accuracy)</span><div class="divider"></div>'+
+           '<div class="sub">Target: <b>'+esc(targetLabel(t))+'</b> • Turn: <b>'+esc(active.name)+'</b> • Dart '+(match.dartInTurn+1)+'/3</div>'+
+           '<div class="divider"></div>'+
+           '<div class="boardBox">'+dartboardSVG(t)+'</div>'+
+           '<div class="divider"></div>'+
+           '<div class="hitRow">'+
+           '<button class="hitBtn" id="hitT">T</button>'+
+           '<button class="hitBtn" id="hitS">S</button>'+
+           '<button class="hitBtn" id="hitD">D</button>'+
+           '<button class="hitBtn miss" id="hitM">M</button></div>'+
+           '<div class="divider"></div>'+
+           '<div class="hitRow">'+
+           '<button class="hitBtn undo" id="undoBtn">Undo</button>'+
+           '<button class="hitBtn" disabled></button>'+
+           '<button class="hitBtn" disabled></button>'+
+           '<button class="hitBtn next" id="nextBtn">Next</button></div>'+
+           (match.finished?'<div class="divider"></div><div class="pill">Finished • Saved to stats + history</div>':'')+
+           '</div>'+
+           '<div class="card"><div class="pill">Round table</div><div class="divider"></div>'+
+           '<div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">'+
+           '<table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table>'+
+           '</div></div>';
 
-    appEl.innerHTML = html;
+  appEl.innerHTML=html;
 
-    document.getElementById("backHome1").onclick = ()=>{ screen="home"; render(); };
-    document.getElementById("clearStatsBtn").onclick = async ()=>{
-      const stats = await getStats(p.email);
-      if(stats.shanghai) delete stats.shanghai;
-      await saveStats(p.email, stats);
-      toastMsg="Stats cleared."; renderStats();
-    };
+  function onHit(h){
+    if(match.finished) return;
+    pushSnap();
+    addThrow(match,h);
+    if(match.finished) saveCompletedMatch();
+    renderPlayScreen();
   }
 
-  // ===== History Screen =====
-  async function renderHistory(){
-    const p = meUser;
-    if(!p){ screen="auth"; render(); return; }
+  document.getElementById("hitT").onclick=()=>onHit('T');
+  document.getElementById("hitS").onclick=()=>onHit('S');
+  document.getElementById("hitD").onclick=()=>onHit('D');
+  document.getElementById("hitM").onclick=()=>onHit('M');
 
-    const hist = await getHistory(p.email);
-    const mine = hist.slice(0,60); // keep max 60
+  document.getElementById("undoBtn").onclick=()=>{
+    popSnap(); renderPlayScreen();
+  };
 
-    let list="";
-    if(mine.length===0) list='<div class="sub">No matches yet.</div>';
-    else{
-      for(const h of mine){
-        list += '<div class="li"><div class="meta">'+
-                '<div class="nm">'+esc(h.summary)+'</div>'+
-                '<div class="em">'+esc(new Date(h.endedAt).toLocaleString())+'</div></div></div>';
-      }
+  document.getElementById("nextBtn").onclick=()=>{
+    if(match.finished) return;
+    while(match.dartInTurn<3){
+      pushSnap(); addThrow(match,'M');
     }
+    if(match.finished) saveCompletedMatch();
+    renderPlayScreen();
+  };
 
-    let html = '<div class="card"><div class="row">'+
-               '<button class="btn ghost" id="backHome2">Back</button>'+
-               '<button class="btn danger" id="clearHistBtn">Clear My History</button></div></div>'+
-               '<div class="card"><span class="pill">Match History</span>'+
-               '<div class="h1">Your recent games</div><div class="divider"></div>'+list+'</div>';
+  document.getElementById("resetBtn").onclick=()=>{
+    const pls = match.players.map(p=>({name:p.name,email:p.email}));
+    match=newMatch(pls);
+    match.snaps=[]; pushSnap();
+    renderPlayScreen();
+  };
 
-    appEl.innerHTML = html;
+  document.getElementById("backHome").onclick=()=>{
+    match=null; screen="home"; render();
+  };
+}
+</script>
+<script>
+// ===== Home Screen =====
+async function renderHomeScreen(){
+  const p = meUser ? {name:meUser.displayName||meUser.email,email:meUser.email} : {name:"",email:""};
+  let html='<div class="card">'+
+           '<span class="pill">Signed in</span>'+
+           '<div class="h1">'+esc(p.name)+'</div>'+
+           '<div class="sub">'+esc(p.email)+'</div>'+
+           '<div class="divider"></div>'+
+           '<div class="row">'+
+           '<button class="btn" id="playNowBtn">Play Now</button>'+
+           '<button class="btn ghost" id="statsBtn">My Stats</button>'+
+           '<button class="btn ghost" id="historyBtn">Match History</button>'+
+           '</div></div>';
+  appEl.innerHTML=html;
 
-    document.getElementById("backHome2").onclick = ()=>{ screen="home"; render(); };
-    document.getElementById("clearHistBtn").onclick = async ()=>{
-      const histAll = await getHistory(p.email);
-      const keep = histAll.filter(h=>!h.players.includes(p.email));
-      for(const h of keep) await saveHistoryEntry(h); // overwrite with only non-user
-      toastMsg="History cleared."; renderHistory();
-    };
+  document.getElementById("playNowBtn").onclick=()=>{ screen="match"; renderMatchScreen(); };
+  document.getElementById("statsBtn").onclick=()=>{ screen="stats"; renderStatsScreen(); };
+  document.getElementById("historyBtn").onclick=()=>{ screen="history"; renderHistoryScreen(); };
+}
+
+// ===== Stats Screen =====
+async function renderStatsScreen(){
+  const p = meUser;
+  const stats = await getStats(p.email);
+  const sh = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
+  const avg = sh.games?Math.round((sh.totalPoints/sh.games)*10)/10:0;
+
+  let bars='';
+  const maxPts = Math.max(...TARGETS.map(t=>{
+    const bt = sh.byTarget[String(t)]||{points:0};
+    return bt.points;
+  }),1);
+
+  TARGETS.forEach(t=>{
+    const k=String(t);
+    const bt = sh.byTarget[k]||{points:0,S:0,D:0,T:0,M:0};
+    const w=Math.round((bt.points/maxPts)*100);
+    bars+='<div class="barRow"><div class="barLabel">'+esc(targetLabel(t))+'</div>'+
+          '<div class="barOuter"><div class="barInner" style="width:'+w+'%"></div></div>'+
+          '<div class="barVal">'+bt.points+' pts</div></div>';
+  });
+
+  let html='<div class="card"><div class="row">'+
+           '<button class="btn ghost" id="backHomeBtn">Back</button>'+
+           '<button class="btn danger" id="clearStatsBtn">Clear My Stats</button>'+
+           '</div></div>'+
+           '<div class="card"><span class="pill">My Stats</span>'+
+           '<div class="h1">Shanghai</div>'+
+           '<div class="sub">T=3, D=2, S=1, M=0 • Shanghai bonus +5</div>'+
+           '<div class="divider"></div>'+
+           '<div class="kpi">'+
+           '<div class="box"><div class="v">'+sh.games+'</div><div class="l">Games played</div></div>'+
+           '<div class="box"><div class="v">'+sh.best+'</div><div class="l">Best score</div></div>'+
+           '<div class="box"><div class="v">'+avg+'</div><div class="l">Average score</div></div></div></div>'+
+           '<div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
+  appEl.innerHTML=html;
+
+  document.getElementById("backHomeBtn").onclick=()=>{ screen="home"; renderHomeScreen(); };
+  document.getElementById("clearStatsBtn").onclick=async ()=>{
+    const s = await getStats(p.email);
+    delete s.shanghai;
+    await saveStats(p.email,s);
+    toastMsg="Stats cleared.";
+    renderStatsScreen();
+  };
+}
+
+// ===== Match History Screen =====
+async function renderHistoryScreen(){
+  const p = meUser;
+  const hist = await getHistory(p.email);
+  const mine = hist.filter(h=>h.players.includes(p.email)).slice(0,60);
+
+  let list='';
+  if(mine.length===0) list='<div class="sub">No matches yet.</div>';
+  else{
+    mine.forEach(h=>{
+      list+='<div class="li"><div class="meta">'+
+            '<div class="nm">'+esc(h.summary)+'</div>'+
+            '<div class="em">'+esc(new Date(h.endedAt).toLocaleString())+'</div></div></div>';
+    });
   }
 
-  // ===== Override Render to call async screens =====
-  async function render(){
-    if(!meUser && screen!=="auth") screen="auth";
-    signOutBtn.style.display = meUser ? "inline-block" : "none";
+  let html='<div class="card"><div class="row">'+
+           '<button class="btn ghost" id="backHomeBtn">Back</button>'+
+           '<button class="btn danger" id="clearHistBtn">Clear My History</button>'+
+           '</div></div>'+
+           '<div class="card"><span class="pill">Match History</span>'+
+           '<div class="h1">Recent Games</div><div class="divider"></div>'+list+'</div>';
+  appEl.innerHTML=html;
 
-    if(screen==="auth") renderAuth();
-    else if(screen==="home") renderHome();
-    else if(screen==="play") renderPlay();
-    else if(screen==="match") renderMatch();
-    else if(screen==="stats") await renderStats();
-    else if(screen==="history") await renderHistory();
+  document.getElementById("backHomeBtn").onclick=()=>{ screen="home"; renderHomeScreen(); };
+  document.getElementById("clearHistBtn").onclick=async ()=>{
+    const keep = hist.filter(h=>!h.players.includes(p.email));
+    for(const h of mine){
+      const docRef = await db.collection('history').where('endedAt','==',h.endedAt).get();
+      docRef.forEach(d=>d.ref.delete());
+    }
+    toastMsg="History cleared."; renderHistoryScreen();
+  };
+}
+
+// ===== Match Screen (add players) =====
+async function renderMatchScreen(){
+  const p = meUser;
+  const allPlayers = await getPlayers();
+  const opp = allPlayers.filter(a=>a.email!==p.email);
+
+  let html='<div class="card"><span class="pill">Add players (1–4)</span>'+
+           '<div class="sub">You are already added. Add up to 3 opponents.</div></div>'+
+           '<div class="card"><div class="li"><div class="meta">'+
+           '<div class="nm">'+esc(p.displayName||p.email)+'</div>'+
+           '<div class="em">'+esc(p.email)+'</div></div><span class="badge">You</span></div>'+
+           '<div class="divider"></div><label>Add opponent</label>'+
+           '<select id="oppSel"><option value="">Select opponent…</option>';
+  opp.forEach(pl=>{ html+='<option value="'+esc(pl.email)+'">'+esc(pl.name)+'</option>'; });
+  html+='</select>'+
+        '<div class="row" style="margin-top:10px;">'+
+        '<button class="btn" id="addBtn">Add</button>'+
+        '<button class="btn ghost" id="backBtn">Back</button></div>'+
+        '<div class="divider"></div><div id="pickedWrap" class="small"></div>'+
+        '<div class="row" style="margin-top:10px;">'+
+        '<button class="btn ok" id="startBtn">Start Shanghai</button>'+
+        '<button class="btn danger" id="clearBtn">Clear</button></div></div>';
+
+  appEl.innerHTML=html;
+
+  let picked=[];
+  function redrawPicked(){
+    const wrap=document.getElementById("pickedWrap");
+    if(picked.length===0){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
+    let out='';
+    picked.forEach(e=>{
+      const pl = allPlayers.find(a=>a.email===e);
+      out+='<div class="li"><div class="meta"><div class="nm">'+esc(pl.name)+'</div><div class="em">'+esc(pl.email)+'</div></div>'+
+           '<button class="btn danger" data-rem="'+esc(pl.email)+'">Remove</button></div>';
+    });
+    wrap.innerHTML=out;
+    wrap.querySelectorAll('[data-rem]').forEach(btn=>{
+      btn.onclick=()=>{ picked = picked.filter(x=>x!==btn.getAttribute('data-rem')); redrawPicked(); };
+    });
   }
+  redrawPicked();
 
-  // ===== Initialize =====
-  render();
+  document.getElementById("backBtn").onclick=()=>{ screen="home"; renderHomeScreen(); };
+  document.getElementById("clearBtn").onclick=()=>{ picked=[]; redrawPicked(); };
+  document.getElementById("addBtn").onclick=()=>{
+    const e=document.getElementById("oppSel").value;
+    if(!e){ toastMsg="Pick an opponent."; renderMatchScreen(); return; }
+    if(picked.includes(e)){ toastMsg="Already added."; renderMatchScreen(); return; }
+    if(picked.length>=3){ toastMsg="Max 4 players total."; renderMatchScreen(); return; }
+    picked.push(e); document.getElementById("oppSel").value=""; redrawPicked();
+  };
+  document.getElementById("startBtn").onclick=()=>{
+    const players=[{name:p.displayName||p.email,email:p.email}];
+    picked.forEach(e=>{ const pl = allPlayers.find(a=>a.email===e); if(pl) players.push({name:pl.name,email:pl.email}); });
+    match=newMatch(players); match.snaps=[]; pushSnap();
+    screen="play"; renderPlayScreen();
+  };
+}
 </script>
