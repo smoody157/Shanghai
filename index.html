@@ -108,3 +108,324 @@
     </div>
   </div>
   <div class="wrap" id="app"></div>
+  <script>
+  // ===== Firebase Initialization =====
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_MESSAGING_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // ===== Utility =====
+  function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function now(){ return new Date().getTime(); }
+  function pts(hit){ return hit==="T"?3:hit==="D"?2:hit==="S"?1:0; }
+  function targetLabel(t){ return t==="B"?"BULL":String(t); }
+
+  // ===== DOM Elements =====
+  const appEl = document.getElementById("app");
+  const homeBtn = document.getElementById("homeBtn");
+  const signOutBtn = document.getElementById("signOutBtn");
+
+  let toastMsg="", screen="auth", meUser=null, match=null;
+
+  // ===== Firebase Operations =====
+  async function getPlayers(){
+    const snapshot = await db.collection("players").get();
+    return snapshot.docs.map(d=>d.data());
+  }
+  async function upsertPlayer(name,email){
+    await db.collection("players").doc(email).set({name,email,createdAt:now()},{merge:true});
+  }
+  async function getStats(email){
+    const doc = await db.collection("stats").doc(email).get();
+    return doc.exists?doc.data():{};
+  }
+  async function saveStats(email,data){
+    await db.collection("stats").doc(email).set(data,{merge:true});
+  }
+  async function getHistory(email){
+    const snapshot = await db.collection("history")
+      .where("players","array-contains",email)
+      .orderBy("endedAt","desc").limit(60).get();
+    return snapshot.docs.map(d=>d.data());
+  }
+  async function saveHistoryEntry(entry){
+    await db.collection("history").add(entry);
+  }
+
+  // ===== Auth =====
+  auth.onAuthStateChanged(user=>{
+    meUser=user;
+    screen = user?"home":"auth";
+    render();
+  });
+
+  async function signUp(name,email,password){
+    try{
+      const res = await auth.createUserWithEmailAndPassword(email,password);
+      await upsertPlayer(name,email);
+      meUser = res.user;
+    }catch(e){ toastMsg=e.message; render(); }
+  }
+  async function signIn(email,password){
+    try{ await auth.signInWithEmailAndPassword(email,password); }catch(e){ toastMsg=e.message; render(); }
+  }
+  async function signOut(){ await auth.signOut(); }
+
+  // ===== Game logic =====
+  const TARGETS=[20,19,18,17,16,15,"B"];
+  function newMatch(players){
+    let m={gameId:"shanghai",players:[],turnIndex:0,targetIndex:0,dartInTurn:0,grid:{},finished:false,startedAt:now(),endedAt:null,snaps:[]};
+    for(const pl of players){
+      m.players.push({name:pl.name,email:pl.email,total:0});
+      m.grid[pl.email]={};
+      for(const t of TARGETS) m.grid[pl.email][String(t)]={throws:[],points:0,shanghai:false};
+    }
+    return m;
+  }
+
+  function pushSnap(){ if(!match) return; match.snaps.push(JSON.stringify(match)); if(match.snaps.length>60) match.snaps.shift(); }
+  function popSnap(){ if(!match || match.snaps.length<2) return false; match.snaps.pop(); let prev=match.snaps.pop(); if(!prev) return false; match=JSON.parse(prev); return true; }
+
+  function addThrow(m,hit){
+    if(m.finished) return;
+    let p=m.players[m.turnIndex];
+    let t=TARGETS[m.targetIndex];
+    let cell=m.grid[p.email][String(t)];
+    cell.throws.push(hit);
+    cell.points+=pts(hit); p.total+=pts(hit);
+
+    if(cell.throws.length===3){
+      const [hasS,hasD,hasT] = [cell.throws.includes("S"), cell.throws.includes("D"), cell.throws.includes("T")];
+      if(hasS && hasD && hasT && cell.throws[2]==="D"){ cell.shanghai=true; cell.points+=5; p.total+=5; }
+    }
+
+    m.dartInTurn++;
+    if(m.dartInTurn>=3){ m.dartInTurn=0; m.turnIndex=(m.turnIndex+1)%m.players.length;
+      if(m.turnIndex===0){ m.targetIndex++; if(m.targetIndex>=TARGETS.length){ m.finished=true; m.endedAt=now(); } }
+    }
+  }
+
+  async function saveCompletedMatch(){
+    if(!match || !match.finished) return;
+    const summaryParts = match.players.map(p=>p.name+": "+p.total);
+    await saveHistoryEntry({gameId:"shanghai",startedAt:match.startedAt,endedAt:match.endedAt||now(),players:match.players.map(p=>p.email),summary:"Shanghai • "+summaryParts.join(" | ")});
+    for(const pl of match.players){
+      const stats = await getStats(pl.email);
+      stats.shanghai=stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
+      const sh=stats.shanghai; sh.games++; sh.totalPoints+=pl.total; if(pl.total>sh.best) sh.best=pl.total;
+      for(const t of TARGETS){
+        const key=String(t); sh.byTarget[key]=sh.byTarget[key]||{S:0,D:0,T:0,M:0,points:0};
+        const cell=match.grid[pl.email][key];
+        for(const h of cell.throws){ if(["S","D","T","M"].includes(h)) sh.byTarget[key][h]+=1; sh.byTarget[key].points+=pts(h); }
+        if(cell.shanghai) sh.byTarget[key].points+=5;
+      }
+      await saveStats(pl.email,stats);
+    }
+  }
+
+  // ===== Dartboard SVG =====
+  const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+  function polar(cx,cy,r,deg){ const rad=(deg-90)*Math.PI/180; return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)}; }
+  function arcWedgePath(cx,cy,r0,r1,a0,a1){
+    const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1), p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
+    const large=((a1-a0)>180)?1:0;
+    function f(n){ return (Math.round(n*1000)/1000).toFixed(3); }
+    return "M "+f(p1.x)+" "+f(p1.y)+" A "+r1+" "+r1+" 0 "+large+" 1 "+f(p2.x)+" "+f(p2.y)+" L "+f(p3.x)+" "+f(p3.y)+" A "+r0+" "+r0+" 0 "+large+" 0 "+f(p4.x)+" "+f(p4.y)+" Z";
+  }
+  function dartboardSVG(activeNumber){
+    const cx=100,cy=100; const outer=80, rDoubleOuter=72, rDoubleInner=66, rTripleOuter=50, rTripleInner=44, rSingleInner=16;
+    const seg=360/20; let idx=-1;
+    if(typeof activeNumber==="number"){ for(let i=0;i<BOARD_NUMS.length;i++) if(BOARD_NUMS[i]===activeNumber){ idx=i; break; } }
+    let activePath=""; if(idx>=0){ const a0=idx*seg+1.2,a1=(idx+1)*seg-1.2; activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1); }
+
+    function ringWedges(r0,r1,fillA,fillB){ let out=""; for(let i=0;i<20;i++){ const a0=i*seg+0.8,a1=(i+1)*seg-0.8; out+='<path d="'+arcWedgePath(cx,cy,r0,r1,a0,a1)+'" fill="'+(i%2===0?fillA:fillB)+'" opacity="0.95"/>'; } return out; }
+
+    let numText=""; for(let i=0;i<20;i++){ const ang=i*seg+seg/2,p=polar(cx,cy,95,ang); numText+='<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>'; }
+
+    return ''+
+    '<svg viewBox="0 0 200 200" width="94%" aria-label="dartboard">'+
+      '<circle cx="100" cy="100" r="'+outer+'" fill="#0d1a2e" stroke="#2a3f5f" stroke-width="2"/>'+
+      (activePath?'<path d="'+activePath+'" fill="rgba(78,168,255,.32)" stroke="rgba(78,168,255,.65)" stroke-width="2"/>':'')+
+      ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")+
+      ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")+
+      ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")+
+      ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
+      '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
+      '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+
+      numText+
+      '</svg>';
+  }
+</script>
+  <script>
+  // ===== UI Render and Interaction =====
+  homeBtn.onclick = ()=>{ screen = meUser ? "home" : "auth"; render(); };
+  signOutBtn.onclick = async ()=>{ await signOut(); screen="auth"; render(); };
+
+  async function render(){
+    let html="";
+    if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
+
+    // ===== AUTH SCREEN =====
+    if(screen==="auth"){
+      html += '<div class="card"><div class="h1">Sign In / Sign Up</div></div>'+
+              '<div class="card">'+
+              '<label>Email</label><input type="email" id="inEmail"/>'+
+              '<label>Password</label><input type="password" id="inPass"/>'+
+              '<label>Name (for sign up)</label><input type="text" id="inName"/>'+
+              '<button class="btn" id="signInBtn">Sign In</button>'+
+              '<button class="btn ok" id="signUpBtn">Sign Up</button>'+
+              '</div>';
+      appEl.innerHTML = html;
+      document.getElementById("signInBtn").onclick = ()=>signIn(
+        document.getElementById("inEmail").value,
+        document.getElementById("inPass").value
+      );
+      document.getElementById("signUpBtn").onclick = ()=>signUp(
+        document.getElementById("inName").value,
+        document.getElementById("inEmail").value,
+        document.getElementById("inPass").value
+      );
+      return;
+    }
+
+    // ===== HOME SCREEN =====
+    if(screen==="home"){
+      const p = {name:meUser.displayName||meUser.email,email:meUser.email};
+      html += '<div class="card"><span class="pill">Signed in</span><div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>';
+      html += '<div class="row"><button class="btn" id="playNowBtn">Play Now</button><button class="btn ghost" id="statsBtn">My Stats</button></div>';
+      appEl.innerHTML = html;
+      document.getElementById("playNowBtn").onclick = ()=>{ screen="match"; render(); };
+      document.getElementById("statsBtn").onclick = ()=>{ screen="stats"; render(); };
+      return;
+    }
+
+    // ===== MATCH SCREEN =====
+    if(screen==="match"){
+      const allPlayers = await getPlayers();
+      const meEmail = meUser.email;
+      const opponents = allPlayers.filter(p=>p.email!==meEmail);
+      html='<div class="card"><span class="pill">Add Opponents</span><div class="sub">Add 1–3 opponents</div></div>';
+      html+='<div class="card"><label>Select Opponent</label><input type="text" id="oppSearch" placeholder="Type name..." list="oppList"/>'+
+            '<datalist id="oppList">'+opponents.map(p=>`<option value="${esc(p.name)}">${esc(p.email)}</option>`).join("")+'</datalist>'+
+            '<div id="pickedWrap" class="small">No opponents added yet (solo allowed).</div>'+
+            '<div class="row" style="margin-top:10px;">'+
+            '<button class="btn ok" id="startBtn">Start Shanghai</button>'+
+            '<button class="btn danger" id="clearBtn">Clear</button>'+
+            '</div></div>';
+      appEl.innerHTML=html;
+      let picked=[];
+      const redrawPicked = ()=>{
+        const wrap=document.getElementById("pickedWrap");
+        if(!picked.length){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
+        wrap.innerHTML = picked.map(n=>{
+          const pl = allPlayers.find(p=>p.name===n);
+          return `<div class="li"><div class="meta"><div class="nm">${esc(pl.name)}</div><div class="em">${esc(pl.email)}</div></div><button class="btn danger" data-rem="${esc(pl.name)}">Remove</button></div>`;
+        }).join("");
+        wrap.querySelectorAll("[data-rem]").forEach(b=>{
+          b.onclick = ()=>{ picked=picked.filter(x=>x!==b.dataset.rem); redrawPicked(); };
+        });
+      };
+      document.getElementById("oppSearch").onchange = ()=>{
+        const name=document.getElementById("oppSearch").value;
+        if(name && !picked.includes(name)) picked.push(name); redrawPicked();
+      };
+      document.getElementById("clearBtn").onclick = ()=>{ picked=[]; redrawPicked(); };
+      document.getElementById("startBtn").onclick = ()=>{
+        const players=[{name:meUser.displayName||meEmail,email:meEmail}];
+        picked.forEach(n=>{
+          const pl = allPlayers.find(p=>p.name===n);
+          if(pl) players.push({name:pl.name,email:pl.email});
+        });
+        match=newMatch(players); match.snaps=[]; pushSnap(); screen="play"; render();
+      };
+      redrawPicked();
+      return;
+    }
+
+    // ===== PLAY SCREEN =====
+    if(screen==="play"){
+      if(!match){ screen="home"; render(); return; }
+      const t = TARGETS[match.targetIndex];
+      const active = match.players[match.turnIndex];
+      let thead='<tr><th>Target</th>'+match.players.map(p=>'<th>'+esc(p.name)+'<div class="small">'+p.total+' pts</div></th>').join("")+'</tr>';
+      let tbody='';
+      for(const r of TARGETS){
+        const key=String(r);
+        tbody+='<tr><td class="l"><span class="badge">'+esc(targetLabel(r))+'</span></td>';
+        for(const p of match.players){
+          const cell=match.grid[p.email][key];
+          let txt = cell.throws.length?cell.throws.join(" "):"—";
+          const bonus = cell.shanghai?" ✨":"";
+          const cls = (String(t)===key)?' class="activeCell"':'';
+          tbody+='<td'+cls+'>'+esc(txt)+bonus+'<div class="small">'+cell.points+'</div></td>';
+        }
+        tbody+='</tr>';
+      }
+
+      html='<div class="card"><div class="row">'+
+           '<button class="btn ghost" id="backHome">Back</button><button class="btn danger" id="resetBtn">Reset</button></div></div>'+
+           '<div class="card"><span class="pill">Shanghai (Accuracy)</span><div class="divider"></div>'+
+           '<div class="sub">Target: <b>'+esc(targetLabel(t))+'</b> • Turn: <b>'+esc(active.name)+'</b> • Dart '+(match.dartInTurn+1)+'/3</div>'+
+           '<div class="divider"></div>'+
+           '<div class="boardBox">'+dartboardSVG(t)+'</div>'+
+           '<div class="divider"></div>'+
+           '<div class="hitRow">'+
+           '<button class="hitBtn" id="hitT">T</button>'+
+           '<button class="hitBtn" id="hitS">S</button>'+
+           '<button class="hitBtn" id="hitD">D</button>'+
+           '<button class="hitBtn miss" id="hitM">M</button>'+
+           '</div>'+
+           '<div class="divider"></div>'+
+           '<div class="hitRow">'+
+           '<button class="hitBtn undo" id="undoBtn">Undo</button>'+
+           '<button class="hitBtn next" id="nextBtn">Next</button></div>'+
+           '<div class="divider"></div>'+
+           '<div class="card"><table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table></div>';
+      appEl.innerHTML=html;
+
+      const onHit = async (h)=>{
+        if(match.finished) return; pushSnap(); addThrow(match,h);
+        if(match.finished) await saveCompletedMatch(); render();
+      };
+      document.getElementById("hitT").onclick=()=>onHit("T");
+      document.getElementById("hitS").onclick=()=>onHit("S");
+      document.getElementById("hitD").onclick=()=>onHit("D");
+      document.getElementById("hitM").onclick=()=>onHit("M");
+      document.getElementById("undoBtn").onclick=()=>{ popSnap(); render(); };
+      document.getElementById("nextBtn").onclick=()=>{
+        while(match.dartInTurn<3){ pushSnap(); addThrow(match,"M"); }
+        if(match.finished) saveCompletedMatch(); render();
+      };
+      document.getElementById("resetBtn").onclick=()=>{ const pls=match.players.map(p=>({name:p.name,email:p.email})); match=newMatch(pls); match.snaps=[]; pushSnap(); render(); };
+      document.getElementById("backHome").onclick=()=>{ match=null; screen="home"; render(); };
+      return;
+    }
+
+    // ===== STATS SCREEN =====
+    if(screen==="stats"){
+      const stats = await getStats(meUser.email);
+      const sh = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
+      let avg = sh.games?Math.round(sh.totalPoints/sh.games*10)/10:0;
+      let bars='';
+      for(const t of TARGETS){
+        const key=String(t); const bt=sh.byTarget[key]||{points:0};
+        let w=Math.round((bt.points/sh.games)/Math.max(1,Math.max(...TARGETS.map(t2=>sh.byTarget[String(t2)]?sh.byTarget[String(t2)].points:0)))*100);
+        bars+='<div class="barRow"><div class="barLabel">'+esc(targetLabel(t))+'</div><div class="barOuter"><div class="barInner" style="width:'+w+'%"></div></div><div class="barVal">'+bt.points+' pts</div></div>';
+      }
+      html='<div class="card"><div class="kpi"><div class="box"><div class="v">'+sh.games+'</div><div class="l">Games played</div></div>'+
+           '<div class="box"><div class="v">'+sh.best+'</div><div class="l">Best score</div></div>'+
+           '<div class="box"><div class="v">'+avg+'</div><div class="l">Average score</div></div></div></div><div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
+      appEl.innerHTML=html;
+    }
+  }
+
+  render();
+</script>
