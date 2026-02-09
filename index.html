@@ -535,3 +535,69 @@ async function render(){
 // ===== Initial Call =====
 render();
 </script>
+  <script>
+// ===== Helper Functions =====
+function me(){ return meUser; }
+function targetLabel(t){ return t==="B"?"BULL":String(t); }
+
+// ===== New Match Constructor =====
+function newMatch(players){
+  const grid = {};
+  players.forEach(p=>{
+    grid[p.email]={};
+    TARGETS.forEach(t=>{
+      grid[p.email][String(t)]={throws:[],points:0,shanghai:false};
+    });
+    p.total=0;
+  });
+  return {
+    players: players.map(p=>({name:p.name,email:p.email,total:0})),
+    grid,
+    turnIndex:0,
+    targetIndex:0,
+    dartInTurn:0,
+    startedAt: now(),
+    snaps: [],
+    finished: false
+  };
+}
+
+// ===== Save Completed Match =====
+async function saveCompletedMatch(){
+  if(!match || !match.finished) return;
+
+  // Save to history
+  await saveHistoryEntry({
+    gameId: "shanghai",
+    startedAt: match.startedAt,
+    endedAt: match.endedAt||now(),
+    players: match.players.map(p=>p.email),
+    summary: match.players.map(p=>p.name + ": " + p.total).join(" | ")
+  });
+
+  // Update stats
+  for(const pl of match.players){
+    const stats = await getStats(pl.email);
+    stats.shanghai = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
+    const sh = stats.shanghai;
+    sh.games += 1;
+    sh.totalPoints += pl.total;
+    if(pl.total > sh.best) sh.best = pl.total;
+
+    for(const t of TARGETS){
+      const key = String(t);
+      sh.byTarget[key] = sh.byTarget[key]||{S:0,D:0,T:0,M:0,points:0};
+      const cell = match.grid[pl.email][key];
+      for(const h of cell.throws){
+        if(["S","D","T","M"].includes(h)) sh.byTarget[key][h] += 1;
+        sh.byTarget[key].points += ["S","D","T","M"].includes(h)?pts(h):0;
+      }
+      if(cell.shanghai) sh.byTarget[key].points += 5;
+    }
+    await saveStats(pl.email,stats);
+  }
+}
+
+// ===== Initialization =====
+render();
+</script>
