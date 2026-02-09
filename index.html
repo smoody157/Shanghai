@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Game Night Darts</title>
 
-<!-- Firebase SDK -->
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -20,73 +20,71 @@
   --ok:#2bd576;
   --shadow: rgba(0,0,0,.25);
 }
-
-* { box-sizing:border-box; }
-body {
+/* Base styles */
+*{box-sizing:border-box;}
+body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
   color:var(--text);
 }
-.topbar {
-  position:sticky; top:0; z-index:10;
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  padding:12px 14px; background:rgba(10,20,35,.78); backdrop-filter:blur(10px);
+.topbar{
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
   border-bottom:1px solid rgba(255,255,255,.08);
 }
-.brand { display:flex; flex-direction:column; line-height:1.05; }
-.brand .t { font-weight:900; font-size:16px; }
-.brand .s { font-size:12px; color:var(--muted); }
-
-.btn {
+.brand{display:flex;flex-direction:column;line-height:1.05}
+.brand .t{font-weight:900;font-size:16px}
+.brand .s{font-size:12px;color:var(--muted)}
+.btn{
   border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.08);
-  color:var(--text); border-radius:14px; padding:10px 12px; font-weight:900;
+  color:var(--text);border-radius:14px;padding:10px 12px;font-weight:900;
   box-shadow:0 6px 16px var(--shadow);
 }
-.btn:active { transform:translateY(1px); }
-.btn.ghost { background:transparent; box-shadow:none; color:var(--muted); }
-.btn.ok { background:rgba(43,213,118,.20); border-color:rgba(43,213,118,.35); }
-.btn.danger { background:rgba(255,77,90,.20); border-color:rgba(255,77,90,.35); }
-
-.wrap { max-width:920px; margin:0 auto; padding:14px; }
-.card {
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
+.btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
+.btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
+.wrap{max-width:920px;margin:0 auto;padding:14px}
+.card{
   background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
   border:1px solid rgba(255,255,255,.10);
-  border-radius:18px; padding:14px;
+  border-radius:18px;padding:14px;
   box-shadow:0 10px 28px rgba(0,0,0,.28);
   margin-bottom:12px;
 }
-.h1 { font-size:24px; font-weight:1000; margin:2px 0 6px; }
-.sub { color:var(--muted); font-size:13px; }
-label { display:block; color:var(--muted); font-size:12px; margin-bottom:6px; }
-input, select {
+.h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
+.sub{color:var(--muted);font-size:13px}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
+input, select{
   width:100%;
   background:rgba(10,20,35,.65);
   border:1px solid rgba(255,255,255,.14);
   color:var(--text);
-  border-radius:14px; padding:12px 12px; font-size:16px; outline:none;
+  border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
 }
-.row { display:flex; gap:10px; }
-.row > * { flex:1; }
-.stack { display:flex; flex-direction:column; gap:10px; }
-.toast {
+.row{display:flex;gap:10px}
+.row > *{flex:1}
+.stack{display:flex;flex-direction:column;gap:10px}
+.toast{
   background:rgba(255,77,90,.12);
   border:1px solid rgba(255,77,90,.30);
   color:#ffd6da;
-  border-radius:14px; padding:10px 12px; font-weight:900; margin-bottom:12px;
+  border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
 }
-.pill {
-  display:inline-block; padding:6px 10px; border-radius:999px;
+.pill{
+  display:inline-block;padding:6px 10px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
   background:rgba(78,168,255,.08);
-  color:var(--accent); font-weight:900; font-size:12px;
+  color:var(--accent);font-weight:900;font-size:12px;
 }
-.divider { height:1px; background:rgba(255,255,255,.10); margin:12px 0; }
+.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+/* More styles will be included in part 2 for dartboard, game board, tables, stats */
 </style>
 </head>
 <body>
-
 <div class="topbar">
   <div class="brand">
     <div class="t">Game Night Darts</div>
@@ -111,27 +109,27 @@ const firebaseConfig = {
   appId: "YOUR_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ===== Utilities =====
-function esc(s){ s=String(s||""); return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+// ===== Utility functions =====
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function normEmail(s){ return String(s||"").trim().toLowerCase(); }
 function now(){ return new Date().getTime(); }
 
-// ===== DOM =====
-const appEl=document.getElementById("app");
-const homeBtn=document.getElementById("homeBtn");
-const signOutBtn=document.getElementById("signOutBtn");
+// ===== DOM elements =====
+const appEl = document.getElementById("app");
+const homeBtn = document.getElementById("homeBtn");
+const signOutBtn = document.getElementById("signOutBtn");
 
-let toastMsg="";
-let screen="auth"; // auth | home | match | play | stats | history
-let meUser=null;
-let match=null;
+let toastMsg = "";
+let screen = "auth"; // auth | home | match | play | stats | history
+let meUser = null;
+let match = null;
 
-// ===== Firebase Operations =====
-async function getPlayers(){ 
+// ===== Firebase Player Functions =====
+async function getPlayers() {
   const snapshot = await db.collection("players").get();
-  return snapshot.docs.map(d=>d.data()); 
+  return snapshot.docs.map(d => d.data());
 }
 async function upsertPlayer(name,email){
   await db.collection("players").doc(email).set({name,email,createdAt:now()},{merge:true});
@@ -152,355 +150,384 @@ async function saveHistoryEntry(entry){
 }
 
 // ===== Authentication =====
-auth.onAuthStateChanged(user=>{
-  meUser=user;
-  screen = user?"home":"auth";
-  render();
-});
-
-async function signInEmail(email){
-  try{
-    // No password, just check if player exists in Firestore
-    const playerDoc = await db.collection("players").doc(email).get();
-    if(playerDoc.exists){
-      meUser = { email, name: playerDoc.data().name };
-      screen="home"; render();
-    } else {
-      screen="signup"; render();
-    }
-  } catch(e){ toastMsg=e.message; render(); }
+function signInEmail(email){
+  return db.collection("players").doc(email).get().then(doc=>{
+    if(doc.exists) return doc.data();
+    return null;
+  });
+}
+async function signUpEmail(name,email){
+  await upsertPlayer(name,email);
+  return {name,email};
 }
 
-async function signUp(name,email){
-  try{
-    await upsertPlayer(name,email);
-    meUser = { email, name };
-    screen="home"; render();
-  } catch(e){ toastMsg=e.message; render(); }
-}
+// ===== UI Helpers =====
+homeBtn.onclick = ()=>{ screen = meUser ? "home" : "auth"; render(); };
+signOutBtn.onclick = async ()=>{ meUser=null; screen="auth"; render(); };
 
-// ===== Navigation =====
-homeBtn.onclick = ()=>{ screen = meUser?"home":"auth"; render(); };
-signOutBtn.onclick = async ()=>{ await auth.signOut(); meUser=null; screen="auth"; render(); };
-
-// ===== Render Function (Part 1) =====
+// ===== Render Function Part 1 =====
 async function render(){
   let html="";
-  if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
+  if(toastMsg){ html += `<div class="toast">${esc(toastMsg)}</div>`; toastMsg=""; }
 
   if(screen==="auth"){
-    html += '<div class="card"><div class="h1">Enter your email</div></div>'+
-            '<div class="card"><input type="email" id="inEmail" placeholder="you@email.com"/>'+
-            '<button class="btn" id="goBtn">Go</button></div>';
-    appEl.innerHTML=html;
+    html += `<div class="card"><div class="h1">Sign in</div><div class="sub">Enter your email to start.</div></div>`;
+    html += `<div class="card"><div class="stack">
+      <input id="inEmail" type="email" placeholder="you@email.com"/>
+      <div class="row">
+        <button class="btn" id="goBtn">Go</button>
+      </div>
+    </div></div>`;
+    appEl.innerHTML = html;
 
     document.getElementById("goBtn").onclick = async ()=>{
-      const email = document.getElementById("inEmail").value.trim().toLowerCase();
-      if(!email.includes("@")){ toastMsg="Enter a valid email"; render(); return; }
-      await signInEmail(email);
+      const e = normEmail(document.getElementById("inEmail").value);
+      if(!e){ toastMsg="Enter a valid email."; render(); return; }
+      const player = await signInEmail(e);
+      if(player){
+        meUser = player;
+        screen="home"; render();
+      } else {
+        // New user → prompt for name
+        screen="signup"; render();
+      }
     };
     return;
   }
 
   if(screen==="signup"){
-    html = '<div class="card"><div class="h1">Create account</div></div>'+
-           '<div class="card"><input type="text" id="upName" placeholder="Your Name"/>'+
-           '<button class="btn ok" id="createBtn">Create Player</button></div>';
-    appEl.innerHTML=html;
+    html += `<div class="card"><div class="h1">Create Player</div><div class="sub">Enter your name to create your player.</div></div>`;
+    html += `<div class="card"><div class="stack">
+      <input id="upName" type="text" placeholder="Your Name"/>
+      <input id="upEmail" type="hidden" value="${meUser ? meUser.email : ''}"/>
+      <div class="row">
+        <button class="btn ok" id="createBtn">Create Player</button>
+      </div>
+    </div></div>`;
+    appEl.innerHTML = html;
 
-    document.getElementById("createBtn").onclick=async ()=>{
-      const name = document.getElementById("upName").value.trim();
-      const email = document.getElementById("inEmail").value.trim().toLowerCase();
-      if(!name){ toastMsg="Enter a name"; render(); return; }
-      await signUp(name,email);
+    document.getElementById("createBtn").onclick = async ()=>{
+      const n = String(document.getElementById("upName").value).trim();
+      const e = normEmail(document.getElementById("inEmail").value);
+      if(!n){ toastMsg="Enter your name."; render(); return; }
+      meUser = await signUpEmail(n,e);
+      screen="home"; render();
     };
     return;
   }
 
-  if(screen==="home"){
-    const p = meUser;
-    html = '<div class="card"><span class="pill">Signed in</span><div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>'+
-           '<div class="row"><button class="btn" id="playNowBtn">Play Now</button>'+
-           '<button class="btn ghost" id="statsBtn">My Stats</button></div>';
-    appEl.innerHTML=html;
-
-    document.getElementById("playNowBtn").onclick = ()=>{ screen="match"; render(); };
-    document.getElementById("statsBtn").onclick = ()=>{ screen="stats"; render(); };
-    return;
-  }
+  // Home screen part 2 will continue in the next part
 }
 
 render();
 </script>
-
 </body>
 </html>
 <script>
-// ===== Game Logic & Match Setup =====
-const TARGETS = [20,19,18,17,16,15,'B'];
-
-function pts(hit){ return hit==='T'?3 : hit==='D'?2 : hit==='S'?1 : 0; }
-function targetLabel(t){ return t==='B' ? 'BULL' : String(t); }
-
-function newMatch(players){
-  const m = { gameId:"shanghai", players:[], turnIndex:0, targetIndex:0, dartInTurn:0, grid:{}, finished:false, startedAt:now(), endedAt:null, snaps:[] };
-  for(const p of players){
-    m.players.push({name:p.name,email:p.email,total:0});
-    m.grid[p.email]={};
-    for(const t of TARGETS){
-      const key = String(t);
-      m.grid[p.email][key]={throws:[],points:0,shanghai:false};
+// ===== Home Screen & Game Navigation =====
+async function renderHome() {
+  const players = await getPlayers();
+  let html = `<div class="card"><span class="pill">Signed in</span><div class="h1">${esc(meUser.name)}</div><div class="sub">${esc(meUser.email)}</div></div>`;
+  
+  html += `<div class="row">
+    <button class="btn" id="playNowBtn">Play Now</button>
+    <button class="btn ghost" id="statsBtn">My Stats</button>
+    <button class="btn ghost" id="historyBtn">History</button>
+  </div>`;
+  
+  html += `<div class="card">
+    <div class="h1">Other Players</div>
+    <div class="stack">`;
+  players.forEach(p=>{
+    if(p.email!==meUser.email){
+      html += `<div class="pill">${esc(p.name)}</div>`;
     }
-  }
-  return m;
+  });
+  html += `</div></div>`;
+
+  appEl.innerHTML = html;
+
+  document.getElementById("playNowBtn").onclick=()=>{ screen="match"; render(); };
+  document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
+  document.getElementById("historyBtn").onclick=()=>{ screen="history"; render(); };
 }
 
+// ===== Match Setup =====
+async function renderMatch() {
+  const players = await getPlayers();
+  let html = `<div class="card"><div class="h1">New Match</div></div>`;
+  
+  html += `<div class="card"><div class="stack">
+    <label>Choose players</label>
+    <select id="matchPlayers" multiple>`;
+  players.forEach(p=>{
+    html += `<option value="${esc(p.email)}">${esc(p.name)}</option>`;
+  });
+  html += `</select>
+    <button class="btn ok" id="startMatchBtn">Start Match</button>
+  </div></div>`;
+
+  appEl.innerHTML = html;
+
+  document.getElementById("startMatchBtn").onclick=()=>{
+    const selected = Array.from(document.getElementById("matchPlayers").selectedOptions).map(o=>o.value);
+    if(selected.length<1){ toastMsg="Select at least one player."; render(); return; }
+    match = {players: selected.map(e=>players.find(p=>p.email===e)), startedAt: now(), grid:{}};
+    screen="play"; render();
+  };
+}
+
+// ===== Play Screen Placeholder =====
+function renderPlay() {
+  let html = `<div class="card"><div class="h1">Match in progress</div></div>`;
+  html += `<div class="card">
+    <div class="stack">
+      <div>TODO: Render Dartboard & Gameplay</div>
+      <button class="btn ok" id="finishMatchBtn">Finish Match</button>
+    </div>
+  </div>`;
+  appEl.innerHTML = html;
+
+  document.getElementById("finishMatchBtn").onclick=async ()=>{
+    // Save match to history & stats
+    if(match){
+      match.endedAt = now();
+      await saveHistoryEntry({
+        gameId:"shanghai",
+        startedAt: match.startedAt,
+        endedAt: match.endedAt,
+        players: match.players.map(p=>p.email),
+        summary: match.players.map(p=>p.name+": 0").join(" | ")
+      });
+      // Reset match
+      match = null;
+      screen="home";
+      render();
+    }
+  };
+}
+
+// ===== Stats Screen Placeholder =====
+async function renderStats() {
+  const stats = await getStats(meUser.email);
+  let html = `<div class="card"><div class="h1">My Stats</div></div>`;
+  html += `<pre>${JSON.stringify(stats,null,2)}</pre>`;
+  html += `<button class="btn" id="statsHomeBtn">Home</button>`;
+  appEl.innerHTML = html;
+
+  document.getElementById("statsHomeBtn").onclick=()=>{ screen="home"; render(); };
+}
+
+// ===== History Screen Placeholder =====
+async function renderHistory() {
+  const history = await getHistory(meUser.email);
+  let html = `<div class="card"><div class="h1">History</div></div>`;
+  html += `<pre>${JSON.stringify(history,null,2)}</pre>`;
+  html += `<button class="btn" id="historyHomeBtn">Home</button>`;
+  appEl.innerHTML = html;
+
+  document.getElementById("historyHomeBtn").onclick=()=>{ screen="home"; render(); };
+}
+
+// ===== Unified Render Dispatcher =====
+async function render(){
+  if(!meUser || screen==="auth" || screen==="signup"){
+    // Already handled in Part 1
+    return render();
+  }
+  if(screen==="home") return renderHome();
+  if(screen==="match") return renderMatch();
+  if(screen==="play") return renderPlay();
+  if(screen==="stats") return renderStats();
+  if(screen==="history") return renderHistory();
+}
+
+render();
+</script>
+<script>
+// ===== Dartboard Utilities =====
+const BOARD_NUMS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+const TARGETS = [20,19,18,17,16,15,"B"];
+
+function polar(cx,cy,r,deg){
+  const rad = (deg-90)*Math.PI/180;
+  return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)};
+}
+
+function arcWedgePath(cx,cy,r0,r1,a0,a1){
+  const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1);
+  const p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
+  const large = (a1-a0)>180?1:0;
+  function f(n){ return (Math.round(n*1000)/1000).toFixed(3); }
+  return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
+}
+
+function dartboardSVG(activeNumber){
+  const cx=100,cy=100;
+  const outer=80, rDoubleOuter=74, rDoubleInner=66, rTripleOuter=48, rTripleInner=40, rSingleInner=12;
+  const seg=360/20;
+  
+  let activePath = "";
+  if(typeof activeNumber==="number"){
+    let idx = BOARD_NUMS.indexOf(activeNumber);
+    if(idx>=0){
+      let a0=idx*seg+1.2, a1=(idx+1)*seg-1.2;
+      activePath = arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
+    }
+  }
+
+  function ringWedges(r0,r1,fillA,fillB){
+    let out="";
+    for(let i=0;i<20;i++){
+      let a0=i*seg+0.8, a1=(i+1)*seg-0.8;
+      out += `<path d="${arcWedgePath(cx,cy,r0,r1,a0,a1)}" fill="${i%2===0?fillA:fillB}" opacity="0.95"/>`;
+    }
+    return out;
+  }
+
+  let numText="";
+  for(let i=0;i<20;i++){
+    let ang=i*seg+seg/2;
+    let p=polar(cx,cy,90,ang);
+    numText += `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
+  }
+
+  return `<svg viewBox="0 0 200 200" width="70%">
+    <defs>
+      <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
+        <stop offset="0%" stop-color="#203a62"/>
+        <stop offset="55%" stop-color="#0d1a2e"/>
+        <stop offset="100%" stop-color="#060d18"/>
+      </radialGradient>
+      <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="3.5" result="b"/>
+        <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 .9 0" result="c"/>
+        <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
+    ${activePath?`<path d="${activePath}" fill="rgba(78,168,255,.25)" stroke="rgba(78,168,255,.55)" stroke-width="1.4" filter="url(#glow)"/>`:''}
+    ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
+    ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
+    ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
+    ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
+    <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
+    <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
+    ${numText}
+  </svg>`;
+}
+
+// ===== Gameplay =====
+function pts(hit){ return hit==="T"?3:hit==="D"?2:hit==="S"?1:0; }
+
+function addThrow(m,hit){
+  if(!m) return;
+  let p = m.players[m.turnIndex];
+  let t = TARGETS[m.targetIndex];
+  let key=String(t);
+  if(!m.grid[p.email][key].throws) m.grid[p.email][key].throws=[];
+  if(!m.grid[p.email][key].points) m.grid[p.email][key].points=0;
+
+  m.grid[p.email][key].throws.push(hit);
+  m.grid[p.email][key].points += pts(hit);
+  p.total = (p.total||0) + pts(hit);
+
+  m.dartInTurn = (m.dartInTurn||0)+1;
+  if(m.dartInTurn>=3){
+    m.dartInTurn=0;
+    m.turnIndex = (m.turnIndex+1)%m.players.length;
+    if(m.turnIndex===0){ m.targetIndex = (m.targetIndex||0)+1; }
+  }
+}
+
+// ===== Snapshots for Undo =====
 function pushSnap(){
   if(!match) return;
-  try{ match.snaps.push(JSON.stringify(match)); if(match.snaps.length>60) match.snaps.shift(); }catch(e){}
+  match.snaps = match.snaps||[];
+  match.snaps.push(JSON.stringify(match));
+  if(match.snaps.length>60) match.snaps.shift();
 }
 
 function popSnap(){
   if(!match || !match.snaps || match.snaps.length<2) return false;
   match.snaps.pop();
-  const prev = match.snaps.pop();
-  if(!prev) return false;
-  try{ match=JSON.parse(prev); return true; }catch(e){ return false; }
-}
-
-function addThrow(m,hit){
-  if(m.finished) return;
-  const p = m.players[m.turnIndex];
-  const t = TARGETS[m.targetIndex];
-  const key = String(t);
-  const cell = m.grid[p.email][key];
-
-  cell.throws.push(hit);
-  cell.points += pts(hit);
-  p.total += pts(hit);
-
-  if(cell.throws.length===3){
-    const hasS = cell.throws.includes('S'), hasD = cell.throws.includes('D'), hasT = cell.throws.includes('T');
-    if(hasS && hasD && hasT && cell.throws[2]==='D'){ cell.shanghai=true; cell.points+=5; p.total+=5; }
-  }
-
-  m.dartInTurn++;
-  if(m.dartInTurn>=3){
-    m.dartInTurn=0;
-    m.turnIndex=(m.turnIndex+1)%m.players.length;
-    if(m.turnIndex===0){ m.targetIndex++; if(m.targetIndex>=TARGETS.length){ m.finished=true; m.endedAt=now(); } }
-  }
-}
-
-async function saveCompletedMatch(){
-  if(!match || !match.finished) return;
-
-  const summaryParts = match.players.map(p=>p.name+": "+p.total);
-  await saveHistoryEntry({gameId:"shanghai",startedAt:match.startedAt,endedAt:match.endedAt||now(),players:match.players.map(p=>p.email),summary:"Shanghai • "+summaryParts.join(" | ")});
-
-  for(const pl of match.players){
-    const stats = await getStats(pl.email);
-    stats.shanghai = stats.shanghai||{games:0,best:0,totalPoints:0,byTarget:{}};
-    const sh = stats.shanghai;
-    sh.games+=1;
-    sh.totalPoints+=pl.total;
-    if(pl.total>sh.best) sh.best=pl.total;
-
-    for(const t of TARGETS){
-      const key = String(t);
-      sh.byTarget[key] = sh.byTarget[key]||{S:0,D:0,T:0,M:0,points:0};
-      const cell = match.grid[pl.email][key];
-      for(const h of cell.throws){
-        if(['S','D','T','M'].includes(h)) sh.byTarget[key][h]+=1;
-        sh.byTarget[key].points += ['S','D','T','M'].includes(h)?pts(h):0;
-      }
-      if(cell.shanghai) sh.byTarget[key].points+=5;
-    }
-    await saveStats(pl.email,stats);
-  }
-}
-
-// ===== Dartboard Rendering =====
-const BOARD_NUMS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-function polar(cx,cy,r,deg){ const rad=(deg-90)*Math.PI/180; return {x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)}; }
-function arcWedgePath(cx,cy,r0,r1,a0,a1){
-  const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1), p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
-  const large=((a1-a0)>180)?1:0;
-  const f=n=>((Math.round(n*1000)/1000).toFixed(3));
-  return "M "+f(p1.x)+" "+f(p1.y)+" A "+r1+" "+r1+" 0 "+large+" 1 "+f(p2.x)+" "+f(p2.y)+" L "+f(p3.x)+" "+f(p3.y)+" A "+r0+" "+r0+" 0 "+large+" 0 "+f(p4.x)+" "+f(p4.y)+" Z";
-}
-
-function dartboardSVG(activeNumber){
-  const cx=100, cy=100;
-  const outer=98, rDoubleOuter=92, rDoubleInner=84, rTripleOuter=62, rTripleInner=54, rSingleInner=16;
-  const seg=360/20;
-  let idx=-1;
-  if(typeof activeNumber==='number'){ for(let i=0;i<BOARD_NUMS.length;i++){ if(BOARD_NUMS[i]===activeNumber){ idx=i; break; } } }
-  let activePath="";
-  if(idx>=0){ const a0=idx*seg+1.2,a1=(idx+1)*seg-1.2; activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1); }
-
-  function ringWedges(r0,r1,fillA,fillB){ let out=""; for(let i=0;i<20;i++){ const a0=i*seg+0.8,a1=(i+1)*seg-0.8; out+='<path d="'+arcWedgePath(cx,cy,r0,r1,a0,a1)+'" fill="'+(i%2===0?fillA:fillB)+'" opacity="0.95"/>'; } return out; }
-
-  let numText="";
-  for(let i=0;i<20;i++){ const ang=i*seg+seg/2; const p=polar(cx,cy,95,ang); numText+='<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>'; }
-
-  return '<svg viewBox="0 0 200 200" width="94%" aria-label="dartboard">'+
-    '<defs><radialGradient id="bgG" cx="50%" cy="42%" r="65%"><stop offset="0%" stop-color="#203a62"/><stop offset="55%" stop-color="#0d1a2e"/><stop offset="100%" stop-color="#060d18"/></radialGradient>'+
-    '<filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.5" result="b"/><feColorMatrix in="b" type="matrix" values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 .9 0" result="c"/><feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
-    '<circle cx="100" cy="100" r="'+outer+'" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>' +
-    (activePath?'<path d="'+activePath+'" fill="rgba(78,168,255,.16)" stroke="rgba(78,168,255,.55)" stroke-width="1.4" filter="url(#glow)"/>':'')+
-    ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")+
-    ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")+
-    ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")+
-    ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
-    '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
-    '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+numText+'</svg>';
+  let prev = match.snaps.pop();
+  try{ match = JSON.parse(prev); return true; }catch(e){ return false; }
 }
 </script>
 <script>
-// ===== Match Setup Screen (Add Opponents) =====
-async function renderMatchScreen() {
-  const p = {name: meUser.displayName||meUser.email, email: meUser.email};
-  const allPlayers = await getPlayers();
-  const opponents = allPlayers.filter(pl => pl.email !== p.email);
-
-  let html = '<div class="card"><span class="pill">Play Now</span>'+
-             '<div class="h1" style="margin-top:8px;">Add players (1–4)</div>'+
-             '<div class="sub">You are already added. Add up to 3 opponents.</div></div>'+
-             '<div class="card">'+
-             `<div class="li"><div class="meta"><div class="nm">${esc(p.name)}</div><div class="em">${esc(p.email)}</div></div><span class="badge">You</span></div>`+
-             '<div class="divider"></div>'+
-             '<label>Add opponent</label>'+
-             '<select id="oppSel"><option value="">Select opponent…</option>';
-
-  for(const op of opponents){
-    html += `<option value="${esc(op.email)}">${esc(op.name)}</option>`;
-  }
-  html += '</select>'+
-          '<div class="row" style="margin-top:10px;">'+
-          '<button class="btn" id="addBtn">Add</button>'+
-          '<button class="btn ghost" id="backBtn">Back</button>'+
-          '</div>'+
-          '<div class="divider"></div>'+
-          '<div id="pickedWrap" class="small"></div>'+
-          '<div class="row" style="margin-top:10px;">'+
-          '<button class="btn ok" id="startBtn">Start Shanghai</button>'+
-          '<button class="btn danger" id="clearBtn">Clear</button>'+
-          '</div>'+
-          '</div>';
-  appEl.innerHTML = html;
-
-  let picked = [];
-  function redrawPicked(){
-    const wrap = document.getElementById("pickedWrap");
-    if(picked.length===0){ wrap.innerHTML="No opponents added yet (solo allowed)."; return; }
-    let out="";
-    for(const email of picked){
-      const pl = allPlayers.find(p=>p.email===email);
-      out += `<div class="li" style="margin-top:10px;"><div class="meta"><div class="nm">${esc(pl.name)}</div><div class="em">${esc(pl.email)}</div></div>`+
-             `<button class="btn danger" data-rem="${esc(pl.email)}">Remove</button></div>`;
-    }
-    wrap.innerHTML = out;
-    const btns = wrap.querySelectorAll("[data-rem]");
-    btns.forEach(btn=>{
-      btn.onclick = function(){
-        const e = this.getAttribute("data-rem");
-        picked = picked.filter(x=>x!==e);
-        redrawPicked();
-      };
-    });
-  }
-  redrawPicked();
-
-  document.getElementById("backBtn").onclick = ()=>{ screen="home"; render(); };
-  document.getElementById("clearBtn").onclick = ()=>{ picked=[]; redrawPicked(); };
-  document.getElementById("addBtn").onclick = ()=>{
-    const e = document.getElementById("oppSel").value;
-    if(!e){ toastMsg="Pick an opponent."; renderMatchScreen(); return; }
-    if(picked.includes(e)){ toastMsg="Already added."; renderMatchScreen(); return; }
-    if(picked.length>=3){ toastMsg="Max 4 players total."; renderMatchScreen(); return; }
-    picked.push(e); document.getElementById("oppSel").value=""; redrawPicked();
-  };
-  document.getElementById("startBtn").onclick = ()=>{
-    const players = [{name:p.name,email:p.email}];
-    for(const email of picked){
-      const pl = allPlayers.find(pl=>pl.email===email);
-      if(pl) players.push({name:pl.name,email:pl.email});
-    }
-    match = newMatch(players);
-    match.snaps=[]; pushSnap();
-    screen="play"; render();
-  };
-}
-</script>
-<script>
-// ===== Play Screen (Dartboard & Throws) =====
+// ===== Play Screen Rendering =====
 async function renderPlayScreen(){
   if(!match){ screen="home"; render(); return; }
 
-  const activeTarget = TARGETS[match.targetIndex];
-  const activePlayer = match.players[match.turnIndex];
+  let t = TARGETS[match.targetIndex];
+  let activePlayer = match.players[match.turnIndex];
 
-  // Build table head
-  let thead = '<tr><th>Target</th>';
-  for(const pl of match.players){
-    thead += `<th>${esc(pl.name)}<div class="small">${pl.total} pts</div></th>`;
+  // Header
+  let html = `<div class="card"><div class="row">
+    <button class="btn ghost" id="backHome">Back</button>
+    <button class="btn danger" id="resetBtn">Reset</button>
+  </div></div>`;
+
+  // Dartboard
+  html += `<div class="card">
+    <span class="pill">Shanghai (Accuracy)</span>
+    <div class="divider"></div>
+    <div class="sub">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Turn: <b>${esc(activePlayer.name)}</b> • Dart ${match.dartInTurn+1}/3</div>
+    <div class="divider"></div>
+    <div class="boardBox">${dartboardSVG(t)}</div>
+    <div class="divider"></div>
+    <div class="hitRow">
+      <button class="hitBtn" id="hitT">T</button>
+      <button class="hitBtn" id="hitS">S</button>
+      <button class="hitBtn" id="hitD">D</button>
+      <button class="hitBtn miss" id="hitM">M</button>
+    </div>
+    <div class="divider"></div>
+    <div class="hitRow">
+      <button class="hitBtn undo" id="undoBtn">Undo</button>
+      <button class="hitBtn" disabled></button>
+      <button class="hitBtn" disabled></button>
+      <button class="hitBtn next" id="nextBtn">Next</button>
+    </div>
+    ${match.finished?'<div class="divider"></div><div class="pill">Finished • Saved to stats + history</div>':''}
+  </div>`;
+
+  // Score table
+  let thead = `<tr><th>Target</th>`;
+  for(let i=0;i<match.players.length;i++){
+    thead += `<th>${esc(match.players[i].name)}<div class="small">${match.players[i].total} pts</div></th>`;
   }
-  thead += '</tr>';
+  thead += `</tr>`;
 
-  // Build table body
-  let tbody = '';
-  for(const t of TARGETS){
-    const key = String(t);
-    tbody += `<tr><td class="l"><span class="badge">${esc(targetLabel(t))}</span></td>`;
-    for(const p of match.players){
-      const cell = match.grid[p.email][key];
-      const txt = cell.throws.length ? cell.throws.join(" ") : "—";
-      const bonus = cell.shanghai ? " ✨" : "";
-      const cls = (String(activeTarget)===key) ? ' class="activeCell"' : '';
+  let tbody = "";
+  for(let r=0;r<TARGETS.length;r++){
+    let key = String(TARGETS[r]);
+    tbody += `<tr><td class="l"><span class="badge">${esc(TARGETS[r])}</span></td>`;
+    for(let c=0;c<match.players.length;c++){
+      let p = match.players[c];
+      let cell = match.grid[p.email][key];
+      let txt = cell.throws.length ? cell.throws.join(" ") : "—";
+      let bonus = cell.shanghai?" ✨":"";
+      let cls = (String(t)===key)?' class="activeCell"':'';
       tbody += `<td${cls}>${esc(txt)}${bonus}<div class="small">${cell.points}</div></td>`;
     }
-    tbody += '</tr>';
+    tbody += "</tr>";
   }
 
-  let html = '<div class="card"><div class="row">'+
-             '<button class="btn ghost" id="backHome">Back</button>'+
-             '<button class="btn danger" id="resetBtn">Reset</button>'+
-             '</div></div>'+
-             '<div class="card">'+
-             `<span class="pill">Shanghai (Accuracy)</span>`+
-             `<div class="divider"></div>`+
-             `<div class="sub">Target: <b>${esc(targetLabel(activeTarget))}</b> • Turn: <b>${esc(activePlayer.name)}</b> • Dart ${match.dartInTurn+1}/3</div>`+
-             `<div class="divider"></div>`+
-             `<div class="boardBox">${dartboardSVG(activeTarget)}</div>`+
-             `<div class="divider"></div>`+
-             '<div class="hitRow">'+
-             '<button class="hitBtn" id="hitT">T</button>'+
-             '<button class="hitBtn" id="hitS">S</button>'+
-             '<button class="hitBtn" id="hitD">D</button>'+
-             '<button class="hitBtn miss" id="hitM">M</button>'+
-             '</div>'+
-             '<div class="divider"></div>'+
-             '<div class="hitRow">'+
-             '<button class="hitBtn undo" id="undoBtn">Undo</button>'+
-             '<button class="hitBtn" disabled></button>'+
-             '<button class="hitBtn" disabled></button>'+
-             '<button class="hitBtn next" id="nextBtn">Next</button>'+
-             '</div>'+
-             (match.finished ? '<div class="divider"></div><div class="pill">Finished • Saved to stats + history</div>' : '')+
-             '</div>'+
-             '<div class="card"><div class="pill">Round table</div><div class="divider"></div>'+
-             '<div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">'+
-             `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`+
-             '</div></div>';
+  html += `<div class="card"><div class="pill">Round table</div><div class="divider"></div>
+    <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+      <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
+    </div>
+  </div>`;
 
   appEl.innerHTML = html;
 
-  function onHit(hit){
+  function onHit(h){
     if(match.finished) return;
     pushSnap();
-    addThrow(match, hit);
-    if(match.finished) saveCompletedMatch();
+    addThrow(match,h);
+    if(match.targetIndex>=TARGETS.length){ match.finished=true; match.endedAt=now(); saveCompletedMatch(); }
     renderPlayScreen();
   }
 
@@ -508,20 +535,15 @@ async function renderPlayScreen(){
   document.getElementById("hitS").onclick = ()=>onHit("S");
   document.getElementById("hitD").onclick = ()=>onHit("D");
   document.getElementById("hitM").onclick = ()=>onHit("M");
-
-  document.getElementById("undoBtn").onclick = ()=>{
-    popSnap(); renderPlayScreen();
-  };
-
+  document.getElementById("undoBtn").onclick = ()=>{ popSnap(); renderPlayScreen(); };
   document.getElementById("nextBtn").onclick = ()=>{
-    if(match.finished) return;
-    while(match.dartInTurn < 3){ pushSnap(); addThrow(match,"M"); }
-    if(match.finished) saveCompletedMatch();
+    while(match.dartInTurn<3){ pushSnap(); addThrow(match,"M"); }
+    if(match.targetIndex>=TARGETS.length){ match.finished=true; match.endedAt=now(); saveCompletedMatch(); }
     renderPlayScreen();
   };
 
   document.getElementById("resetBtn").onclick = ()=>{
-    const pls = match.players.map(p=>({name:p.name,email:p.email}));
+    let pls = match.players.map(p=>({name:p.name,email:p.email}));
     match = newMatch(pls); match.snaps=[]; pushSnap(); renderPlayScreen();
   };
 
@@ -530,224 +552,191 @@ async function renderPlayScreen(){
 </script>
 <script>
 // ===== Stats Screen =====
-async function renderStatsScreen(){
+async function renderStats(){
   const p = me();
   const allStats = await getStats(p.email);
   const sh = allStats.shanghai || {games:0,best:0,totalPoints:0,byTarget:{}};
   const avg = sh.games ? Math.round((sh.totalPoints/sh.games)*10)/10 : 0;
 
-  let maxPts = 0;
-  for(const t of TARGETS){
-    const bt = sh.byTarget[t] || {points:0,S:0,D:0,T:0,M:0};
+  let maxPts=0;
+  for(let i=0;i<TARGETS.length;i++){
+    const k=String(TARGETS[i]);
+    const bt=sh.byTarget[k]||{points:0,S:0,D:0,T:0,M:0};
     if(bt.points>maxPts) maxPts=bt.points;
   }
   if(maxPts<1) maxPts=1;
 
-  let bars = '';
-  for(const t of TARGETS){
-    const bt = sh.byTarget[t] || {points:0,S:0,D:0,T:0,M:0};
-    const w = Math.round((bt.points/maxPts)*100);
-    bars += '<div class="barRow">'+
-            `<div class="barLabel">${esc(targetLabel(t))}</div>`+
-            `<div class="barOuter"><div class="barInner" style="width:${w}%"></div></div>`+
-            `<div class="barVal">${bt.points} pts</div>`+
-            '</div>';
+  let bars="";
+  for(let i=0;i<TARGETS.length;i++){
+    const t=TARGETS[i], k=String(t);
+    const bt=sh.byTarget[k]||{points:0,S:0,D:0,T:0,M:0};
+    const w=Math.round((bt.points/maxPts)*100);
+    bars += `<div class="barRow">
+      <div class="barLabel">${esc(targetLabel(t))}</div>
+      <div class="barOuter"><div class="barInner" style="width:${w}%"></div></div>
+      <div class="barVal">${bt.points} pts</div>
+    </div>`;
   }
 
-  let html = '<div class="card"><div class="row">'+
-             '<button class="btn ghost" id="backHome1">Back</button>'+
-             '<button class="btn danger" id="clearStatsBtn">Clear My Stats</button>'+
-             '</div></div>'+
-             '<div class="card">'+
-             '<span class="pill">My Stats</span>'+
-             `<div class="h1">Shanghai</div>`+
-             '<div class="sub">T=3, D=2, S=1, M=0 • Shanghai bonus +5</div>'+
-             '<div class="divider"></div>'+
-             '<div class="kpi">'+
-             `<div class="box"><div class="v">${sh.games}</div><div class="l">Games played</div></div>`+
-             `<div class="box"><div class="v">${sh.best}</div><div class="l">Best score</div></div>`+
-             `<div class="box"><div class="v">${avg}</div><div class="l">Average score</div></div>`+
-             '</div></div>'+
-             '<div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
+  let html = `<div class="card">
+    <div class="row">
+      <button class="btn ghost" id="backHome1">Back</button>
+    </div>
+  </div>
+  <div class="card">
+    <span class="pill">My Stats</span>
+    <div class="h1" style="margin-top:8px;">Shanghai</div>
+    <div class="sub">T=3, D=2, S=1, M=0 • Shanghai bonus +5</div>
+    <div class="divider"></div>
+    <div class="kpi">
+      <div class="box"><div class="v">${sh.games}</div><div class="l">Games played</div></div>
+      <div class="box"><div class="v">${sh.best}</div><div class="l">Best score</div></div>
+      <div class="box"><div class="v">${avg}</div><div class="l">Average score</div></div>
+    </div>
+  </div>
+  <div class="card"><span class="pill">Points by target</span><div class="divider"></div>${bars}</div>`;
 
   appEl.innerHTML = html;
 
-  document.getElementById("backHome1").onclick = ()=>{ screen="home"; render(); };
-  document.getElementById("clearStatsBtn").onclick = async ()=>{
-    const s = await getStats(p.email);
-    if(s.shanghai) delete s.shanghai;
-    await saveStats(p.email, s);
-    toastMsg="Stats cleared.";
-    renderStatsScreen();
-  };
+  document.getElementById("backHome1").onclick=()=>{ screen="home"; render(); };
 }
 
 // ===== History Screen =====
-async function renderHistoryScreen(){
-  const p = me();
+async function renderHistory(){
+  const p=me();
   const hist = await getHistory(p.email);
-  const mine = hist.filter(h=>h.players.includes(p.email)).slice(0,60);
+  const mine = hist.slice(0,60); // limit 60
 
-  let list = '';
+  let list="";
   if(mine.length===0) list='<div class="sub">No matches yet.</div>';
   else{
     for(const h of mine){
-      list += '<div class="li"><div class="meta">'+
-              `<div class="nm">${esc(h.summary)}</div>`+
-              `<div class="em">${esc(new Date(h.endedAt).toLocaleString())}</div>`+
-              '</div></div>';
+      list += `<div class="li">
+        <div class="meta">
+          <div class="nm">${esc(h.summary)}</div>
+          <div class="em">${esc(new Date(h.endedAt).toLocaleString())}</div>
+        </div>
+      </div>`;
     }
   }
 
-  let html = '<div class="card"><div class="row">'+
-             '<button class="btn ghost" id="backHome2">Back</button>'+
-             '<button class="btn danger" id="clearHistBtn">Clear My History</button>'+
-             '</div></div>'+
-             '<div class="card"><span class="pill">Match History</span>'+
-             '<div class="h1">Your recent games</div><div class="divider"></div>'+list+'</div>';
+  let html = `<div class="card">
+    <div class="row">
+      <button class="btn ghost" id="backHome2">Back</button>
+    </div>
+  </div>
+  <div class="card">
+    <span class="pill">Match History</span>
+    <div class="h1" style="margin-top:8px;">Your recent games</div>
+    <div class="divider"></div>${list}
+  </div>`;
 
-  appEl.innerHTML = html;
+  appEl.innerHTML=html;
+  document.getElementById("backHome2").onclick=()=>{ screen="home"; render(); };
+}
 
-  document.getElementById("backHome2").onclick = ()=>{ screen="home"; render(); };
-  document.getElementById("clearHistBtn").onclick = async ()=>{
-    const allHist = await getHistory(p.email);
-    const keep = allHist.filter(h=>!h.players.includes(p.email));
-    // Re-save history excluding current player's matches
-    for(const h of allHist){
-      if(h.players.includes(p.email)){
-        await db.collection("history").doc(h.id).delete().catch(()=>{});
-      }
-    }
-    toastMsg="History cleared.";
-    renderHistoryScreen();
-  };
+// ===== Main Render Integration =====
+async function render(){
+  if(screen==="auth"){ await renderAuth(); return; }
+  if(screen==="home"){ await renderHome(); return; }
+  if(screen==="match"){ await renderMatch(); return; }
+  if(screen==="play"){ await renderPlayScreen(); return; }
+  if(screen==="stats"){ await renderStats(); return; }
+  if(screen==="history"){ await renderHistory(); return; }
 }
 </script>
 <script>
-// ===== Helper Functions =====
-
-// Normalize email (trim, lowercase)
-function normalizeEmail(s){
-  try{
-    return String(s||"").trim().toLowerCase();
-  }catch(e){
-    return "";
+// ===== Undo / Next Handling for Play Screen =====
+function onUndoPlay(){
+  if(!match || !match.snaps || match.snaps.length<2) return;
+  match.snaps.pop(); // current snap
+  const prev = match.snaps.pop(); // previous state
+  if(prev){
+    match = JSON.parse(prev);
+    render();
   }
 }
 
-// Find player object by email
-async function findPlayer(email){
-  email = normalizeEmail(email);
-  if(!email) return null;
-  const playerDoc = await db.collection("players").doc(email).get();
-  if(playerDoc.exists){
-    return { name: playerDoc.data().name, email: email };
+function onNextTurn(){
+  if(!match) return;
+  while(match.dartInTurn < 3){
+    pushSnap();
+    addThrow(match,"M"); // auto-miss for remaining darts in turn
   }
-  return null;
-}
-
-// Return current signed in player
-function me(){
-  if(!meUser) return null;
-  return { name: meUser.name || meUser.email, email: meUser.email };
-}
-
-// ===== Sign Out Flow =====
-async function signOutUser(){
-  try{
-    await auth.signOut();
-  }catch(e){
-    // ignore
-  }
-  meUser=null;
-  screen="auth";
+  if(match.finished) saveCompletedMatch();
   render();
 }
 
-// ===== Unified Render Dispatch =====
-async function render(){
-  // if authenticated and on first screen, go to home
-  if(meUser && screen === "auth") screen="home";
+// ===== Dartboard Flashing & Highlighting =====
+let flashInterval=null;
+function startFlash(){
+  if(flashInterval) clearInterval(flashInterval);
+  const activeTarget = TARGETS[match.targetIndex];
+  const board = document.querySelector('.boardBox svg path');
+  if(!board) return;
+  let visible = true;
+  flashInterval = setInterval(()=>{
+    board.style.opacity = visible ? '0.5' : '0.16';
+    visible = !visible;
+  }, 500);
+}
 
-  // show/hide sign out button
-  signOutBtn.style.display = meUser ? "inline-block" : "none";
-
-  // dispatch to correct screen
-  if(screen === "auth"){
-    await renderAuthScreen();
-  } else if(screen === "signup"){
-    await renderSignupScreen();
-  } else if(screen === "home"){
-    await renderHomeScreen();
-  } else if(screen === "match"){
-    await renderMatchScreen();
-  } else if(screen === "play"){
-    await renderPlayScreen();
-  } else if(screen === "stats"){
-    await renderStatsScreen();
-  } else if(screen === "history"){
-    await renderHistoryScreen();
+function stopFlash(){
+  if(flashInterval){
+    clearInterval(flashInterval);
+    flashInterval=null;
   }
 }
 
-// ===== Refactored Render Subscreens =====
+// ===== Start & Reset Buttons =====
+function startMatch(players){
+  match=newMatch(players);
+  match.snaps=[];
+  pushSnap();
+  screen="play";
+  render();
+}
 
-async function renderAuthScreen(){
-  let html="";
-  if(toastMsg){ html+='<div class="toast">'+esc(toastMsg)+'</div>'; toastMsg=""; }
-  html += '<div class="card"><div class="h1">Enter your email</div></div>'+
-          '<div class="card"><input type="email" id="inEmail" placeholder="you@email.com"/>'+
-          '<button class="btn" id="goBtn">Go</button></div>';
-  appEl.innerHTML = html;
+function resetMatch(){
+  const pls = match.players.map(p=>({name:p.name,email:p.email}));
+  match = newMatch(pls);
+  match.snaps=[];
+  pushSnap();
+  render();
+}
 
-  document.getElementById("goBtn").onclick = async ()=>{
-    const emailInput = document.getElementById("inEmail").value;
-    const emailNorm = normalizeEmail(emailInput);
-    if(!emailNorm || emailNorm.indexOf("@") < 0){
-      toastMsg = "Enter a valid email";
-      renderAuthScreen();
-      return;
-    }
-    await signInEmail(emailNorm);
+// ===== Event Listeners on Play Screen =====
+function bindPlayEvents(){
+  document.getElementById("hitT").onclick=()=>{addThrow(match,"T"); render();};
+  document.getElementById("hitS").onclick=()=>{addThrow(match,"S"); render();};
+  document.getElementById("hitD").onclick=()=>{addThrow(match,"D"); render();};
+  document.getElementById("hitM").onclick=()=>{addThrow(match,"M"); render();};
+  document.getElementById("undoBtn").onclick=onUndoPlay;
+  document.getElementById("nextBtn").onclick=onNextTurn;
+  document.getElementById("resetBtn").onclick=resetMatch;
+  document.getElementById("backHome").onclick=()=>{
+    match=null;
+    stopFlash();
+    screen="home";
+    render();
   };
 }
 
-async function renderSignupScreen(){
-  let html = '<div class="card"><div class="h1">Create account</div></div>'+
-             '<div class="card"><input type="text" id="upName" placeholder="Your Name"/>'+
-             '<button class="btn ok" id="createBtn">Create Player</button></div>';
-  appEl.innerHTML = html;
-
-  document.getElementById("createBtn").onclick = async ()=>{
-    const nameVal = document.getElementById("upName").value.trim();
-    const emailVal = normalizeEmail(document.getElementById("inEmail").value);
-    if(!nameVal){
-      toastMsg="Enter a name";
-      renderSignupScreen();
-      return;
-    }
-    await signUp(nameVal,emailVal);
-  };
+// ===== Full Integration =====
+async function render(){
+  if(screen==="auth"){ await renderAuth(); return; }
+  if(screen==="home"){ await renderHome(); return; }
+  if(screen==="match"){ await renderMatch(); return; }
+  if(screen==="play"){
+    await renderPlayScreen();
+    bindPlayEvents();
+    startFlash();
+    return;
+  }
+  if(screen==="stats"){ await renderStats(); return; }
+  if(screen==="history"){ await renderHistory(); return; }
 }
 
-async function renderHomeScreen(){
-  const p = me();
-  let html = '<div class="card"><span class="pill">Signed in</span>'+
-             '<div class="h1">'+esc(p.name)+'</div><div class="sub">'+esc(p.email)+'</div></div>'+
-             '<div class="row"><button class="btn" id="playNowBtn">Play Now</button>'+
-             '<button class="btn ghost" id="statsBtn">My Stats</button></div>'+
-             '<div class="row" style="margin-top:10px;"><button class="btn ghost" id="histBtn">Match History</button></div>';
-  appEl.innerHTML = html;
-
-  document.getElementById("playNowBtn").onclick = ()=>{ screen="match"; render(); };
-  document.getElementById("statsBtn").onclick = ()=>{ screen="stats"; render(); };
-  document.getElementById("histBtn").onclick = ()=>{ screen="history"; render(); };
-}
-
-// attach global actions
-homeBtn.onclick = ()=>{ screen = meUser ? "home" : "auth"; render(); };
-signOutBtn.onclick = ()=>{ signOutUser(); };
-
-// initial render
+// ===== Initial Call =====
 render();
 </script>
