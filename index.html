@@ -180,18 +180,29 @@ async function render(){
     </div></div>`;
     appEl.innerHTML = html;
 
-    document.getElementById("goBtn").onclick = async ()=>{
-      const e = normEmail(document.getElementById("inEmail").value);
-      if(!e){ toastMsg="Enter a valid email."; render(); return; }
-      const player = await signInEmail(e);
-      if(player){
-        meUser = player;
-        screen="home"; render();
-      } else {
-        // New user → prompt for name
-        screen="signup"; render();
-      }
-    };
+    document.getElementById("goBtn").onclick = async () => {
+  const emailInput = normEmail(document.getElementById("inEmail").value);
+  if (!emailInput) {
+    toastMsg = "Enter a valid email.";
+    render();
+    return;
+  }
+
+  // Check if player exists
+  const playerDoc = await db.collection("players").doc(emailInput).get();
+
+  if (playerDoc.exists) {
+    // Existing player → go straight to home
+    meUser = playerDoc.data();
+    screen = "home";
+    render();
+  } else {
+    // New player → go to signup screen
+    meUser = { email: emailInput }; // store email for signup
+    screen = "signup";
+    render();
+  }
+};
     return;
   }
 
