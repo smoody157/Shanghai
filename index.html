@@ -20,6 +20,7 @@
   --ok:#2bd576;
   --shadow: rgba(0,0,0,.25);
 }
+
 /* Base styles */
 *{box-sizing:border-box;}
 body{
@@ -81,32 +82,13 @@ input, select{
   color:var(--accent);font-weight:900;font-size:12px;
 }
 .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-.hitRow{display:flex;gap:8px;margin-top:6px}
-.hitBtn{flex:1;padding:10px;border-radius:12px;font-weight:900;font-size:14px;border:1px solid rgba(255,255,255,.14)}
-.hitBtn.miss{background:#3a1e2a;color:#ff4d5a}
-.hitBtn.undo{background:#332b3a;color:#f9d}
-.hitBtn.next{background:#1c3a2c;color:#2bd576}
-.activeCell{background:rgba(78,168,255,.25)}
-.boardBox{display:flex;justify-content:center;margin:10px 0}
-.barRow{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.barLabel{width:32px;font-size:12px}
-.barOuter{flex:1;height:10px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden}
-.barInner{height:100%;background:var(--accent)}
-.barVal{width:40px;text-align:right;font-size:11px;margin-left:4px}
-.kpi{display:flex;gap:6px;margin-top:6px}
-.kpi .box{flex:1;text-align:center;background:rgba(255,255,255,.06);border-radius:12px;padding:6px}
-.kpi .v{font-size:20px;font-weight:900}
-.kpi .l{font-size:11px;color:var(--muted)}
-.badge{display:inline-block;padding:2px 5px;border-radius:4px;background:rgba(78,168,255,.12);font-size:11px;margin-right:2px}
-.l{text-align:left}
-.small{font-size:10px;color:var(--muted)}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="brand">
     <div class="t">Game Night Darts</div>
-    <div class="s">The Dart Room presents • Developed by Steve</div>
+    <div class="s">The Dart Room • Developed by Steve’s Graphic Designs</div>
   </div>
   <div>
     <button class="btn ghost" id="homeBtn" type="button">Home</button>
@@ -115,6 +97,7 @@ input, select{
 </div>
 
 <div class="wrap" id="app"></div>
+
 <script>
 // ===== Firebase Initialization =====
 const firebaseConfig = {
@@ -167,71 +150,84 @@ async function saveHistoryEntry(entry){
 }
 
 // ===== Authentication =====
-async function signInEmail(email){
-  const doc = await db.collection("players").doc(email).get();
-  return doc.exists ? doc.data() : null;
+function signInEmail(email){
+  return db.collection("players").doc(email).get().then(doc=>{
+    if(doc.exists) return doc.data();
+    return null;
+  });
 }
 async function signUpEmail(name,email){
   await upsertPlayer(name,email);
   return {name,email};
 }
 
-// ===== UI Event Handlers =====
+// ===== UI Helpers =====
 homeBtn.onclick = ()=>{ screen = meUser ? "home" : "auth"; render(); };
 signOutBtn.onclick = async ()=>{ meUser=null; screen="auth"; render(); };
 
-// ===== Render Functions =====
-async function renderAuth(){
-  let html = "";
+// ===== Render Function Part 1 =====
+async function render(){
+  let html="";
   if(toastMsg){ html += `<div class="toast">${esc(toastMsg)}</div>`; toastMsg=""; }
 
-  html += `<div class="card"><div class="h1">Sign in</div><div class="sub">Enter your email to start.</div></div>`;
-  html += `<div class="card"><div class="stack">
-    <input id="inEmail" type="email" placeholder="you@email.com"/>
-    <div class="row">
-      <button class="btn" id="goBtn">Go</button>
-    </div>
-  </div></div>`;
-  appEl.innerHTML = html;
+  if(screen==="auth"){
+    html += `<div class="card"><div class="h1">Sign in</div><div class="sub">Enter your email to start.</div></div>`;
+    html += `<div class="card"><div class="stack">
+      <input id="inEmail" type="email" placeholder="you@email.com"/>
+      <div class="row">
+        <button class="btn" id="goBtn">Go</button>
+      </div>
+    </div></div>`;
+    appEl.innerHTML = html;
 
-  document.getElementById("goBtn").onclick = async ()=>{
-    const e = normEmail(document.getElementById("inEmail").value);
-    if(!e){ toastMsg="Enter a valid email."; renderAuth(); return; }
-    const player = await signInEmail(e);
-    if(player){
-      meUser = player;
+    document.getElementById("goBtn").onclick = async ()=>{
+      const e = normEmail(document.getElementById("inEmail").value);
+      if(!e){ toastMsg="Enter a valid email."; render(); return; }
+      const player = await signInEmail(e);
+      if(player){
+        meUser = player;
+        screen="home"; render();
+      } else {
+        screen="signup"; render();
+      }
+    };
+    return;
+  }
+
+  if(screen==="signup"){
+    html += `<div class="card"><div class="h1">Create Player</div><div class="sub">Enter your name to create your player.</div></div>`;
+    html += `<div class="card"><div class="stack">
+      <input id="upName" type="text" placeholder="Your Name"/>
+      <input id="upEmail" type="hidden" value="${meUser ? meUser.email : ''}"/>
+      <div class="row">
+        <button class="btn ok" id="createBtn">Create Player</button>
+      </div>
+    </div></div>`;
+    appEl.innerHTML = html;
+
+    document.getElementById("createBtn").onclick = async ()=>{
+      const n = String(document.getElementById("upName").value).trim();
+      const e = normEmail(document.getElementById("inEmail").value);
+      if(!n){ toastMsg="Enter your name."; render(); return; }
+      meUser = await signUpEmail(n,e);
       screen="home"; render();
-    } else {
-      meUser={email:e};
-      screen="signup"; render();
-    }
-  };
+    };
+    return;
+  }
+
+  // Home, match, play, stats, history will be rendered in Part 2
 }
 
-async function renderSignup(){
-  let html = `<div class="card"><div class="h1">Create Player</div><div class="sub">Enter your name to create your player.</div></div>`;
-  html += `<div class="card"><div class="stack">
-    <input id="upName" type="text" placeholder="Your Name"/>
-    <input id="upEmail" type="hidden" value="${esc(meUser.email)}"/>
-    <div class="row">
-      <button class="btn ok" id="createBtn">Create Player</button>
-    </div>
-  </div></div>`;
-  appEl.innerHTML = html;
-
-  document.getElementById("createBtn").onclick = async ()=>{
-    const n = String(document.getElementById("upName").value).trim();
-    const e = normEmail(document.getElementById("upEmail").value);
-    if(!n){ toastMsg="Enter your name."; renderSignup(); return; }
-    meUser = await signUpEmail(n,e);
-    screen="home"; render();
-  };
-}
-
+render();
+</script>
+<script>
 // ===== Home Screen =====
-async function renderHome(){
+async function renderHome() {
   const players = await getPlayers();
-  let html = `<div class="card"><span class="pill">Signed in</span><div class="h1">${esc(meUser.name)}</div><div class="sub">${esc(meUser.email)}</div></div>`;
+  let html = `<div class="card"><span class="pill">Signed in</span>
+    <div class="h1">${esc(meUser.name)}</div>
+    <div class="sub">${esc(meUser.email)}</div>
+  </div>`;
 
   html += `<div class="row">
     <button class="btn" id="playNowBtn">Play Now</button>
@@ -241,41 +237,115 @@ async function renderHome(){
 
   html += `<div class="card"><div class="h1">Other Players</div><div class="stack">`;
   players.forEach(p=>{
-    if(p.email!==meUser.email) html += `<div class="pill">${esc(p.name)}</div>`;
+    if(p.email!==meUser.email){
+      html += `<div class="pill">${esc(p.name)}</div>`;
+    }
   });
   html += `</div></div>`;
 
   appEl.innerHTML = html;
 
-  document.getElementById("playNowBtn").onclick = ()=>{ screen="match"; render(); };
-  document.getElementById("statsBtn").onclick = ()=>{ screen="stats"; render(); };
-  document.getElementById("historyBtn").onclick = ()=>{ screen="history"; render(); };
+  document.getElementById("playNowBtn").onclick=()=>{ screen="match"; render(); };
+  document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
+  document.getElementById("historyBtn").onclick=()=>{ screen="history"; render(); };
 }
 
 // ===== Match Setup =====
-async function renderMatch(){
+async function renderMatch() {
   const players = await getPlayers();
   let html = `<div class="card"><div class="h1">New Match</div></div>`;
+  
   html += `<div class="card"><div class="stack">
-    <label>Select Players</label>
+    <label>Choose players</label>
     <select id="matchPlayers" multiple>`;
   players.forEach(p=>{
     html += `<option value="${esc(p.email)}">${esc(p.name)}</option>`;
   });
-  html += `</select><button class="btn ok" id="startMatchBtn">Start Match</button></div></div>`;
+  html += `</select>
+    <button class="btn ok" id="startMatchBtn">Start Match</button>
+  </div></div>`;
+
   appEl.innerHTML = html;
 
   document.getElementById("startMatchBtn").onclick=()=>{
     const selected = Array.from(document.getElementById("matchPlayers").selectedOptions).map(o=>o.value);
-    if(selected.length<1){ toastMsg="Select at least one player."; renderMatch(); return; }
-    match = {players: selected.map(e=>players.find(p=>p.email===e)), startedAt: now(), grid:{}, turnIndex:0, targetIndex:0, dartInTurn:0};
-    // initialize grid for each player and target
+    if(selected.length<1){ toastMsg="Select at least one player."; render(); return; }
+    match = {
+      players: selected.map(e=>players.find(p=>p.email===e)),
+      startedAt: now(),
+      grid:{},
+      turnIndex:0,
+      targetIndex:0,
+      dartInTurn:0,
+      snaps:[]
+    };
     match.players.forEach(p=>{
       match.grid[p.email]={};
-      ["20","19","18","17","16","15","B"].forEach(t=>{ match.grid[p.email][t]={throws:[],points:0,shanghai:false}; });
+      TARGETS.forEach(t=>match.grid[p.email][String(t)]={throws:[],points:0});
     });
     screen="play"; render();
   };
+}
+
+// ===== Play Screen Placeholder =====
+function renderPlay() {
+  if(!match){ screen="home"; render(); return; }
+
+  let html = `<div class="card"><div class="h1">Match in progress</div></div>`;
+  html += `<div class="card">
+    <div class="stack">
+      <div>TODO: Render Dartboard & Gameplay</div>
+      <button class="btn ok" id="finishMatchBtn">Finish Match</button>
+    </div>
+  </div>`;
+  appEl.innerHTML = html;
+
+  document.getElementById("finishMatchBtn").onclick=async ()=>{
+    if(match){
+      match.endedAt=now();
+      await saveHistoryEntry({
+        gameId:"shanghai",
+        startedAt: match.startedAt,
+        endedAt: match.endedAt,
+        players: match.players.map(p=>p.email),
+        summary: match.players.map(p=>p.name+": 0").join(" | ")
+      });
+      match = null;
+      screen="home"; render();
+    }
+  };
+}
+
+// ===== Stats Screen Placeholder =====
+async function renderStats() {
+  const stats = await getStats(meUser.email);
+  let html = `<div class="card"><div class="h1">My Stats</div></div>`;
+  html += `<pre>${JSON.stringify(stats,null,2)}</pre>`;
+  html += `<button class="btn" id="statsHomeBtn">Home</button>`;
+  appEl.innerHTML = html;
+
+  document.getElementById("statsHomeBtn").onclick=()=>{ screen="home"; render(); };
+}
+
+// ===== History Screen Placeholder =====
+async function renderHistory() {
+  const history = await getHistory(meUser.email);
+  let html = `<div class="card"><div class="h1">History</div></div>`;
+  html += `<pre>${JSON.stringify(history,null,2)}</pre>`;
+  html += `<button class="btn" id="historyHomeBtn">Home</button>`;
+  appEl.innerHTML = html;
+
+  document.getElementById("historyHomeBtn").onclick=()=>{ screen="home"; render(); };
+}
+
+// ===== Unified Render Dispatcher =====
+async function render(){
+  if(!meUser || screen==="auth" || screen==="signup"){ return; }
+  if(screen==="home") return renderHome();
+  if(screen==="match") return renderMatch();
+  if(screen==="play") return renderPlay();
+  if(screen==="stats") return renderStats();
+  if(screen==="history") return renderHistory();
 }
 </script>
 <script>
@@ -300,7 +370,7 @@ function dartboardSVG(activeNumber){
   const cx=100,cy=100;
   const outer=80, rDoubleOuter=74, rDoubleInner=66, rTripleOuter=48, rTripleInner=40, rSingleInner=12;
   const seg=360/20;
-
+  
   let activePath = "";
   if(typeof activeNumber==="number"){
     let idx = BOARD_NUMS.indexOf(activeNumber);
@@ -430,7 +500,7 @@ async function renderPlayScreen(){
   // Score table
   let thead = `<tr><th>Target</th>`;
   for(let i=0;i<match.players.length;i++){
-    thead += `<th>${esc(match.players[i].name)}<div class="small">${match.players[i].total || 0} pts</div></th>`;
+    thead += `<th>${esc(match.players[i].name)}<div class="small">${match.players[i].total} pts</div></th>`;
   }
   thead += `</tr>`;
 
@@ -440,7 +510,7 @@ async function renderPlayScreen(){
     tbody += `<tr><td class="l"><span class="badge">${esc(TARGETS[r])}</span></td>`;
     for(let c=0;c<match.players.length;c++){
       let p = match.players[c];
-      let cell = match.grid[p.email][key] || {throws:[], points:0};
+      let cell = match.grid[p.email][key];
       let txt = cell.throws.length ? cell.throws.join(" ") : "—";
       let bonus = cell.shanghai?" ✨":"";
       let cls = (String(t)===key)?' class="activeCell"':'';
@@ -461,11 +531,7 @@ async function renderPlayScreen(){
     if(match.finished) return;
     pushSnap();
     addThrow(match,h);
-    if(match.targetIndex>=TARGETS.length){ 
-      match.finished=true; 
-      match.endedAt=now(); 
-      saveCompletedMatch(); 
-    }
+    if(match.targetIndex>=TARGETS.length){ match.finished=true; match.endedAt=now(); saveCompletedMatch(); }
     renderPlayScreen();
   }
 
@@ -473,7 +539,9 @@ async function renderPlayScreen(){
   document.getElementById("hitS").onclick = ()=>onHit("S");
   document.getElementById("hitD").onclick = ()=>onHit("D");
   document.getElementById("hitM").onclick = ()=>onHit("M");
-  document.getElementById("undoBtn").onclick = ()=>{ popSnap(); renderPlayScreen(); };
+  document.getElementById("undoBtn").onclick = ()=>{
+    popSnap(); renderPlayScreen();
+  };
   document.getElementById("nextBtn").onclick = ()=>{
     while(match.dartInTurn<3){ pushSnap(); addThrow(match,"M"); }
     if(match.targetIndex>=TARGETS.length){ match.finished=true; match.endedAt=now(); saveCompletedMatch(); }
@@ -486,31 +554,30 @@ async function renderPlayScreen(){
   };
 
   document.getElementById("backHome").onclick = ()=>{ match=null; screen="home"; render(); };
-
-  // Start flashing active segment
-  startFlash();
 }
-</script>
-<script>
+
 // ===== Stats Screen =====
 async function renderStats(){
-  const stats = await getStats(meUser.email);
-  const sh = stats.shanghai || {games:0,best:0,totalPoints:0,byTarget:{}};
+  const p = me();
+  const allStats = await getStats(p.email);
+  const sh = allStats.shanghai || {games:0,best:0,totalPoints:0,byTarget:{}};
   const avg = sh.games ? Math.round((sh.totalPoints/sh.games)*10)/10 : 0;
 
   let maxPts=0;
-  for(let t of TARGETS){
-    const bt = sh.byTarget[t] || {points:0,S:0,D:0,T:0,M:0};
+  for(let i=0;i<TARGETS.length;i++){
+    const k=String(TARGETS[i]);
+    const bt=sh.byTarget[k]||{points:0,S:0,D:0,T:0,M:0};
     if(bt.points>maxPts) maxPts=bt.points;
   }
   if(maxPts<1) maxPts=1;
 
   let bars="";
-  for(let t of TARGETS){
-    const bt = sh.byTarget[t] || {points:0,S:0,D:0,T:0,M:0};
-    const w = Math.round((bt.points/maxPts)*100);
+  for(let i=0;i<TARGETS.length;i++){
+    const t=TARGETS[i], k=String(t);
+    const bt=sh.byTarget[k]||{points:0,S:0,D:0,T:0,M:0};
+    const w=Math.round((bt.points/maxPts)*100);
     bars += `<div class="barRow">
-      <div class="barLabel">${esc(String(t))}</div>
+      <div class="barLabel">${esc(targetLabel(t))}</div>
       <div class="barOuter"><div class="barInner" style="width:${w}%"></div></div>
       <div class="barVal">${bt.points} pts</div>
     </div>`;
@@ -518,7 +585,7 @@ async function renderStats(){
 
   let html = `<div class="card">
     <div class="row">
-      <button class="btn ghost" id="backHomeStats">Back</button>
+      <button class="btn ghost" id="backHome1">Back</button>
     </div>
   </div>
   <div class="card">
@@ -535,18 +602,20 @@ async function renderStats(){
   <div class="card"><span class="pill">Points by target</span><div class="divider"></div>${bars}</div>`;
 
   appEl.innerHTML = html;
-  document.getElementById("backHomeStats").onclick=()=>{ screen="home"; render(); };
+
+  document.getElementById("backHome1").onclick=()=>{ screen="home"; render(); };
 }
 
 // ===== History Screen =====
 async function renderHistory(){
-  const history = await getHistory(meUser.email);
-  const recent = history.slice(0,60);
+  const p=me();
+  const hist = await getHistory(p.email);
+  const mine = hist.slice(0,60); // limit 60
 
   let list="";
-  if(recent.length===0) list='<div class="sub">No matches yet.</div>';
+  if(mine.length===0) list='<div class="sub">No matches yet.</div>';
   else{
-    for(const h of recent){
+    for(const h of mine){
       list += `<div class="li">
         <div class="meta">
           <div class="nm">${esc(h.summary)}</div>
@@ -558,7 +627,7 @@ async function renderHistory(){
 
   let html = `<div class="card">
     <div class="row">
-      <button class="btn ghost" id="backHomeHistory">Back</button>
+      <button class="btn ghost" id="backHome2">Back</button>
     </div>
   </div>
   <div class="card">
@@ -567,15 +636,25 @@ async function renderHistory(){
     <div class="divider"></div>${list}
   </div>`;
 
-  appEl.innerHTML = html;
-  document.getElementById("backHomeHistory").onclick=()=>{ screen="home"; render(); };
+  appEl.innerHTML=html;
+  document.getElementById("backHome2").onclick=()=>{ screen="home"; render(); };
+}
+
+// ===== Unified Render Dispatcher =====
+async function render(){
+  if(screen==="auth"){ await renderAuth(); return; }
+  if(screen==="home"){ await renderHome(); return; }
+  if(screen==="match"){ await renderMatch(); return; }
+  if(screen==="play"){ await renderPlayScreen(); return; }
+  if(screen==="stats"){ await renderStats(); return; }
+  if(screen==="history"){ await renderHistory(); return; }
 }
 
 // ===== Undo / Next Handling for Play Screen =====
 function onUndoPlay(){
   if(!match || !match.snaps || match.snaps.length<2) return;
-  match.snaps.pop();
-  const prev = match.snaps.pop();
+  match.snaps.pop(); // current snap
+  const prev = match.snaps.pop(); // previous state
   if(prev){
     match = JSON.parse(prev);
     render();
@@ -586,7 +665,7 @@ function onNextTurn(){
   if(!match) return;
   while(match.dartInTurn < 3){
     pushSnap();
-    addThrow(match,"M");
+    addThrow(match,"M"); // auto-miss for remaining darts in turn
   }
   if(match.finished) saveCompletedMatch();
   render();
@@ -613,16 +692,137 @@ function stopFlash(){
   }
 }
 
-// ===== Main Render Dispatcher =====
+// ===== Start & Reset Buttons =====
+function startMatch(players){
+  match=newMatch(players);
+  match.snaps=[];
+  pushSnap();
+  screen="play";
+  render();
+}
+
+function resetMatch(){
+  const pls = match.players.map(p=>({name:p.name,email:p.email}));
+  match = newMatch(pls);
+  match.snaps=[];
+  pushSnap();
+  render();
+}
+
+// ===== Event Listeners on Play Screen =====
+function bindPlayEvents(){
+  document.getElementById("hitT").onclick=()=>{addThrow(match,"T"); render();};
+  document.getElementById("hitS").onclick=()=>{addThrow(match,"S"); render();};
+  document.getElementById("hitD").onclick=()=>{addThrow(match,"D"); render();};
+  document.getElementById("hitM").onclick=()=>{addThrow(match,"M"); render();};
+  document.getElementById("undoBtn").onclick=onUndoPlay;
+  document.getElementById("nextBtn").onclick=onNextTurn;
+  document.getElementById("resetBtn").onclick=resetMatch;
+  document.getElementById("backHome").onclick=()=>{
+    match=null;
+    stopFlash();
+    screen="home";
+    render();
+  };
+}
+
+// ===== Full Integration =====
 async function render(){
-  if(screen==="auth" || screen==="signup"){ await render(); return; }
-  if(screen==="home") return renderHome();
-  if(screen==="match") return renderMatch();
-  if(screen==="play"){ await renderPlayScreen(); bindPlayEvents(); startFlash(); return; }
-  if(screen==="stats") return renderStats();
-  if(screen==="history") return renderHistory();
+  if(screen==="auth"){ await renderAuth(); return; }
+  if(screen==="home"){ await renderHome(); return; }
+  if(screen==="match"){ await renderMatch(); return; }
+  if(screen==="play"){
+    await renderPlayScreen();
+    bindPlayEvents();
+    startFlash();
+    return;
+  }
+  if(screen==="stats"){ await renderStats(); return; }
+  if(screen==="history"){ await renderHistory(); return; }
 }
 
 // ===== Initial Call =====
 render();
+</script>
+<script>
+// ===== Final Styling Adjustments =====
+const style = document.createElement('style');
+style.innerHTML = `
+.activeCell { background: rgba(78,168,255,.22); transition: background 0.3s; }
+.hitBtn { flex:1; padding:8px 0; margin:2px; border-radius:8px; border:none; font-weight:900; background:rgba(78,168,255,.1); color:var(--text); }
+.hitBtn.miss { background: rgba(255,77,90,.1); }
+.hitBtn.undo { background: rgba(255,206,0,.2); }
+.hitBtn.next { background: rgba(43,213,118,.2); }
+.boardBox { text-align:center; margin:12px 0; }
+.barRow { display:flex; align-items:center; gap:6px; margin:4px 0; }
+.barLabel { flex:1; font-size:12px; }
+.barOuter { flex:3; height:10px; background:rgba(255,255,255,.06); border-radius:8px; overflow:hidden; }
+.barInner { height:100%; background:var(--accent); border-radius:8px; }
+.barVal { width:50px; text-align:right; font-size:12px; color:var(--muted); }
+.kpi { display:flex; gap:12px; margin-top:12px; }
+.kpi .box { flex:1; text-align:center; background:rgba(255,255,255,.03); border-radius:14px; padding:8px 0; }
+.kpi .v { font-weight:900; font-size:18px; }
+.kpi .l { font-size:12px; color:var(--muted); }
+.li { padding:6px 0; border-bottom:1px solid rgba(255,255,255,.08); }
+.meta { display:flex; justify-content:space-between; font-size:12px; }
+.nm { font-weight:700; }
+.em { color:var(--muted); }
+`;
+document.head.appendChild(style);
+
+// ===== Helper for target labels in stats =====
+function targetLabel(t){ return t==="B"?"BULL":String(t); }
+
+// ===== Save Completed Match =====
+async function saveCompletedMatch(){
+  if(!match || !match.finished) return;
+  const entry = {
+    gameId: "shanghai",
+    startedAt: match.startedAt,
+    endedAt: match.endedAt,
+    players: match.players.map(p=>p.email),
+    summary: match.players.map(p=>p.name+": "+(p.total||0)).join(" | ")
+  };
+  await saveHistoryEntry(entry);
+
+  // Update stats for each player
+  for(const p of match.players){
+    const st = await getStats(p.email);
+    st.shanghai = st.shanghai || {games:0,best:0,totalPoints:0,byTarget:{}};
+    st.shanghai.games = (st.shanghai.games||0)+1;
+    st.shanghai.totalPoints = (st.shanghai.totalPoints||0)+(p.total||0);
+    if(!st.shanghai.best || p.total>st.shanghai.best) st.shanghai.best = p.total||0;
+
+    // per-target stats
+    TARGETS.forEach(t=>{
+      const k = String(t);
+      st.shanghai.byTarget[k] = st.shanghai.byTarget[k] || {S:0,D:0,T:0,M:0,points:0};
+      const cell = match.grid[p.email][k];
+      if(cell){
+        st.shanghai.byTarget[k].S += cell.throws.filter(v=>"S"===v).length;
+        st.shanghai.byTarget[k].D += cell.throws.filter(v=>"D"===v).length;
+        st.shanghai.byTarget[k].T += cell.throws.filter(v=>"T"===v).length;
+        st.shanghai.byTarget[k].M += cell.throws.filter(v=>"M"===v).length;
+        st.shanghai.byTarget[k].points += cell.points||0;
+      }
+    });
+    await saveStats(p.email,st);
+  }
+}
+
+// ===== New Match Factory =====
+function newMatch(players){
+  const grid={};
+  players.forEach(p=>{
+    grid[p.email]={};
+    TARGETS.forEach(t=>{ grid[p.email][String(t)]={throws:[],points:0}; });
+  });
+  return {players:JSON.parse(JSON.stringify(players)),grid,turnIndex:0,targetIndex:0,dartInTurn:0,finished:false};
+}
+
+// ===== Me helper =====
+function me(){ return meUser; }
+
+// ===== Initialization =====
+document.addEventListener("DOMContentLoaded",()=>{ render(); });
 </script>
