@@ -619,3 +619,395 @@ if(screen==="play"){
   document.getElementById("backHome").onclick = () => { match=null; screen="home"; render(); };
 }
 </script>
+<script>
+// ===== Game logic =====
+const TARGETS=[20,19,18,17,16,15,"B"];
+function pts(hit){ return hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0; }
+
+function newMatch(players){
+  let m={
+    gameId:"shanghai",
+    players:[],
+    turnIndex:0,
+    targetIndex:0,
+    dartInTurn:0,
+    grid:{},
+    finished:false,
+    startedAt:now(),
+    endedAt:null,
+    snaps:[]
+  };
+  for(let pl of players){
+    m.players.push({name:pl.name,email:pl.email,total:0});
+    m.grid[pl.email]={};
+    for(let t of TARGETS){
+      const k=String(t);
+      m.grid[pl.email][k]={throws:[],points:0,shanghai:false};
+    }
+  }
+  return m;
+}
+
+function pushSnap(){
+  if(!match) return;
+  try{
+    match.snaps.push(JSON.stringify(match));
+    if(match.snaps.length>60) match.snaps.shift();
+  }catch(e){}
+}
+function popSnap(){
+  if(!match || !match.snaps || match.snaps.length<2) return false;
+  match.snaps.pop();
+  let prev=match.snaps.pop();
+  if(!prev) return false;
+  try{ match=JSON.parse(prev); return true; }catch(e){ return false; }
+}
+
+function addThrow(m, hit){
+  if(m.finished) return;
+  let p=m.players[m.turnIndex];
+  let t=TARGETS[m.targetIndex];
+  let key=String(t);
+  let cell=m.grid[p.email][key];
+
+  cell.throws.push(hit);
+  cell.points += pts(hit);
+  p.total += pts(hit);
+
+  if(cell.throws.length===3){
+    let hasS=false, hasT=false, hasD=false;
+    for(let h of cell.throws){
+      if(h==="S") hasS=true;
+      if(h==="T") hasT=true;
+      if(h==="D") hasD=true;
+    }
+    if(hasS && hasT && hasD && cell.throws[2]==="D"){
+      cell.shanghai=true;
+      cell.points+=5; p.total+=5;
+    }
+  }
+
+  m.dartInTurn++;
+  if(m.dartInTurn>=3){
+    m.dartInTurn=0;
+    m.turnIndex=(m.turnIndex+1)%m.players.length;
+    if(m.turnIndex===0){
+      m.targetIndex++;
+      if(m.targetIndex>=TARGETS.length){
+        m.finished=true;
+        m.endedAt=now();
+      }
+    }
+  }
+}
+
+// ===== Dartboard SVG =====
+const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+function polar(cx,cy,r,deg){let rad=(deg-90)*Math.PI/180; return {x:cx+r*Math.cos(rad),y:cy+r*Math.sin(rad)};}
+function arcWedgePath(cx,cy,r0,r1,a0,a1){
+  let p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1), p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
+  let large=((a1-a0)>180)?1:0;
+  function f(n){ return (Math.round(n*1000)/1000).toFixed(3); }
+  return "M "+f(p1.x)+" "+f(p1.y)
+    +" A "+r1+" "+r1+" 0 "+large+" 1 "+f(p2.x)+" "+f(p2.y)
+    +" L "+f(p3.x)+" "+f(p3.y)
+    +" A "+r0+" "+r0+" 0 "+large+" 0 "+f(p4.x)+" "+f(p4.y)
+    +" Z";
+}
+
+function dartboardSVG(activeNumber){
+  let cx=100,cy=100;
+  let outer=98, rDoubleOuter=92, rDoubleInner=84, rTripleOuter=62, rTripleInner=54, rSingleInner=16;
+  let seg=360/20;
+  let idx=-1;
+  if(typeof activeNumber==="number"){
+    for(let i=0;i<BOARD_NUMS.length;i++){ if(BOARD_NUMS[i]===activeNumber){ idx=i; break; } }
+  }
+  let activePath="";
+  if(idx>=0){
+    let a0=idx*seg+1.2, a1=(idx+1)*seg-1.2;
+    activePath=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
+  }
+
+  function ringWedges(r0,r1,fillA,fillB){
+    let out="";
+    for(let i=0;i<20;i++){
+      let a0=i*seg+0.8, a1=(i+1)*seg-0.8;
+      let p=arcWedgePath(cx,cy,r0,r1,a0,a1);
+      out+='<path d="'+p+'" fill="'+(i%2===0?fillA:fillB)+'" opacity="0.95"/>';
+    }
+    return out;
+  }
+
+  let numText="";
+  for(let i=0;i<20;i++){
+    let ang=i*seg+seg/2; let p=polar(cx,cy,95,ang);
+    numText+='<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">'+BOARD_NUMS[i]+'</text>';
+  }
+
+  return ''+
+  '<svg viewBox="0 0 200 200" width="80%" aria-label="dartboard">'+
+    '<defs>'+
+      '<radialGradient id="bgG" cx="50%" cy="42%" r="65%">'+
+        '<stop offset="0%" stop-color="#203a62"/>'+
+        '<stop offset="55%" stop-color="#0d1a2e"/>'+
+        '<stop offset="100%" stop-color="#060d18"/>'+
+      '</radialGradient>'+
+      '<filter id="glow" x="-30%" y="-30%" width="160%" height="160%">'+
+        '<feGaussianBlur stdDeviation="3.5" result="b"/>'+
+        '<feColorMatrix in="b" type="matrix" values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 .9 0" result="c"/>'+
+        '<feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>'+
+      '</filter>'+
+    '</defs>'+
+    '<circle cx="100" cy="100" r="'+outer+'" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>'+
+    (activePath?'<path d="'+activePath+'" fill="rgba(78,168,255,.3)" stroke="rgba(78,168,255,.7)" stroke-width="1.8" filter="url(#glow)"/>':'')+
+    ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")+
+    ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")+
+    ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")+
+    ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")+
+    '<circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>'+
+    '<circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>'+
+    numText+
+    '<g>'+
+      '<rect x="60" y="8" rx="8" ry="8" width="80" height="18" fill="rgba(0,0,0,.35)" stroke="rgba(255,255,255,.12)"/>'+
+      '<text x="100" y="21" text-anchor="middle" font-size="9.5" fill="#cfe4ff" font-weight="900">TARGET: '+(activeNumber==="B"?"BULL":activeNumber)+'</text>'+
+    '</g>'+
+  '</svg>';
+}
+</script>
+<script>
+// ===== Play screen UI =====
+async function renderPlayScreen(){
+  if(!match){ screen="home"; render(); return; }
+
+  let t=TARGETS[match.targetIndex];
+  let activePlayer=match.players[match.turnIndex];
+
+  // Table header
+  let thead='<tr><th>Target</th>';
+  for(let p of match.players){
+    thead+='<th>'+esc(p.name)+'<div class="small">'+p.total+' pts</div></th>';
+  }
+  thead+='</tr>';
+
+  // Table body
+  let tbody='';
+  for(let r=0;r<TARGETS.length;r++){
+    let key=String(TARGETS[r]);
+    tbody+='<tr><td class="l"><span class="badge">'+esc(TARGETS[r])+'</span></td>';
+    for(let p of match.players){
+      let cell=match.grid[p.email][key];
+      let txt=cell.throws.length?cell.throws.join(" "):"—";
+      let bonus=cell.shanghai?" ✨":"";
+      let cls=(String(t)===key)?' class="activeCell"':'';
+      tbody+='<td'+cls+'>'+esc(txt)+bonus+'<div class="small">'+cell.points+'</div></td>';
+    }
+    tbody+='</tr>';
+  }
+
+  let html='';
+  html += '<div class="card"><div class="row">'+
+          '<button class="btn ghost" id="backHomeBtn">Back</button>'+
+          '<button class="btn danger" id="resetBtn">Reset</button>'+
+          '</div></div>';
+
+  html += '<div class="card">'+
+          '<span class="pill">Shanghai (Accuracy)</span>'+
+          '<div class="divider"></div>'+
+          '<div class="sub">Target: <b>'+esc(t)+'</b> • Turn: <b>'+esc(activePlayer.name)+'</b> • Dart '+(match.dartInTurn+1)+'/3</div>'+
+          '<div class="divider"></div>'+
+          '<div class="boardBox">'+dartboardSVG(t)+'</div>'+
+          '<div class="divider"></div>'+
+          '<div class="hitRow">'+
+            '<button class="hitBtn" id="hitT">T</button>'+
+            '<button class="hitBtn" id="hitS">S</button>'+
+            '<button class="hitBtn" id="hitD">D</button>'+
+            '<button class="hitBtn miss" id="hitM">M</button>'+
+          '</div>'+
+          '<div class="divider"></div>'+
+          '<div class="hitRow">'+
+            '<button class="hitBtn undo" id="undoBtn">Undo</button>'+
+            '<button class="hitBtn next" id="nextBtn">Next</button>'+
+          '</div>'+
+          (match.finished?'<div class="divider"></div><div class="pill">Finished • Saved to stats + history</div>':'')+
+          '</div>';
+
+  html += '<div class="card"><div class="pill">Round table</div><div class="divider"></div>'+
+          '<div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">'+
+          '<table><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table>'+
+          '</div></div>';
+
+  appEl.innerHTML=html;
+
+  // ===== Hit buttons =====
+  function onHit(h){
+    if(match.finished) return;
+    pushSnap();
+    addThrow(match,h);
+    if(match.finished) saveCompletedMatch();
+    renderPlayScreen();
+  }
+  document.getElementById("hitT").onclick=()=>onHit("T");
+  document.getElementById("hitS").onclick=()=>onHit("S");
+  document.getElementById("hitD").onclick=()=>onHit("D");
+  document.getElementById("hitM").onclick=()=>onHit("M");
+
+  // Undo
+  document.getElementById("undoBtn").onclick=()=>{
+    popSnap(); renderPlayScreen();
+  };
+
+  // Next (skip remaining darts)
+  document.getElementById("nextBtn").onclick=()=>{
+    while(match.dartInTurn<3){ pushSnap(); addThrow(match,"M"); }
+    if(match.finished) saveCompletedMatch();
+    renderPlayScreen();
+  };
+
+  // Reset match
+  document.getElementById("resetBtn").onclick=()=>{
+    let pls=match.players.map(p=>({name:p.name,email:p.email}));
+    match=newMatch(pls); match.snaps=[]; pushSnap(); renderPlayScreen();
+  };
+
+  // Back home
+  document.getElementById("backHomeBtn").onclick=()=>{
+    match=null; screen="home"; render();
+  };
+}
+</script>
+<script>
+// ===== Stats Screen =====
+async function renderStatsScreen(){
+  const p = me();
+  if(!p){ screen="home"; render(); return; }
+
+  const allStats = await getStats(p.email);
+  const sh = allStats.shanghai || {games:0,best:0,totalPoints:0,byTarget:{}};
+  const avg = sh.games? Math.round((sh.totalPoints/sh.games)*10)/10:0;
+
+  let maxPts=0;
+  for(let t of TARGETS){
+    const k=String(t);
+    const bt=sh.byTarget[k] || {points:0,S:0,D:0,T:0,M:0};
+    if(bt.points>maxPts) maxPts=bt.points;
+  }
+  if(maxPts<1) maxPts=1;
+
+  let bars='';
+  for(let t of TARGETS){
+    const k=String(t);
+    const bt=sh.byTarget[k] || {points:0,S:0,D:0,T:0,M:0};
+    const w=Math.round((bt.points/maxPts)*100);
+    bars+='<div class="barRow">'+
+          '<div class="barLabel">'+esc(targetLabel(t))+'</div>'+
+          '<div class="barOuter"><div class="barInner" style="width:'+w+'%"></div></div>'+
+          '<div class="barVal">'+bt.points+' pts</div>'+
+          '</div>';
+  }
+
+  let html='';
+  html+='<div class="card"><div class="row">'+
+        '<button class="btn ghost" id="backHomeStats">Back</button>'+
+        '<button class="btn danger" id="clearStatsBtn">Clear My Stats</button>'+
+        '</div></div>';
+
+  html+='<div class="card"><span class="pill">My Stats</span>'+
+        '<div class="h1" style="margin-top:8px;">Shanghai</div>'+
+        '<div class="sub">T=3, D=2, S=1, M=0 • Shanghai bonus +5</div>'+
+        '<div class="divider"></div>'+
+        '<div class="kpi">'+
+          '<div class="box"><div class="v">'+sh.games+'</div><div class="l">Games played</div></div>'+
+          '<div class="box"><div class="v">'+sh.best+'</div><div class="l">Best score</div></div>'+
+          '<div class="box"><div class="v">'+avg+'</div><div class="l">Average score</div></div>'+
+        '</div></div>';
+
+  html+='<div class="card"><span class="pill">Points by target</span><div class="divider"></div>'+bars+'</div>';
+
+  appEl.innerHTML=html;
+
+  document.getElementById("backHomeStats").onclick=()=>{ screen="home"; render(); };
+  document.getElementById("clearStatsBtn").onclick=async ()=>{
+    const stats = await getStats(p.email);
+    if(stats.shanghai) delete stats.shanghai;
+    await saveStats(p.email,stats);
+    toastMsg="Stats cleared."; renderStatsScreen();
+  };
+}
+
+// ===== Match History =====
+async function renderHistoryScreen(){
+  const p=me();
+  if(!p){ screen="home"; render(); return; }
+
+  const hist = await getHistory(p.email);
+  let mine=hist.filter(h=>h.players.includes(p.email)).slice(0,60);
+
+  let list='';
+  if(mine.length===0) list='<div class="sub">No matches yet.</div>';
+  else{
+    for(let h of mine){
+      list+='<div class="li"><div class="meta">'+
+            '<div class="nm">'+esc(h.summary)+'</div>'+
+            '<div class="em">'+esc(new Date(h.endedAt).toLocaleString())+'</div>'+
+            '</div></div>';
+    }
+  }
+
+  let html='';
+  html+='<div class="card"><div class="row">'+
+        '<button class="btn ghost" id="backHomeHist">Back</button>'+
+        '<button class="btn danger" id="clearHistBtn">Clear My History</button>'+
+        '</div></div>';
+
+  html+='<div class="card"><span class="pill">Match History</span>'+
+        '<div class="h1" style="margin-top:8px;">Your recent games</div>'+
+        '<div class="divider"></div>'+list+'</div>';
+
+  appEl.innerHTML=html;
+
+  document.getElementById("backHomeHist").onclick=()=>{ screen="home"; render(); };
+  document.getElementById("clearHistBtn").onclick=async ()=>{
+    const allHist = await db.collection("history").get();
+    const keep=[];
+    allHist.forEach(doc=>{
+      const data=doc.data();
+      if(!data.players.includes(p.email)) keep.push(doc.id);
+    });
+    // Remove all entries with player
+    const batch = db.batch();
+    allHist.forEach(doc=>{
+      const data=doc.data();
+      if(data.players.includes(p.email)) batch.delete(doc.ref);
+    });
+    await batch.commit();
+    toastMsg="History cleared."; renderHistoryScreen();
+  };
+}
+
+// ===== Main render switch =====
+async function render(){
+  if(meUser && screen==="auth") screen="home";
+
+  signOutBtn.style.display = meUser ? "inline-block":"none";
+
+  if(screen==="auth"){
+    renderAuthScreen(); return;
+  }
+  if(screen==="home"){
+    renderHomeScreen(); return;
+  }
+  if(screen==="match"){
+    renderMatchScreen(); return;
+  }
+  if(screen==="play"){
+    renderPlayScreen(); return;
+  }
+  if(screen==="stats"){
+    renderStatsScreen(); return;
+  }
+  if(screen==="history"){
+    renderHistoryScreen(); return;
+  }
+}
+</script>
