@@ -144,7 +144,7 @@ input,select{
 @keyframes leaderGlow{0%{box-shadow:0 0 0 rgba(43,213,118,0)}50%{box-shadow:0 0 26px rgba(43,213,118,.25)}100%{box-shadow:0 0 0 rgba(43,213,118,0)}}
 .leaderGlow{animation:leaderGlow 1.25s ease-in-out infinite;}
 
-/* Play UI (Shanghai) */
+/* Play UI */
 .boardBox{display:flex;justify-content:center;align-items:center}
 .hitRow{display:flex;gap:10px;flex-wrap:wrap}
 .hitBtn{
@@ -390,7 +390,7 @@ function startApp(){
     </svg>`;
   }
 
-  /* Undo snaps */
+  /* Undo snaps (used by Shanghai) */
   function pushSnap(m){
     m.snaps=m.snaps||[];
     m.snaps.push(JSON.stringify(m));
@@ -403,17 +403,17 @@ function startApp(){
     try{return JSON.parse(prev);}catch{return m;}
   }
 
-  /* Games registry (Killer stays “Coming soon” for now) */
+  /* Games registry (Shanghai + Killer ACTIVE) */
   const Games=[
     {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
-    {id:"killer",   name:"Killer",   icon:"🔥", active:false, tagline:"Coming soon"},
+    {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles"},
     {id:"around",   name:"Around the Clock", icon:"🕒", active:false, tagline:"Coming soon"},
     {id:"halve",    name:"Halve-It", icon:"➗", active:false, tagline:"Coming soon"},
     {id:"baseball", name:"Baseball", icon:"⚾", active:false, tagline:"Coming soon"},
   ];
   const getGame=id=>Games.find(g=>g.id===id)||null;
 
-  /* Shanghai (Cricket targets only) */
+  /* Shanghai */
   const ShanghaiGame=(()=>{
     const TARGETS=[20,19,18,17,16,15,"B"];
     const pts=hit=>hit==="T"?3:hit==="D"?2:hit==="S"?1:0;
@@ -585,6 +585,277 @@ function startApp(){
     }
 
     return {initMatch, renderPlay, bindPlay};
+  })();
+
+  /* Killer (FULL: play + history + stats) */
+  const KillerGame = (() => {
+    const MAX_LIVES = 3;
+
+    function initMatch(selectedPlayers){
+      return {
+        gameId:"killer",
+        phase:"claim",
+        claimIndex:0,
+        players: selectedPlayers.map(p=>({
+          name:p.name,
+          email:p.email,
+          number:null,
+          lives:MAX_LIVES,
+          killer:false,
+          out:false
+        })),
+        turnIndex:0,
+        dartInTurn:0,
+        finished:false,
+        winner:null,
+        startedAt:now(),
+        endedAt:null,
+        _saved:false
+      };
+    }
+
+    function nextAliveIndex(m, from){
+      for(let step=1; step<=m.players.length; step++){
+        const i=(from+step)%m.players.length;
+        if(!m.players[i].out) return i;
+      }
+      return from;
+    }
+
+    function checkWinner(m){
+      const alive=m.players.filter(p=>!p.out);
+      if(alive.length===1){
+        m.finished=true;
+        m.winner=alive[0]; // store full player object
+        m.endedAt=now();
+      }
+    }
+
+    async function saveFinish(ctx){
+      const m=ctx.match;
+      if(!m.finished || m._saved) return;
+      m._saved=true;
+
+      const winnerName = m.winner?.name || "Unknown";
+      const summary = `🏆 ${winnerName} wins • ` + m.players
+        .map(p=>`${p.name}${p.out?" (OUT)":""}`)
+        .join(" | ");
+
+      // History entry
+      await saveHistoryEntry({
+        gameId:"killer",
+        gameName:"Killer",
+        startedAt:m.startedAt,
+        endedAt:m.endedAt,
+        players:m.players.map(p=>p.email),
+        summary,
+        meta:{
+          winnerEmail: m.winner?.email || null,
+          numbers: m.players.map(p=>({email:p.email, number:p.number}))
+        }
+      });
+
+      // Stats (like Shanghai: update only the signed-in user's stats doc)
+      const stats=await getStatsDoc(ctx.meUser.email);
+      const games=stats.games||{};
+      const g=games.killer||{};
+      const played=(g.played||0)+1;
+
+      const iWon = (m.winner?.email === ctx.meUser.email);
+      const wins = (g.wins||0) + (iWon?1:0);
+
+      await saveStatsDoc(ctx.meUser.email,{
+        games:{
+          ...games,
+          killer:{...g, played, wins, lastPlayedAt:m.endedAt||now()}
+        },
+        updatedAt:now()
+      });
+    }
+
+    function renderPlay(ctx){
+      const m=ctx.match;
+
+      if(m.phase==="claim"){
+        const p=m.players[m.claimIndex];
+        const taken=m.players.filter(x=>x.number!=null).map(x=>x.number);
+        let opts = `<option value="" selected disabled>Select a number…</option>`;
+        for(let n=1;n<=20;n++){
+          const dis=taken.includes(n) && p.number!==n;
+          opts += `<option value="${n}" ${dis?"disabled":""}>${n}${dis?" (taken)":""}</option>`;
+        }
+        return `
+          <div class="card">
+            <div class="row">
+              <button class="btn ghost" id="backToSetup">Back</button>
+              <button class="btn danger" id="resetBtn">Reset</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="pill">Killer • Claim Numbers</span>
+            <div class="divider"></div>
+            <div class="h1" style="font-size:18px;margin:0">${esc(p.name)}</div>
+            <div class="sub">Opposite-hand throw — pick the number you hit.</div>
+            <div class="divider"></div>
+            <select id="claimNum">${opts}</select>
+            <div class="divider"></div>
+            <button class="btn ok" id="saveClaim">Save & Next</button>
+          </div>
+        `;
+      }
+
+      const active=m.players[m.turnIndex];
+      const status = m.finished
+        ? `🏆 Winner: <b>${esc(m.winner?.name||"")}</b>`
+        : `${esc(active.name)}’s turn • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?"🔥 Killer":"— Not killer yet"}`;
+
+      const rows = m.players.map(p=>{
+        const lifeTxt = p.out ? "OUT" : "❤".repeat(p.lives);
+        return `
+          <tr>
+            <td class="l">${esc(p.name)} <span class="badge">${esc(p.number??"?")}</span></td>
+            <td>${p.killer?"🔥":""}</td>
+            <td>${esc(lifeTxt)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div class="card">
+          <div class="row">
+            <button class="btn ghost" id="backToSetup">Back</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="pill">Killer</span>
+          <div class="divider"></div>
+          <div class="sub">${status}</div>
+          ${m.finished ? `<div class="divider"></div><div class="pill">Finished</div>` : `<div class="divider"></div>
+            <div class="hitRow">
+              <button class="hitBtn" id="myDouble">MY DOUBLE</button>
+              <button class="hitBtn" id="attackDouble">ATTACK DOUBLE</button>
+              <button class="hitBtn miss" id="miss">MISS</button>
+            </div>`}
+        </div>
+
+        <div class="card">
+          <div class="pill">Players</div>
+          <div class="divider"></div>
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+            <table>
+              <thead><tr><th>Player</th><th>K</th><th>Lives</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindPlay(ctx){
+      const m=ctx.match;
+
+      // Back/Reset (claim + play)
+      const backBtn=document.getElementById("backToSetup");
+      if(backBtn){
+        backBtn.onclick=()=>{
+          match=null;
+          screen="game.setup";
+          render();
+        };
+      }
+      const resetBtn=document.getElementById("resetBtn");
+      if(resetBtn){
+        resetBtn.onclick=()=>{
+          const pls=m.players.map(p=>({name:p.name,email:p.email}));
+          match=initMatch(pls);
+          render();
+        };
+      }
+
+      // Claim screen
+      const claimBtn=document.getElementById("saveClaim");
+      if(claimBtn){
+        claimBtn.onclick=()=>{
+          const p=m.players[m.claimIndex];
+          const raw=document.getElementById("claimNum").value;
+          const n=parseInt(raw,10);
+          if(!n){ alert("Pick a number."); return; }
+
+          if(m.players.some(x=>x.email!==p.email && x.number===n)){
+            alert("That number is taken. Pick another.");
+            return;
+          }
+          p.number=n;
+
+          const next = m.players.findIndex(x=>x.number==null);
+          if(next===-1){
+            m.phase="play";
+            m.turnIndex=0;
+            m.dartInTurn=0;
+          } else {
+            m.claimIndex=next;
+          }
+          render();
+        };
+        return;
+      }
+
+      if(m.finished){
+        // ensure saved (in case someone reloads right at finish)
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        return;
+      }
+
+      function endDart(){
+        m.dartInTurn += 1;
+        if(m.dartInTurn>=3){
+          m.dartInTurn=0;
+          m.turnIndex = nextAliveIndex(m, m.turnIndex);
+        }
+        checkWinner(m);
+        render();
+        if(m.finished){
+          saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        }
+      }
+
+      document.getElementById("miss").onclick=()=>{
+        endDart();
+      };
+
+      document.getElementById("myDouble").onclick=()=>{
+        const me=m.players[m.turnIndex];
+        if(me.number==null) return;
+
+        // become killer if not killer yet; else heal
+        if(!me.killer) me.killer=true;
+        else me.lives = Math.min(MAX_LIVES, me.lives+1);
+        endDart();
+      };
+
+      document.getElementById("attackDouble").onclick=()=>{
+        const me=m.players[m.turnIndex];
+        if(!me.killer){
+          alert("You must become a killer first (hit your double).");
+          return;
+        }
+        const target = prompt("Enter opponent's number you hit (double):");
+        const n=parseInt(target,10);
+        if(!n) return;
+
+        const victim=m.players.find(p=>p.number===n && !p.out);
+        if(victim && victim.email!==me.email){
+          victim.lives -= 1;
+          if(victim.lives<=0) victim.out=true;
+        }
+        endDart();
+      };
+    }
+
+    return { initMatch, renderPlay, bindPlay };
   })();
 
   /* App state */
@@ -887,6 +1158,12 @@ function startApp(){
         screen="game.play";
         return render();
       }
+      if(activeGameId==="killer"){
+        match=KillerGame.initMatch(selectedPlayers);
+        screen="game.play";
+        return render();
+      }
+
       toastMsg="Coming soon.";
       render();
     };
@@ -905,6 +1182,14 @@ function startApp(){
       ShanghaiGame.bindPlay(ctx);
       return;
     }
+
+    if(activeGameId==="killer"){
+      const ctx={meUser, match};
+      appEl.innerHTML=KillerGame.renderPlay(ctx);
+      KillerGame.bindPlay(ctx);
+      return;
+    }
+
     screen="home"; render();
   }
 
@@ -939,9 +1224,14 @@ function startApp(){
       ${Games.map(g=>{
         const gs=games[g.id]||{};
         const played=gs.played||0;
-        const line = g.id==="shanghai"
-          ? `Played: <b>${played}</b> • Best: <b>${esc(gs.best||0)}</b> • Points: <b>${esc(gs.points||0)}</b>`
+
+        const line =
+          g.id==="shanghai"
+            ? `Played: <b>${played}</b> • Best: <b>${esc(gs.best||0)}</b> • Points: <b>${esc(gs.points||0)}</b>`
+          : g.id==="killer"
+            ? `Played: <b>${played}</b> • Wins: <b>${esc(gs.wins||0)}</b>`
           : (g.active ? `Played: <b>${played}</b>` : `Coming soon`);
+
         return `
           <div class="gameCard">
             <div class="gameHead">
@@ -991,6 +1281,12 @@ function startApp(){
         <div class="sub">Played: <b>${esc(gs.played||0)}</b></div>
         <div class="sub">Points: <b>${esc(gs.points||0)}</b></div>
         <div class="sub">Best game: <b>${esc(gs.best||0)}</b></div>
+        <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
+      `;
+    }else if(g.id==="killer"){
+      body=`
+        <div class="sub">Played: <b>${esc(gs.played||0)}</b></div>
+        <div class="sub">Wins: <b>${esc(gs.wins||0)}</b></div>
         <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
       `;
     }else{
