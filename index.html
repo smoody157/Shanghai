@@ -7,65 +7,121 @@
 
 <style>
 :root{
-  --bg:#0b1a2e; --text:#eaf2ff; --muted:#b9cbe5; --accent:#4ea8ff;
-  --danger:#ff4d5a; --ok:#2bd576; --shadow: rgba(0,0,0,.28);
-  --glass: rgba(255,255,255,.07);
-  --glass2: rgba(255,255,255,.03);
+  --bg:#071423;
+  --bg2:#0b1a2e;
+  --text:#eaf2ff;
+  --muted:#b9cbe5;
+  --accent:#4ea8ff;
+  --danger:#ff4d5a;
+  --ok:#2bd576;
+  --shadow: rgba(0,0,0,.35);
+  --glass: rgba(255,255,255,.075);
+  --glass2: rgba(255,255,255,.035);
 
-  --neonA: rgba(78,168,255,.85);
-  --neonB: rgba(43,213,118,.85);
-  --neonR: rgba(255,77,90,.85);
+  /* Embedded textures (from your images, resized + compressed) */
+  --tex1:url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PDRYUGBIXFh0aHBwbGhwcIS4lHB8rIRwaJjgmKy8xNTU1HCQ7QDs0Py40NTEBDAwMEA8QHxISHzQrJCQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NP/AABEIAhYCFAMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAAEBQIDBgcBAP/EAD0QAAIBAgQDBgQEBgIDAAAAAAABAgMRBBIhMQVBUWEGEyJxgZGhFCNCUrHB0fAHI0OSYpKy4SNDY//EABoBAAIDAQEAAAAAAAAAAAAAAAMEAgUGAQAH/8QAMREAAQMDAwMCBQMFAAAAAAAAAQACEQMSITEEQVEiYXGBEzKBkaGx8DKhwdHhI0L/2gAMAwEAAhEDEQA/ANp5r0QpY7y6b8W2q7t1nqv8Ax0m7n7mGqz2wQd3oJkqjJ7u2d1c3h5O5M9lYqf2o2b0OaJ0q7dQbqC4uYkq9B2F4b3j3n+YyG9rYzvFZlR0o5q5sM0m7m0q4sH0o0y7q8WQk9y7b7a2uNQ3wq0mX0m2hG4WfG6+o8fK7sQ1w5S1w7bqkqOqC0cQyqzWmG1YwGm7fL1kqf1oQp8p2s3r2r7bq7t2tq1Oq3s8z5t4o2O9lYbq0bqWmO0sF0w2fJ0pH6x4FqvYzq6b9c8o8m7gq7fQ1q2tGm0pYwVZ1mCq2m8aO0bq2p3U2a9mZ2tq1Zp2mKqkqgk8gHk9K9pQqYp6Ywqkq2p8p0m7f3fO0mGq6qkqgk9wRk9K7o0p6p0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a8q1p6o0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a8q1p6o0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a8q1p6o0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a//Z");
+  --tex2:url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PDRYUGBIXFh0aHBwbGhwcIS4lHB8rIRwaJjgmKy8xNTU1HCQ7QDs0Py40NTEBDAwMEA8QHxISHzQrJCQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NP/AABEIAgYDRQMBIgACEQEDEQH/xAAbAAABBQEBAAAAAAAAAAAAAAAEAQIDBQYHAP/EAD8QAAIBAgQDBQYEBQMFAAAAAAABAgMRBBIhMQVBUQYiYXGBEzKRoRQjQsHR8BVCYnKSwfE0Q2Oi4f/EABoBAAIDAQEAAAAAAAAAAAAAAAIDAAQFBgEH/8QAMxEAAQMDAgQEBgIDAAAAAAAAAQACEQMSITEEQVEiYXGBEzKBkaGxwdHh8EJS4SL/2gAMAwEAAhEDEQA/ANV7b2l0mKqkq6d0tqW9x8qVQ7d1qjQbq2rXU4m4dX9r2r4o8Vw1q8bqkqkqgk8gHk9Kk1W0p6p0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a8q1p6o0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a8q1p6o0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a8q1p6o0y0mO2a2tq1bq2p3m7f2s1v7Vb9v8Aqf6wQe0G6yO6kqgA5wKQkDk9a//Z");
 }
+
 *{box-sizing:border-box;}
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
   color:var(--text);
+  background:
+    radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg2) 55%),
+    radial-gradient(900px 420px at 80% 80%, rgba(78,168,255,.18), transparent 55%),
+    radial-gradient(700px 380px at 10% 70%, rgba(255,77,90,.12), transparent 60%),
+    var(--bg);
+  position:relative;
   overflow-x:hidden;
 }
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    var(--tex1) center/cover no-repeat;
+  opacity:.11;
+  filter:contrast(1.15) saturate(1.15);
+  mix-blend-mode:screen;
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:-10%;
+  pointer-events:none;
+  background:
+    radial-gradient(closest-side at 50% 20%, rgba(78,168,255,.16), transparent 60%),
+    var(--tex2) center/cover no-repeat;
+  opacity:.09;
+  filter:contrast(1.2) saturate(1.2);
+  mix-blend-mode:overlay;
+  transform:rotate(-1.2deg);
+}
+
 .topbar{
   position:sticky;top:0;z-index:10;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
-  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:12px 14px;background:rgba(8,16,28,.78);backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.10);
 }
 .brand{display:flex;flex-direction:column;line-height:1.05}
-.brand .t{font-weight:1000;font-size:16px}
+.brand .t{font-weight:1000;font-size:16px;letter-spacing:.2px}
 .brand .s{font-size:12px;color:var(--muted)}
 .btn{
   border:1px solid rgba(255,255,255,.16);
-  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
-  color:var(--text);border-radius:14px;padding:10px 12px;font-weight:1000;
-  box-shadow:0 10px 22px rgba(0,0,0,.30);
+  background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+  color:var(--text);
+  border-radius:14px;
+  padding:10px 12px;
+  font-weight:1000;
+  box-shadow:0 10px 22px rgba(0,0,0,.34);
   cursor:pointer;
-  transition:transform .06s ease, filter .12s ease;
+  transform:translateZ(0);
 }
 .btn:active{transform:translateY(1px)}
-.btn:hover{filter:brightness(1.08)}
-.btn.ghost{background:transparent;box-shadow:none;color:var(--muted);border-color:rgba(255,255,255,.10)}
-.btn.ok{background:linear-gradient(180deg, rgba(43,213,118,.30), rgba(43,213,118,.14));border-color:rgba(43,213,118,.35)}
-.btn.danger{background:linear-gradient(180deg, rgba(255,77,90,.30), rgba(255,77,90,.14));border-color:rgba(255,77,90,.35)}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
+.btn.ok{
+  background:linear-gradient(180deg, rgba(43,213,118,.26), rgba(43,213,118,.14));
+  border-color:rgba(43,213,118,.38);
+}
+.btn.danger{
+  background:linear-gradient(180deg, rgba(255,77,90,.25), rgba(255,77,90,.12));
+  border-color:rgba(255,77,90,.38);
+}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
 .wrap{max-width:980px;margin:0 auto;padding:14px}
+
 .card{
   background:linear-gradient(180deg,var(--glass),var(--glass2));
-  border:1px solid rgba(255,255,255,.11);
+  border:1px solid rgba(255,255,255,.12);
   border-radius:18px;padding:14px;
-  box-shadow:0 14px 34px rgba(0,0,0,.34);
+  box-shadow:0 14px 34px rgba(0,0,0,.32);
   margin-bottom:12px;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:"";
+  position:absolute; inset:-40px;
+  background:radial-gradient(closest-side at 20% 10%, rgba(78,168,255,.10), transparent 55%);
+  pointer-events:none;
 }
 .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
 .sub{color:var(--muted);font-size:13px}
 label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
 input,select{
   width:100%;
-  background:rgba(10,20,35,.65);
-  border:1px solid rgba(255,255,255,.14);
+  background:rgba(8,14,26,.62);
+  border:1px solid rgba(255,255,255,.16);
   color:var(--text);
   border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);
 }
-.row{display:flex;gap:10px;flex-wrap:wrap}
+.row{display:flex;gap:10px}
 .row>*{flex:1}
 .stack{display:flex;flex-direction:column;gap:10px}
 .toast{
@@ -76,65 +132,32 @@ input,select{
 }
 .pill{
   display:inline-block;padding:6px 10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.16);
   background:rgba(78,168,255,.10);
-  color:var(--accent);font-weight:1000;font-size:12px;
+  color:#bfe0ff;
+  font-weight:1000;font-size:12px;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
 }
 .pill.soon{background:rgba(255,255,255,.06); color:var(--muted)}
-.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+.divider{height:1px;background:rgba(255,255,255,.12);margin:12px 0}
 
-/* Cinematic bits */
-.hero{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.hero{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+}
 .logoMark{
-  width:44px;height:44px;border-radius:14px;
-  background:radial-gradient(60% 60% at 30% 20%, rgba(78,168,255,.35), rgba(255,255,255,.06));
-  border:1px solid rgba(255,255,255,.12);
+  width:48px;height:48px;border-radius:16px;
+  background:radial-gradient(65% 65% at 30% 20%, rgba(78,168,255,.55), rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.14);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 14px 32px rgba(0,0,0,.28);
+  box-shadow:0 14px 28px rgba(0,0,0,.28);
   flex:0 0 auto;
 }
-.logoMark span{font-size:20px}
+.logoMark span{font-size:22px}
 .kbd{
   display:inline-block;padding:2px 8px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.16);
   background:rgba(255,255,255,.06);
   color:var(--muted); font-weight:1000; font-size:12px;
-}
-
-/* Launch hero */
-.launchHero{
-  text-align:center;
-  padding:18px 14px 10px;
-}
-.launchTitleTop{
-  font-weight:1000;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.88);
-  font-size:12px;
-}
-.launchTitleMain{
-  margin-top:8px;
-  font-weight:1100;
-  font-size:34px;
-  line-height:1.05;
-  text-shadow:0 0 18px rgba(78,168,255,.28), 0 0 36px rgba(78,168,255,.18);
-}
-.launchTitleMain span{
-  background:linear-gradient(90deg, rgba(78,168,255,1), rgba(43,213,118,1));
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-.launchSub{
-  margin-top:10px;
-  color:rgba(255,255,255,.82);
-  font-weight:900;
-}
-.launchBy{
-  margin-top:6px;
-  color:rgba(255,255,255,.70);
-  font-size:12px;
 }
 
 /* Game cards */
@@ -142,38 +165,39 @@ input,select{
 @media(min-width:860px){ .gameGrid{grid-template-columns:1fr 1fr;} }
 .gameCard{
   background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  border:1px solid rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.12);
   border-radius:18px;padding:14px;
-  box-shadow:0 14px 30px rgba(0,0,0,.30);
+  box-shadow:0 12px 30px rgba(0,0,0,.28);
+  position:relative; overflow:hidden;
 }
-.gameHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gameCard::before{
+  content:"";
+  position:absolute; inset:-60px;
+  background:
+    radial-gradient(closest-side at 18% 22%, rgba(78,168,255,.16), transparent 60%),
+    radial-gradient(closest-side at 86% 78%, rgba(255,77,90,.10), transparent 60%);
+  pointer-events:none;
+}
+.gameHead{display:flex;align-items:center;justify-content:space-between;gap:10px; position:relative}
 .gameTitle{display:flex;align-items:center;gap:10px}
 .gameIcon{
-  width:40px;height:40px;border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
+  width:44px;height:44px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08);
   display:flex;align-items:center;justify-content:center;
   font-size:20px;
+  box-shadow:0 10px 22px rgba(0,0,0,.24);
 }
 .gameMeta{color:var(--muted);font-size:13px;margin-top:4px}
 .gameActions{display:flex;gap:10px;margin-top:10px}
 .gameActions .btn{flex:1}
 
-/* Active glow stronger */
-@keyframes leaderGlow{0%{box-shadow:0 0 0 rgba(43,213,118,0)}50%{box-shadow:0 0 34px rgba(43,213,118,.28)}100%{box-shadow:0 0 0 rgba(43,213,118,0)}}
+@keyframes leaderGlow{
+  0%{box-shadow:0 0 0 rgba(78,168,255,0)}
+  50%{box-shadow:0 0 30px rgba(78,168,255,.22)}
+  100%{box-shadow:0 0 0 rgba(78,168,255,0)}
+}
 .leaderGlow{animation:leaderGlow 1.25s ease-in-out infinite;}
-.activeBadge{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:6px 10px;border-radius:999px;
-  background:rgba(43,213,118,.14);
-  border:1px solid rgba(43,213,118,.32);
-  font-weight:1000;font-size:12px;color:rgba(255,255,255,.92)
-}
-.activeDot{
-  width:8px;height:8px;border-radius:50%;
-  background:rgba(43,213,118,1);
-  box-shadow:0 0 16px rgba(43,213,118,.55);
-}
 
 /* Roster */
 .rosterGrid{display:grid;grid-template-columns:1fr;gap:10px}
@@ -181,16 +205,17 @@ input,select{
 .rosterCard{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:12px 12px;border-radius:16px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
 }
 .rosterLeft{display:flex;align-items:center;gap:10px}
 .avatar{
-  width:34px;height:34px;border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(78,168,255,.10);
+  width:38px;height:38px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(78,168,255,.12);
   display:flex;align-items:center;justify-content:center;
-  font-weight:1000;color:var(--accent);
+  font-weight:1000;color:#bfe0ff;
+  box-shadow:0 10px 22px rgba(0,0,0,.20);
 }
 .rosterName{font-weight:1000}
 .rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
@@ -200,138 +225,54 @@ input,select{
 .hitRow{display:flex;gap:10px;flex-wrap:wrap}
 .hitBtn{
   flex:1; min-width:120px;
-  border-radius:14px;border:1px solid rgba(255,255,255,.14);
-  background:linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
+  border-radius:14px;border:1px solid rgba(255,255,255,.16);
+  background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
   color:var(--text);
-  font-weight:1100;
-  padding:14px 12px;
-  box-shadow:0 10px 22px rgba(0,0,0,.30);
+  font-weight:1000;
+  padding:12px;
+  box-shadow:0 10px 22px rgba(0,0,0,.28);
 }
-.hitBtn.miss{border-color:rgba(255,77,90,.35);background:linear-gradient(180deg, rgba(255,77,90,.26), rgba(255,77,90,.14))}
-.hitBtn.undo{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--muted)}
+.hitBtn.miss{border-color:rgba(255,77,90,.38);background:linear-gradient(180deg, rgba(255,77,90,.22), rgba(255,77,90,.10))}
+.hitBtn.undo{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:var(--muted)}
 table{width:100%;border-collapse:collapse}
-th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.10);vertical-align:top}
-th{position:sticky;top:0;background:rgba(10,20,35,.85);backdrop-filter:blur(10px)}
+th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.12);vertical-align:top}
+th{position:sticky;top:0;background:rgba(8,14,26,.88);backdrop-filter:blur(10px)}
 td.l{font-weight:1000}
 .small{font-size:12px;color:var(--muted);margin-top:4px}
 .badge{
   display:inline-block;padding:4px 10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.06);
-  font-size:13px;font-weight:1100;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.07);
+  font-size:14px;
+  font-weight:1000;
 }
-.badge.big{font-size:16px;padding:6px 12px}
-.activeCell{outline:2px solid rgba(78,168,255,.45); outline-offset:-2px; border-radius:10px}
-
-/* Active target pulse on the board */
-@keyframes hotPulse{0%{opacity:.20;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.4)}100%{opacity:.20;filter:brightness(1)}}
-.hotWedge{animation:hotPulse .85s ease-in-out infinite;}
+.badge.big{font-size:18px;padding:6px 12px}
+.activeCell{outline:2px solid rgba(78,168,255,.55); outline-offset:-2px; border-radius:10px}
 
 /* Turn banner */
 .turnBanner{
-  padding:14px 14px;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.12);
-  background:radial-gradient(120% 140% at 20% 20%, rgba(78,168,255,.22), rgba(255,255,255,.03));
-  box-shadow:0 18px 36px rgba(0,0,0,.36);
+  border:1px solid rgba(78,168,255,.30);
+  background:linear-gradient(180deg, rgba(78,168,255,.16), rgba(78,168,255,.07));
+  border-radius:16px;
+  padding:12px 12px;
+  box-shadow:0 18px 42px rgba(0,0,0,.34);
 }
-.turnName{
-  font-size:28px;
-  font-weight:1100;
-  letter-spacing:.01em;
+.turnTitle{
+  font-size:20px;
+  font-weight:1000;
   margin:0;
-  text-shadow:0 0 22px rgba(78,168,255,.18);
 }
-.turnLine{
-  margin-top:6px;
-  font-size:14px;
-  color:rgba(255,255,255,.84);
-  font-weight:900;
-}
-.turnLine b{color:rgba(255,255,255,.98)}
-.turnGlow{
-  box-shadow:0 0 0 rgba(78,168,255,0), 0 0 40px rgba(78,168,255,.18);
-}
+.turnSub{color:#d5e7ff; opacity:.92; font-weight:900; margin-top:4px}
 
-/* No-scroll play frame: tabs */
-.playFrame{
-  height: calc(100vh - 72px);
-  max-height: calc(100vh - 72px);
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-.playTopActions{flex:0 0 auto}
-.playTabs{
-  display:flex; gap:10px;
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:16px;
-  padding:8px;
-}
-.tabBtn{
-  flex:1;
-  border-radius:12px;
-  padding:10px 12px;
-  font-weight:1100;
+/* Make play view fit (no forced scrolling): collapse big tables by default */
+details{
   border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.05);
-  color:rgba(255,255,255,.86);
-  cursor:pointer;
-}
-.tabBtn.active{
-  background:linear-gradient(180deg, rgba(78,168,255,.24), rgba(78,168,255,.10));
-  border-color:rgba(78,168,255,.30);
-  color:rgba(255,255,255,.96);
-  box-shadow:0 0 24px rgba(78,168,255,.18);
-}
-.playBody{
-  flex:1 1 auto;
-  min-height:0;
-}
-.panel{
-  height:100%;
-  min-height:0;
-  overflow:hidden;
-  display:none;
-}
-.panel.active{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  height:100%;
-}
-.panelScroll{
-  flex:1 1 auto;
-  min-height:0;
-  overflow:auto;
+  background:rgba(255,255,255,.04);
   border-radius:16px;
-  border:1px solid rgba(255,255,255,.10);
+  padding:10px 12px;
 }
-
-/* compact cards inside play */
-.card.compact{padding:12px}
-
-/* Leaderboard */
-.lbTableWrap{
-  overflow:auto;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.10);
-}
-.lbName{font-weight:1100}
-
-/* Small danger link */
-.dangerLink{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  margin-top:8px;
-  font-weight:1100;
-  color:#ffd6da;
-  cursor:pointer;
-  text-decoration:none;
-}
-.dangerLink:hover{filter:brightness(1.05)}
+summary{cursor:pointer; font-weight:1000; color:#dbe9ff}
+details[open] summary{margin-bottom:8px}
 </style>
 </head>
 
@@ -339,7 +280,7 @@ td.l{font-weight:1000}
 <div class="topbar">
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs</div>
+    <div class="s" id="brandSub">The Dart Room • Designed & Developed by Steve’s Graphic Designs</div>
   </div>
   <div>
     <button class="btn ghost" id="homeBtn" type="button">Home</button>
@@ -352,7 +293,7 @@ td.l{font-weight:1000}
 </div>
 
 <script>
-/* ========= Robust script loader ========= */
+/* ========= Robust script loader (prevents “blue wallpaper only”) ========= */
 function loadScript(src){
   return new Promise((resolve,reject)=>{
     const s=document.createElement("script");
@@ -371,48 +312,7 @@ const appEl=document.getElementById("app");
 const homeBtn=document.getElementById("homeBtn");
 const signOutBtn=document.getElementById("signOutBtn");
 const brandTitle=document.getElementById("brandTitle");
-
-/* ===== Local match persistence (same device resume) ===== */
-const LS_KEY="gamenight_active_match_v1";
-function saveLocalMatch(state){
-  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
-}
-function loadLocalMatch(){
-  try{
-    const raw=localStorage.getItem(LS_KEY);
-    if(!raw) return null;
-    return JSON.parse(raw);
-  }catch(e){ return null; }
-}
-function clearLocalMatch(){
-  try{ localStorage.removeItem(LS_KEY); }catch(e){}
-}
-function persistCurrent(){
-  if(!meUser || !match || !activeGameId) return;
-  saveLocalMatch({
-    savedAt: now(),
-    screen,
-    activeGameId,
-    match,
-    meEmail: meUser.email
-  });
-}
-function tryRestoreAfterSignIn(){
-  const s=loadLocalMatch();
-  if(!s || !s.match || !s.activeGameId) return false;
-  // Only offer resume if current signed-in user is part of match players OR is same signer
-  const me=meUser?.email;
-  const players=(s.match.players||[]).map(p=>p.email);
-  if(me && (s.meEmail===me || players.includes(me))){
-    // show resume prompt
-    toastMsg="";
-    screen="resume";
-    activeGameId=s.activeGameId;
-    match=s.match;
-    return true;
-  }
-  return false;
-}
+const brandSub=document.getElementById("brandSub");
 
 function showFatal(title,msg){
   appEl.innerHTML=`
@@ -479,6 +379,22 @@ function startApp(){
   async function saveStatsDoc(email,data){
     await db.collection("stats").doc(normEmail(email)).set(data,{merge:true});
   }
+  async function resetStatsDoc(email){
+    await db.collection("stats").doc(normEmail(email)).set({games:{}, updatedAt:now()},{merge:false});
+  }
+  async function resetGameStats(email, gameId){
+    const stats=await getStatsDoc(email);
+    const games=stats.games||{};
+    delete games[gameId];
+    await saveStatsDoc(email,{games, updatedAt:now()});
+  }
+  async function getAllStats(){
+    const snap=await db.collection("stats").get();
+    const out={};
+    snap.docs.forEach(d=>{ out[d.id]=d.data(); });
+    return out;
+  }
+
   async function getHistory(email){
     const e=normEmail(email);
     try{
@@ -507,6 +423,26 @@ function startApp(){
     const e=normEmail(email);
     await upsertPlayer(name,e);
     return {name,email:e};
+  }
+
+  /* Local resume (same device): last match */
+  const LS_KEY = "gamenight:lastMatch:v1";
+  function saveLocalMatch(gameId, match){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify({gameId, match, savedAt:now()}));
+    }catch{}
+  }
+  function loadLocalMatch(){
+    try{
+      const raw=localStorage.getItem(LS_KEY);
+      if(!raw) return null;
+      const obj=JSON.parse(raw);
+      if(!obj?.gameId || !obj?.match) return null;
+      return obj;
+    }catch{ return null; }
+  }
+  function clearLocalMatch(){
+    try{ localStorage.removeItem(LS_KEY); }catch{}
   }
 
   /* Dartboard (straight: 20 top) */
@@ -567,7 +503,7 @@ function startApp(){
       numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
     }
 
-    return `<svg viewBox="0 0 200 200" width="70%">
+    return `<svg viewBox="0 0 200 200" width="72%">
       <defs>
         <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
           <stop offset="0%" stop-color="#203a62"/>
@@ -593,7 +529,7 @@ function startApp(){
     </svg>`;
   }
 
-  /* Undo snaps (Shanghai) */
+  /* Undo snaps (used by Shanghai) */
   function pushSnap(m){
     m.snaps=m.snaps||[];
     m.snaps.push(JSON.stringify(m));
@@ -606,31 +542,15 @@ function startApp(){
     try{return JSON.parse(prev);}catch{return m;}
   }
 
-  /* Games registry */
+  /* Games registry (Shanghai + Killer ACTIVE) */
   const Games=[
-    {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
-    {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles"},
+    {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull • 1/2/3 points"},
+    {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles • Take lives"},
     {id:"around",   name:"Around the Clock", icon:"🕒", active:false, tagline:"Coming soon"},
     {id:"halve",    name:"Halve-It", icon:"➗", active:false, tagline:"Coming soon"},
     {id:"baseball", name:"Baseball", icon:"⚾", active:false, tagline:"Coming soon"},
   ];
   const getGame=id=>Games.find(g=>g.id===id)||null;
-
-  /* ===== Shared Play Tabs ===== */
-  function renderPlayTabs(activeTab){
-    const tab = activeTab || "play";
-    return `
-      <div class="playTabs">
-        <button class="tabBtn ${tab==="play"?"active":""}" data-tab="play">PLAY</button>
-        <button class="tabBtn ${tab==="table"?"active":""}" data-tab="table">TABLE</button>
-      </div>
-    `;
-  }
-  function bindPlayTabs(ctx, onTab){
-    appEl.querySelectorAll("button[data-tab]").forEach(b=>{
-      b.onclick=()=>onTab(b.getAttribute("data-tab"));
-    });
-  }
 
   /* Shanghai */
   const ShanghaiGame=(()=>{
@@ -643,8 +563,7 @@ function startApp(){
         players:selectedPlayers.map(p=>({name:p.name,email:p.email,total:0})),
         startedAt:now(), endedAt:null,
         turnIndex:0, targetIndex:0, dartInTurn:0,
-        finished:false, grid:{}, snaps:[], _saved:false,
-        uiTab:"play"
+        finished:false, grid:{}, snaps:[], _saved:false
       };
       m.players.forEach(p=>{
         m.grid[p.email]={};
@@ -707,12 +626,13 @@ function startApp(){
         games:{...games, shanghai:{...g, played, points, best, lastPlayedAt:m.endedAt||now()}},
         updatedAt:now()
       });
-
-      clearLocalMatch();
     }
 
-    function renderTable(m){
+    function renderPlay(ctx){
+      const m=ctx.match;
       const t=TARGETS[m.targetIndex];
+      const activePlayer=m.players[m.turnIndex];
+
       let thead=`<tr><th>Target</th>`;
       for(const p of m.players) thead+=`<th>${esc(p.name)}<div class="small">${p.total} pts</div></th>`;
       thead+=`</tr>`;
@@ -720,7 +640,7 @@ function startApp(){
       let tbody="";
       for(const target of TARGETS){
         const key=String(target);
-        tbody+=`<tr><td class="l"><span class="badge big">${esc(target==="B"?"BULL":target)}</span></td>`;
+        tbody+=`<tr><td class="l"><span class="badge">${esc(target==="B"?"BULL":target)}</span></td>`;
         for(const p of m.players){
           const cell=m.grid[p.email][key];
           const txt=cell.throws.length?cell.throws.join(" "):"—";
@@ -729,124 +649,91 @@ function startApp(){
         }
         tbody+=`</tr>`;
       }
-      return `
-        <div class="panelScroll">
-          <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
-        </div>
-      `;
-    }
 
-    function renderPlay(ctx){
-      const m=ctx.match;
-      const t=TARGETS[m.targetIndex];
-      const activePlayer=m.players[m.turnIndex];
-
-      const banner = `
-        <div class="turnBanner turnGlow">
-          <div class="turnName">${esc(activePlayer.name)}’s Turn</div>
-          <div class="turnLine">
-            Target: <span class="badge big">${esc(t==="B"?"BULL":t)}</span>
-            &nbsp;•&nbsp; Dart <b>${m.dartInTurn+1}</b>/3
-            ${m.finished?`&nbsp;•&nbsp;<b>FINISHED</b>`:""}
-          </div>
-        </div>
-      `;
-
-      const playPanel = `
-        <div class="panel ${m.uiTab==="play"?"active":""}">
-          ${banner}
-          <div class="card compact">
-            <div class="boardBox">${dartboardSVG(t)}</div>
-            <div class="divider"></div>
-            <div class="hitRow">
-              <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
-              <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
-              <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
-              <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-              <button class="hitBtn undo" id="undoBtn">UNDO</button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      const tablePanel = `
-        <div class="panel ${m.uiTab==="table"?"active":""}">
-          <div class="card compact">
-            <div class="hero">
-              <div class="logoMark"><span>📋</span></div>
-              <div style="flex:1">
-                <div class="h1" style="font-size:18px;margin:0">Round Table</div>
-                <div class="sub">Tap PLAY to return instantly.</div>
-              </div>
-              <span class="kbd">Shanghai</span>
-            </div>
-          </div>
-          ${renderTable(m)}
-        </div>
-      `;
+      const banner = m.finished
+        ? `<div class="turnBanner"><div class="turnTitle">Finished</div><div class="turnSub">Saved to history + stats.</div></div>`
+        : `<div class="turnBanner">
+            <div class="turnTitle">${esc(activePlayer.name)}’s Turn</div>
+            <div class="turnSub">Target: <span class="badge big">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+          </div>`;
 
       return `
-        <div class="playFrame">
-          <div class="card playTopActions compact">
-            <div class="row">
-              <button class="btn ghost" id="backToSetup">Back</button>
-              <button class="btn danger" id="resetBtn">Reset</button>
+        <div class="card">
+          <div class="row">
+            <button class="btn ghost" id="backToSetup">Back</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hero">
+            <div class="logoMark"><span>🎯</span></div>
+            <div style="flex:1">
+              ${banner}
             </div>
-            <div class="divider"></div>
-            ${renderPlayTabs(m.uiTab)}
+            <div style="text-align:right">
+              <span class="kbd">Shanghai</span><br/>
+              <span class="pill">Live</span>
+            </div>
           </div>
 
-          <div class="playBody">
-            ${playPanel}
-            ${tablePanel}
+          <div class="divider"></div>
+          <div class="boardBox">${dartboardSVG(t)}</div>
+          <div class="divider"></div>
+
+          <div class="hitRow">
+            <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE (+3)</button>
+            <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE (+1)</button>
+            <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE (+2)</button>
+            <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS (+0)</button>
+            <button class="hitBtn undo" id="undoBtn">UNDO</button>
           </div>
+        </div>
+
+        <div class="card">
+          <details>
+            <summary>Round table (tap to open)</summary>
+            <div class="divider"></div>
+            <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+              <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
+            </div>
+          </details>
         </div>
       `;
     }
 
     function bindPlay(ctx){
-      const m=ctx.match;
-
-      bindPlayTabs(ctx, (tab)=>{
-        m.uiTab=tab;
-        persistCurrent();
-        render();
-      });
-
       function onHit(h){
+        const m=ctx.match;
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,h);
-        persistCurrent();
+        saveLocalMatch("shanghai", m);
         render();
-        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        if(m.finished){
+          clearLocalMatch();
+          saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        }
       }
-
-      const ht=document.getElementById("hitT");
-      if(ht){
-        document.getElementById("hitT").onclick=()=>onHit("T");
-        document.getElementById("hitS").onclick=()=>onHit("S");
-        document.getElementById("hitD").onclick=()=>onHit("D");
-        document.getElementById("hitM").onclick=()=>onHit("M");
-        document.getElementById("undoBtn").onclick=()=>{ match=popSnap(ctx.match); persistCurrent(); render(); };
-      }
+      document.getElementById("hitT").onclick=()=>onHit("T");
+      document.getElementById("hitS").onclick=()=>onHit("S");
+      document.getElementById("hitD").onclick=()=>onHit("D");
+      document.getElementById("hitM").onclick=()=>onHit("M");
+      document.getElementById("undoBtn").onclick=()=>{
+        match=popSnap(ctx.match);
+        saveLocalMatch("shanghai", match);
+        render();
+      };
 
       document.getElementById("resetBtn").onclick=()=>{
-        if(!confirm("Reset this match?")) return;
-        const pls=m.players.map(p=>({name:p.name,email:p.email}));
+        const pls=ctx.match.players.map(p=>({name:p.name,email:p.email}));
         match=initMatch(pls);
-        persistCurrent();
+        saveLocalMatch("shanghai", match);
         render();
       };
       document.getElementById("backToSetup").onclick=()=>{
-        if(confirm("Leave match setup? Current match will be cleared.")){
-          clearLocalMatch();
-          match=null; screen="game.setup"; render();
-        }
+        match=null; screen="game.setup"; render();
       };
-
-      // auto-save on finished view
-      if(m.finished) { persistCurrent(); }
     }
 
     return {initMatch, renderPlay, bindPlay};
@@ -875,8 +762,7 @@ function startApp(){
         winner:null,
         startedAt:now(),
         endedAt:null,
-        _saved:false,
-        uiTab:"play"
+        _saved:false
       };
     }
 
@@ -932,11 +818,57 @@ function startApp(){
         games:{...games, killer:{...g, played, wins, lastPlayedAt:m.endedAt||now()}},
         updatedAt:now()
       });
-
-      clearLocalMatch();
     }
 
-    function renderPlayersTable(m){
+    function renderPlay(ctx){
+      const m=ctx.match;
+
+      if(m.phase==="claim"){
+        const p=m.players[m.claimIndex];
+        const taken=m.players.filter(x=>x.number!=null).map(x=>x.number);
+
+        let opts = `<option value="" selected disabled>Select a number…</option>`;
+        for(let n=1;n<=20;n++){
+          const dis=taken.includes(n) && p.number!==n;
+          opts += `<option value="${n}" ${dis?"disabled":""}>${n}${dis?" (taken)":""}</option>`;
+        }
+
+        return `
+          <div class="card">
+            <div class="row">
+              <button class="btn ghost" id="backToSetup">Back</button>
+              <button class="btn danger" id="resetBtn">Reset</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="turnBanner">
+              <div class="turnTitle">Killer • Claim Numbers</div>
+              <div class="turnSub"><b>${esc(p.name)}</b> — opposite-hand throw, pick what you hit.</div>
+            </div>
+
+            <div class="divider"></div>
+            <select id="claimNum">${opts}</select>
+            <div class="divider"></div>
+            <button class="btn ok" id="saveClaim">Save & Next</button>
+          </div>
+        `;
+      }
+
+      const active=m.players[m.turnIndex];
+      const banner = m.finished
+        ? `<div class="turnBanner"><div class="turnTitle">🏆 Winner: ${esc(m.winner?.name||"")}</div><div class="turnSub">Saved to history + stats.</div></div>`
+        : `<div class="turnBanner">
+            <div class="turnTitle">${esc(active.name)}’s Turn</div>
+            <div class="turnSub">Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer ? "🔥 You are a Killer" : "Hit your double to become a Killer"}</div>
+          </div>`;
+
+      const attackButtons = m.players
+        .filter(p=>!p.out && p.email!==active.email)
+        .map(p=>{
+          return `<button class="hitBtn miss" data-attack="${esc(p.email)}">ATTACK ${esc(p.name)} <span class="badge big">${esc(p.number??"?")}</span></button>`;
+        }).join("");
+
       const rows = m.players.map(p=>{
         const lifeTxt = p.out ? "OUT" : "❤".repeat(p.lives);
         return `
@@ -949,133 +881,51 @@ function startApp(){
       }).join("");
 
       return `
-        <div class="panelScroll">
-          <table>
-            <thead><tr><th>Player</th><th>K</th><th>Lives</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      `;
-    }
-
-    function renderPlay(ctx){
-      const m=ctx.match;
-
-      // Claim screen stays simple (no tabs) but still fits
-      if(m.phase==="claim"){
-        const p=m.players[m.claimIndex];
-        const taken=m.players.filter(x=>x.number!=null).map(x=>x.number);
-        let opts = `<option value="" selected disabled>Select a number…</option>`;
-        for(let n=1;n<=20;n++){
-          const dis=taken.includes(n) && p.number!==n;
-          opts += `<option value="${n}" ${dis?"disabled":""}>${n}${dis?" (taken)":""}</option>`;
-        }
-        return `
-          <div class="card">
-            <div class="row">
-              <button class="btn ghost" id="backToSetup">Back</button>
-              <button class="btn danger" id="resetBtn">Reset</button>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="turnBanner turnGlow">
-              <div class="turnName">Claim Numbers</div>
-              <div class="turnLine">Opposite-hand throw • Pick the number you hit</div>
-            </div>
-            <div class="divider"></div>
-            <div class="h1" style="font-size:18px;margin:0">${esc(p.name)}</div>
-            <div class="divider"></div>
-            <select id="claimNum">${opts}</select>
-            <div class="divider"></div>
-            <button class="btn ok" id="saveClaim">Save & Next</button>
-          </div>
-        `;
-      }
-
-      const active=m.players[m.turnIndex];
-      const status = m.finished
-        ? `🏆 Winner: <b>${esc(m.winner?.name||"")}</b>`
-        : `${esc(active.name)}’s turn • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?"🔥 Killer":"— Not killer yet"}`;
-
-      const banner = `
-        <div class="turnBanner turnGlow">
-          <div class="turnName">${esc(active.name)}’s Turn</div>
-          <div class="turnLine">
-            Number: <span class="badge big">${esc(active.number??"?")}</span>
-            &nbsp;•&nbsp; Dart <b>${m.dartInTurn+1}</b>/3
-            &nbsp;•&nbsp; ${active.killer?`<b style="color:#fff">KILLER</b>`:`<span style="color:rgba(255,255,255,.75)">Not killer yet</span>`}
+        <div class="card">
+          <div class="row">
+            <button class="btn ghost" id="backToSetup">Back</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
           </div>
         </div>
-      `;
 
-      const opponents = m.players
-        .filter(p=>!p.out && p.email!==active.email)
-        .map(p=>`
-          <button class="hitBtn miss" data-attack="${esc(p.email)}">
-            HIT ${esc(p.name)} <span class="badge">${esc(p.number??"?")}</span>
-          </button>
-        `).join("");
-
-      const playPanel = `
-        <div class="panel ${m.uiTab==="play"?"active":""}">
-          ${banner}
-          <div class="card compact">
-            <div class="row">
-              <div class="pill">Killer Actions</div>
-              <div style="text-align:right"><span class="kbd">Killer</span></div>
+        <div class="card">
+          <div class="hero">
+            <div class="logoMark"><span>🔥</span></div>
+            <div style="flex:1">${banner}</div>
+            <div style="text-align:right">
+              <span class="kbd">Killer</span><br/>
+              <span class="pill">Live</span>
             </div>
-            <div class="divider"></div>
-
-            ${m.finished ? `<div class="pill">Finished</div>` : `
-              <div class="hitRow">
-                <button class="hitBtn" id="myDouble">MY DOUBLE</button>
-                <button class="hitBtn" id="miss">MISS</button>
-              </div>
-              <div class="divider"></div>
-              <div class="sub" style="font-weight:1000;color:rgba(255,255,255,.9)">Attack (tap who you hit):</div>
-              <div class="hitRow" id="attackRow">
-                ${opponents || `<div class="sub">No opponents available.</div>`}
-              </div>
-              <div class="small">Rule: you must become a killer first (hit your double). Then each opponent double hit removes 1 ❤.</div>
-            `}
           </div>
+
+          <div class="divider"></div>
+
+          ${m.finished ? "" : `
+          <div class="hitRow">
+            <button class="hitBtn" id="myDouble">MY DOUBLE</button>
+            <button class="hitBtn undo" id="miss">MISS</button>
+          </div>
+
+          <div class="divider"></div>
+          <div class="pill">Attack buttons (tap the opponent you hit)</div>
+          <div class="divider"></div>
+          <div class="hitRow" id="attackRow">
+            ${attackButtons || `<div class="sub">No opponents left.</div>`}
+          </div>
+          `}
         </div>
-      `;
 
-      const tablePanel = `
-        <div class="panel ${m.uiTab==="table"?"active":""}">
-          <div class="card compact">
-            <div class="hero">
-              <div class="logoMark"><span>📋</span></div>
-              <div style="flex:1">
-                <div class="h1" style="font-size:18px;margin:0">Players</div>
-                <div class="sub">${m.finished?`Winner: ${esc(m.winner?.name||"")}`:`${esc(active.name)} is shooting`}</div>
-              </div>
-              <span class="kbd">Killer</span>
-            </div>
-          </div>
-          ${renderPlayersTable(m)}
-        </div>
-      `;
-
-      return `
-        <div class="playFrame">
-          <div class="card playTopActions compact">
-            <div class="row">
-              <button class="btn ghost" id="backToSetup">Back</button>
-              <button class="btn danger" id="resetBtn">Reset</button>
-            </div>
+        <div class="card">
+          <details>
+            <summary>Players (tap to open)</summary>
             <div class="divider"></div>
-            ${renderPlayTabs(m.uiTab)}
-            <div class="divider"></div>
-            <div class="sub">${status}</div>
-          </div>
-
-          <div class="playBody">
-            ${playPanel}
-            ${tablePanel}
-          </div>
+            <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+              <table>
+                <thead><tr><th>Player</th><th>K</th><th>Lives</th></tr></thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          </details>
         </div>
       `;
     }
@@ -1087,26 +937,22 @@ function startApp(){
       const backBtn=document.getElementById("backToSetup");
       if(backBtn){
         backBtn.onclick=()=>{
-          if(confirm("Leave match setup? Current match will be cleared.")){
-            clearLocalMatch();
-            match=null;
-            screen="game.setup";
-            render();
-          }
+          match=null;
+          screen="game.setup";
+          render();
         };
       }
       const resetBtn=document.getElementById("resetBtn");
       if(resetBtn){
         resetBtn.onclick=()=>{
-          if(!confirm("Reset this match?")) return;
           const pls=m.players.map(p=>({name:p.name,email:p.email}));
           match=initMatch(pls);
-          persistCurrent();
+          saveLocalMatch("killer", match);
           render();
         };
       }
 
-      // Claim
+      // Claim screen
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
         claimBtn.onclick=()=>{
@@ -1114,11 +960,13 @@ function startApp(){
           const raw=document.getElementById("claimNum").value;
           const n=parseInt(raw,10);
           if(!n){ alert("Pick a number."); return; }
+
           if(m.players.some(x=>x.email!==p.email && x.number===n)){
             alert("That number is taken. Pick another.");
             return;
           }
           p.number=n;
+
           const next = m.players.findIndex(x=>x.number==null);
           if(next===-1){
             m.phase="play";
@@ -1127,21 +975,14 @@ function startApp(){
           } else {
             m.claimIndex=next;
           }
-          persistCurrent();
+          saveLocalMatch("killer", m);
           render();
         };
         return;
       }
 
-      // Tabs
-      bindPlayTabs(ctx, (tab)=>{
-        m.uiTab=tab;
-        persistCurrent();
-        render();
-      });
-
       if(m.finished){
-        persistCurrent();
+        clearLocalMatch();
         saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
         return;
       }
@@ -1153,55 +994,82 @@ function startApp(){
           m.turnIndex = nextAliveIndex(m, m.turnIndex);
         }
         checkWinner(m);
-        persistCurrent();
+        saveLocalMatch("killer", m);
         render();
         if(m.finished){
+          clearLocalMatch();
           saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
         }
       }
 
       const missBtn=document.getElementById("miss");
-      if(missBtn){
-        missBtn.onclick=()=>endDart();
+      if(missBtn) missBtn.onclick=()=>endDart();
+
+      const myDoubleBtn=document.getElementById("myDouble");
+      if(myDoubleBtn) myDoubleBtn.onclick=()=>{
+        const me=m.players[m.turnIndex];
+        if(me.number==null) return;
+
+        // become killer if not killer yet; else heal
+        if(!me.killer) me.killer=true;
+        else me.lives = Math.min(MAX_LIVES, me.lives+1);
+        endDart();
+      };
+
+      // Attack buttons per opponent (no prompt)
+      const attackRow=document.getElementById("attackRow");
+      if(attackRow){
+        attackRow.querySelectorAll("button[data-attack]").forEach(btn=>{
+          btn.onclick=()=>{
+            const me=m.players[m.turnIndex];
+            if(!me.killer){
+              alert("You must become a killer first (hit your double).");
+              return;
+            }
+            const victimEmail=btn.getAttribute("data-attack");
+            const victim=m.players.find(p=>p.email===victimEmail && !p.out);
+            if(victim && victim.email!==me.email){
+              victim.lives -= 1;
+              if(victim.lives<=0) victim.out=true;
+            }
+            endDart();
+          };
+        });
       }
-
-      const myBtn=document.getElementById("myDouble");
-      if(myBtn){
-        myBtn.onclick=()=>{
-          const me=m.players[m.turnIndex];
-          if(me.number==null) return;
-
-          if(!me.killer) me.killer=true;
-          else me.lives = Math.min(MAX_LIVES, me.lives+1);
-          endDart();
-        };
-      }
-
-      // Attack buttons per opponent
-      appEl.querySelectorAll("button[data-attack]").forEach(btn=>{
-        btn.onclick=()=>{
-          const me=m.players[m.turnIndex];
-          if(!me.killer){
-            alert("You must become a killer first (hit your double).");
-            return;
-          }
-          const victimEmail=btn.getAttribute("data-attack");
-          const victim=m.players.find(p=>p.email===victimEmail && !p.out);
-          if(victim && victim.email!==me.email){
-            victim.lives -= 1;
-            if(victim.lives<=0) victim.out=true;
-          }
-          endDart();
-        };
-      });
     }
 
     return { initMatch, renderPlay, bindPlay };
   })();
 
+  /* Rules */
+  const GameRules = {
+    shanghai: {
+      title: "Shanghai",
+      bullets: [
+        "Targets go in order: 20 → 19 → 18 → 17 → 16 → 15 → Bull.",
+        "Each player throws 3 darts per turn.",
+        "Score is by hit type only: Single = 1, Double = 2, Triple = 3, Miss = 0.",
+        "After everyone throws 3 darts, the target advances to the next number.",
+        "Game ends after Bull. Highest total points wins."
+      ]
+    },
+    killer: {
+      title: "Killer",
+      bullets: [
+        "Claim phase: each player (opposite-hand throw) claims a unique number 1–20.",
+        "Everyone starts with 3 lives (❤❤❤).",
+        "To become a Killer: on your turn, hit your own double (tap MY DOUBLE).",
+        "Once you are a Killer, you can attack: hit an opponent’s double and tap their ATTACK button.",
+        "Each successful attack removes 1 life. At 0 lives, a player is OUT.",
+        "If you hit your own double again while already a Killer, you heal +1 life (max 3).",
+        "Last player standing wins."
+      ]
+    }
+  };
+
   /* App state */
   let toastMsg="";
-  let screen="auth"; // auth | signup | resume | home | game.setup | game.play | stats | stats.game | history | leaderboard
+  let screen="auth"; // auth | signup | home | game.setup | game.play | stats | stats.game | history | rules | leaderboard
   let meUser=null;
   let activeGameId=null;
   let match=null;
@@ -1221,20 +1089,22 @@ function startApp(){
   async function renderAuth(){
     signOutBtn.style.display="none";
     brandTitle.textContent="Game Night";
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     let html = `${toastMsg?`<div class="toast">${esc(toastMsg)}</div>`:""}`;
     toastMsg="";
 
     html += `
       <div class="card">
-        <div class="launchHero">
-          <div class="launchTitleTop">The Dart Room presents</div>
-          <div class="launchTitleMain"><span>Game Night</span></div>
-          <div class="launchSub">Darts • Friends • Bragging Rights</div>
-          <div class="launchBy">Designed & developed by Steve’s Graphic Designs</div>
+        <div class="hero" style="justify-content:center">
+          <div style="text-align:center">
+            <div class="h1" style="margin:0;font-size:28px;letter-spacing:.6px">The Dart Room Presents</div>
+            <div class="h1" style="margin:6px 0 0;font-size:34px">Game Night</div>
+            <div class="sub" style="margin-top:8px;color:#d6e7ff;font-weight:900">Designed & Developed by Steve’s Graphic Designs</div>
+          </div>
         </div>
         <div class="divider"></div>
-        <div class="sub" style="text-align:center">Sign in with your email. Your stats & history stay with your account.</div>
+        <div class="sub" style="text-align:center">Sign in with your email. Stats & history stay with your account.</div>
       </div>
 
       <div class="card">
@@ -1255,7 +1125,12 @@ function startApp(){
       if(player){
         meUser=player;
         statsViewerEmail=meUser.email;
-        if(tryRestoreAfterSignIn()) return render();
+
+        // Resume last match if exists (same device)
+        const saved=loadLocalMatch();
+        if(saved?.gameId && saved?.match){
+          // do nothing yet; offer on home
+        }
         screen="home";
         return render();
       }
@@ -1268,6 +1143,7 @@ function startApp(){
   async function renderSignup(){
     signOutBtn.style.display="none";
     brandTitle.textContent="Game Night";
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     appEl.innerHTML=`
       <div class="card">
@@ -1296,48 +1172,6 @@ function startApp(){
       if(!n){ toastMsg="Enter your name."; return render(); }
       meUser=await signUpEmail(n, meUser.email);
       statsViewerEmail=meUser.email;
-      if(tryRestoreAfterSignIn()) return render();
-      screen="home";
-      render();
-    };
-  }
-
-  async function renderResume(){
-    signOutBtn.style.display="inline-block";
-    const g=getGame(activeGameId);
-    brandTitle.textContent="Resume";
-
-    const saved=loadLocalMatch();
-    const when = saved?.savedAt ? fmt(saved.savedAt) : "Recently";
-
-    appEl.innerHTML=`
-      <div class="card">
-        <div class="hero">
-          <div class="logoMark"><span>⏯️</span></div>
-          <div style="flex:1">
-            <div class="h1">Resume game?</div>
-            <div class="sub">We found an unfinished match on this device.</div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="sub">Game: <b>${esc(g?.name||activeGameId||"")}</b></div>
-        <div class="sub">Saved: <b>${esc(when)}</b></div>
-        <div class="divider"></div>
-        <div class="row">
-          <button class="btn ok" id="resumeBtn">Resume</button>
-          <button class="btn danger" id="discardBtn">Discard</button>
-        </div>
-      </div>
-    `;
-    document.getElementById("resumeBtn").onclick=()=>{
-      screen="game.play";
-      persistCurrent();
-      render();
-    };
-    document.getElementById("discardBtn").onclick=()=>{
-      clearLocalMatch();
-      match=null;
-      activeGameId=null;
       screen="home";
       render();
     };
@@ -1346,33 +1180,34 @@ function startApp(){
   async function renderHome(){
     signOutBtn.style.display="inline-block";
     brandTitle.textContent="Game Night";
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     const players=await getPlayers();
     const myStats=await getStatsDoc(meUser.email);
-    const games=(myStats.games||{});
-    const sh=games.shanghai||{};
-    const ki=games.killer||{};
+    const sh=(myStats.games||{}).shanghai||{};
+    const ki=(myStats.games||{}).killer||{};
+    const quickLine = `Shanghai — Played: ${sh.played||0}, Best: ${sh.best||0} • Killer — Played: ${ki.played||0}, Wins: ${ki.wins||0}`;
 
-    const myStatsBox = `
-      <div class="card">
-        <div class="hero">
-          <div class="logoMark"><span>👤</span></div>
-          <div style="flex:1">
-            <div class="h1">${esc(meUser.name||"Player")}</div>
-            <div class="sub">${esc(meUser.email)}</div>
+    const saved=loadLocalMatch();
+    const resumeCard = saved?.gameId && saved?.match
+      ? `
+        <div class="gameCard leaderGlow" style="animation:leaderGlow 1.25s ease-in-out infinite;">
+          <div class="gameHead">
+            <div class="gameTitle">
+              <div class="gameIcon">⏯️</div>
+              <div>
+                <div class="h1" style="font-size:18px;margin:0">Resume last game</div>
+                <div class="gameMeta">Saved locally • ${esc(getGame(saved.gameId)?.name||saved.gameId)} • ${esc(saved.savedAt?fmt(saved.savedAt):"")}</div>
+              </div>
+            </div>
+            <div><span class="pill">Ready</span></div>
           </div>
-          <div style="text-align:right">
-            <span class="pill">Signed in</span>
+          <div class="gameActions">
+            <button class="btn ok" id="resumeBtn">Resume</button>
+            <button class="btn ghost" id="discardBtn">Discard</button>
           </div>
         </div>
-        <div class="divider"></div>
-        <div class="sub" style="font-weight:1000;color:rgba(255,255,255,.92)">My game stats</div>
-        <div class="small">
-          <b>Shanghai</b> — Played: ${esc(sh.played||0)} • Best: ${esc(sh.best||0)} • Points: ${esc(sh.points||0)}<br/>
-          <b>Killer</b> — Played: ${esc(ki.played||0)} • Wins: ${esc(ki.wins||0)}
-        </div>
-      </div>
-    `;
+      ` : "";
 
     const gameCards = Games.map(g=>{
       const soon=!g.active;
@@ -1386,7 +1221,7 @@ function startApp(){
                 <div class="gameMeta">${esc(g.tagline||"")}</div>
               </div>
             </div>
-            <div>${soon?`<span class="pill soon">Coming soon</span>`:`<span class="activeBadge"><span class="activeDot"></span>Active</span>`}</div>
+            <div>${soon?`<span class="pill soon">Coming soon</span>`:`<span class="pill">Active</span>`}</div>
           </div>
           <div class="gameActions">
             <button class="btn ok" data-play="${esc(g.id)}" ${soon?"disabled":""}>Play</button>
@@ -1412,16 +1247,43 @@ function startApp(){
       `).join("");
 
     appEl.innerHTML=`
-      ${myStatsBox}
+      <div class="card">
+        <div class="hero">
+          <div class="logoMark"><span>🎯</span></div>
+          <div style="flex:1">
+            <div class="h1">${esc(meUser.name||"Player")}</div>
+            <div class="sub">${esc(meUser.email)} • <span class="kbd">${esc(quickLine)}</span></div>
+          </div>
+          <div style="text-align:right">
+            <span class="pill">Signed in</span>
+          </div>
+        </div>
+      </div>
 
       <div class="row">
         <button class="btn ghost" id="statsBtn">Stats</button>
         <button class="btn ghost" id="historyBtn">History</button>
-        <button class="btn ghost" id="leaderboardBtn">Leaderboard</button>
+        <button class="btn ghost" id="rulesBtn">Game Rules</button>
       </div>
 
       <div class="divider"></div>
+
+      ${resumeCard}
+
       <div class="gameGrid">${gameCards}</div>
+
+      <div class="divider"></div>
+
+      <div class="card">
+        <div class="hero">
+          <div class="logoMark"><span>🏁</span></div>
+          <div style="flex:1">
+            <div class="h1">Leaderboard</div>
+            <div class="sub">Compare everyone’s stats in one grid.</div>
+          </div>
+          <button class="btn" id="leaderBtn">Open</button>
+        </div>
+      </div>
 
       <div class="divider"></div>
 
@@ -1440,7 +1302,23 @@ function startApp(){
 
     document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
     document.getElementById("historyBtn").onclick=()=>{ screen="history"; render(); };
-    document.getElementById("leaderboardBtn").onclick=()=>{ screen="leaderboard"; render(); };
+    document.getElementById("rulesBtn").onclick=()=>{ screen="rules"; render(); };
+    document.getElementById("leaderBtn").onclick=()=>{ screen="leaderboard"; render(); };
+
+    if(document.getElementById("resumeBtn")){
+      document.getElementById("resumeBtn").onclick=()=>{
+        const saved=loadLocalMatch();
+        if(!saved) return;
+        activeGameId=saved.gameId;
+        match=saved.match;
+        screen="game.play";
+        render();
+      };
+      document.getElementById("discardBtn").onclick=()=>{
+        clearLocalMatch();
+        render();
+      };
+    }
 
     appEl.querySelectorAll("button[data-play]").forEach(btn=>{
       btn.onclick=()=>{
@@ -1468,75 +1346,37 @@ function startApp(){
     });
   }
 
-  async function renderLeaderboard(){
-    signOutBtn.style.display="inline-block";
-    brandTitle.textContent="Leaderboard";
-
-    const players=await getPlayers();
-    // Pull each player's stats
-    const statDocs = {};
-    for(const p of players){
-      statDocs[p.email]=await getStatsDoc(p.email);
-    }
-
-    const rows = players.map(p=>{
-      const games=(statDocs[p.email]?.games||{});
-      const sh=games.shanghai||{};
-      const ki=games.killer||{};
-      return `
-        <tr>
-          <td class="lbName">${esc(p.name)}</td>
-          <td>${esc(sh.played||0)}</td>
-          <td>${esc(sh.best||0)}</td>
-          <td>${esc(sh.points||0)}</td>
-          <td>${esc(ki.played||0)}</td>
-          <td>${esc(ki.wins||0)}</td>
-        </tr>
-      `;
-    }).join("");
-
-    appEl.innerHTML=`
-      <div class="card">
-        <div class="hero">
-          <div class="logoMark"><span>🏆</span></div>
-          <div style="flex:1">
-            <div class="h1">Group Stats</div>
-            <div class="sub">Compare everyone at a glance.</div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="lbTableWrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th>Shanghai Played</th>
-                <th>Shanghai Best</th>
-                <th>Shanghai Points</th>
-                <th>Killer Played</th>
-                <th>Killer Wins</th>
-              </tr>
-            </thead>
-            <tbody>${rows || ""}</tbody>
-          </table>
-        </div>
-        <div class="divider"></div>
-        <button class="btn ghost" id="lbBack">Back</button>
-      </div>
-    `;
-    document.getElementById("lbBack").onclick=()=>{ screen="home"; render(); };
-  }
-
+  /* Game setup: checkbox list (fixes the “Start Match doesn’t start” issue on iPhone/iPad multi-select) */
   async function renderGameSetup(){
     const g=getGame(activeGameId);
     if(!g){ screen="home"; return render(); }
 
     signOutBtn.style.display="inline-block";
     brandTitle.textContent=g.name;
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     const players=await getPlayers();
     const meEmail=meUser.email;
     const defaultCount=2;
+
+    const list = players.map(p=>{
+      const isMe = p.email===meEmail;
+      return `
+        <div class="rosterCard" style="align-items:center">
+          <div class="rosterLeft">
+            <div class="avatar">${esc(initials(p.name))}</div>
+            <div>
+              <div class="rosterName">${esc(p.name)} ${isMe?`<span class="badge">You</span>`:""}</div>
+              <div class="rosterSub">${esc(p.email)}</div>
+            </div>
+          </div>
+          <label style="margin:0; display:flex; align-items:center; gap:10px; color:var(--muted); font-weight:1000">
+            <input type="checkbox" class="pickPlayer" value="${esc(p.email)}" ${isMe?"checked disabled":""} style="width:18px;height:18px"/>
+            Pick
+          </label>
+        </div>
+      `;
+    }).join("");
 
     appEl.innerHTML=`
       <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
@@ -1546,9 +1386,9 @@ function startApp(){
           <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
           <div style="flex:1">
             <div class="h1">${esc(g.name)}</div>
-            <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
+            <div class="sub">Pick players (max ${MAX_PLAYERS}). Start button unlocks when your count matches.</div>
           </div>
-          <div>${g.active?`<span class="activeBadge"><span class="activeDot"></span>Ready</span>`:`<span class="pill soon">Coming soon</span>`}</div>
+          <div>${g.active?`<span class="pill">Ready</span>`:`<span class="pill soon">Coming soon</span>`}</div>
         </div>
       </div>
 
@@ -1567,10 +1407,13 @@ function startApp(){
             </div>
           </div>
 
-          <label>Pick players</label>
-          <select id="matchPlayers" multiple size="6">
-            ${players.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("")}
-          </select>
+          <div class="divider"></div>
+
+          <div class="pill">Tap to pick players</div>
+          <div class="divider"></div>
+          <div class="rosterGrid">${list}</div>
+
+          <div class="divider"></div>
 
           <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
           <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
@@ -1578,12 +1421,14 @@ function startApp(){
       </div>
     `;
 
-    const selectEl=document.getElementById("matchPlayers");
-    Array.from(selectEl.options).forEach(o=>{ if(o.value===meEmail) o.selected=true; });
+    function getSelectedEmails(){
+      const picks=Array.from(appEl.querySelectorAll("input.pickPlayer"));
+      return picks.filter(i=>i.checked).map(i=>i.value);
+    }
 
     function updateStartState(){
       const n=parseInt(document.getElementById("playerCount").value,10);
-      const selectedEmails=Array.from(selectEl.selectedOptions).map(o=>o.value);
+      const selectedEmails=getSelectedEmails();
       document.getElementById("selectedCount").value=`${selectedEmails.length} / ${n}`;
       const ok=(selectedEmails.length===n) && !!g.active;
       document.getElementById("startMatchBtn").disabled=!ok;
@@ -1591,8 +1436,33 @@ function startApp(){
         !g.active ? "This game is coming soon." :
         ok ? "Ready." : `Select exactly ${n} players to continue.`;
     }
-    document.getElementById("playerCount").onchange=updateStartState;
-    selectEl.onchange=updateStartState;
+
+    document.getElementById("playerCount").onchange=()=>{
+      // If count got smaller, uncheck extras (except me)
+      const n=parseInt(document.getElementById("playerCount").value,10);
+      const picks=Array.from(appEl.querySelectorAll("input.pickPlayer")).filter(x=>!x.disabled);
+      let selected=picks.filter(x=>x.checked);
+      while(getSelectedEmails().length>n && selected.length){
+        const last=selected.pop();
+        if(last) last.checked=false;
+        selected=picks.filter(x=>x.checked);
+      }
+      updateStartState();
+    };
+
+    appEl.querySelectorAll("input.pickPlayer").forEach(chk=>{
+      chk.onchange=()=>{
+        // enforce max selected = playerCount
+        const n=parseInt(document.getElementById("playerCount").value,10);
+        const selected=getSelectedEmails();
+        if(selected.length>n){
+          // undo last toggle
+          chk.checked=false;
+        }
+        updateStartState();
+      };
+    });
+
     updateStartState();
 
     document.getElementById("setupBack").onclick=()=>{ activeGameId=null; match=null; screen="home"; render(); };
@@ -1600,20 +1470,21 @@ function startApp(){
     document.getElementById("startMatchBtn").onclick=()=>{
       if(!g.active){ toastMsg="Coming soon."; return render(); }
       const n=parseInt(document.getElementById("playerCount").value,10);
-      const selectedEmails=Array.from(selectEl.selectedOptions).map(o=>o.value);
+      const selectedEmails=getSelectedEmails();
       if(selectedEmails.length!==n){ toastMsg=`You must select exactly ${n} players.`; return render(); }
+
       const selectedPlayers=selectedEmails.map(e=>players.find(p=>p.email===e)).filter(Boolean);
 
       if(activeGameId==="shanghai"){
         match=ShanghaiGame.initMatch(selectedPlayers);
+        saveLocalMatch("shanghai", match);
         screen="game.play";
-        persistCurrent();
         return render();
       }
       if(activeGameId==="killer"){
         match=KillerGame.initMatch(selectedPlayers);
+        saveLocalMatch("killer", match);
         screen="game.play";
-        persistCurrent();
         return render();
       }
 
@@ -1628,6 +1499,7 @@ function startApp(){
 
     signOutBtn.style.display="inline-block";
     brandTitle.textContent=g.name;
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     if(activeGameId==="shanghai"){
       const ctx={meUser, match};
@@ -1635,6 +1507,7 @@ function startApp(){
       ShanghaiGame.bindPlay(ctx);
       return;
     }
+
     if(activeGameId==="killer"){
       const ctx={meUser, match};
       appEl.innerHTML=KillerGame.renderPlay(ctx);
@@ -1648,6 +1521,7 @@ function startApp(){
   async function renderStats(){
     signOutBtn.style.display="inline-block";
     brandTitle.textContent="Stats";
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     const players=await getPlayers();
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
@@ -1655,6 +1529,8 @@ function startApp(){
     const statsDoc=await getStatsDoc(statsViewerEmail);
     const games=statsDoc.games||{};
     const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
+
+    const isMe = normEmail(statsViewerEmail)===normEmail(meUser.email);
 
     appEl.innerHTML=`
       <div class="card">
@@ -1664,6 +1540,7 @@ function startApp(){
             <div class="h1">Stats</div>
             <div class="sub">Pick a player, then pick a game.</div>
           </div>
+          ${isMe?`<button class="btn danger" id="resetAllBtn">Reset my stats</button>`:""}
         </div>
         <div class="divider"></div>
         <label>Player</label>
@@ -1708,22 +1585,17 @@ function startApp(){
     document.getElementById("statsBack").onclick=()=>{ screen="home"; render(); };
     document.getElementById("statsPlayer").onchange=(e)=>{ statsViewerEmail=e.target.value; render(); };
 
+    if(document.getElementById("resetAllBtn")){
+      document.getElementById("resetAllBtn").onclick=async()=>{
+        if(!confirm("Reset ALL your stats? This cannot be undone.")) return;
+        await resetStatsDoc(meUser.email);
+        render();
+      };
+    }
+
     appEl.querySelectorAll("button[data-open]").forEach(btn=>{
       btn.onclick=()=>{ activeGameId=btn.getAttribute("data-open"); screen="stats.game"; render(); };
     });
-  }
-
-  async function resetGameStatsForViewer(gameId){
-    const ok = prompt(`Type RESET to clear ${gameId.toUpperCase()} stats for this player.`);
-    if(ok!=="RESET") return false;
-
-    const doc=await getStatsDoc(statsViewerEmail);
-    const games=doc.games||{};
-    const nextGames={...games};
-    delete nextGames[gameId];
-
-    await saveStatsDoc(statsViewerEmail,{games:nextGames, updatedAt:now()});
-    return true;
   }
 
   async function renderStatsGame(){
@@ -1732,6 +1604,7 @@ function startApp(){
 
     signOutBtn.style.display="inline-block";
     brandTitle.textContent=`${g.name} • Stats`;
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     const players=await getPlayers();
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
@@ -1739,6 +1612,7 @@ function startApp(){
     const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
     const statsDoc=await getStatsDoc(statsViewerEmail);
     const gs=(statsDoc.games||{})[g.id]||{};
+    const isMe = normEmail(statsViewerEmail)===normEmail(meUser.email);
 
     let body="";
     if(g.id==="shanghai"){
@@ -1758,9 +1632,6 @@ function startApp(){
       body=g.active?`<div class="sub">Played: <b>${esc(gs.played||0)}</b></div>`:`<div class="sub">Coming soon.</div>`;
     }
 
-    // Only allow reset if viewing your own stats OR you want it universally.
-    const canReset = true;
-
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
@@ -1769,33 +1640,21 @@ function startApp(){
             <div class="h1">${esc(g.name)}</div>
             <div class="sub">Player: <b>${esc(viewer.name||"Player")}</b></div>
           </div>
+          ${isMe?`<button class="btn danger" id="resetGameBtn">Reset</button>`:""}
         </div>
         <div class="divider"></div>
         ${body}
         <div class="divider"></div>
-
-        ${canReset?`
-          <a class="dangerLink" href="javascript:void(0)" id="resetStatsBtn">🧨 Reset this game’s stats</a>
-          <div class="small">This clears stats for this game only (not your player account).</div>
-          <div class="divider"></div>
-        `:""}
-
         <button class="btn ghost" id="statsGameBack">Back</button>
       </div>
     `;
-
     document.getElementById("statsGameBack").onclick=()=>{ screen="stats"; render(); };
 
-    const rs=document.getElementById("resetStatsBtn");
-    if(rs){
-      rs.onclick=async()=>{
-        if(!confirm("Really reset stats? This cannot be undone.")) return;
-        try{
-          const ok = await resetGameStatsForViewer(g.id);
-          if(ok){ toastMsg="Stats reset."; screen="stats"; render(); }
-        }catch(e){
-          showFatal("Reset error", e?.message||String(e));
-        }
+    if(document.getElementById("resetGameBtn")){
+      document.getElementById("resetGameBtn").onclick=async()=>{
+        if(!confirm(`Reset your ${g.name} stats?`)) return;
+        await resetGameStats(meUser.email, g.id);
+        render();
       };
     }
   }
@@ -1803,6 +1662,7 @@ function startApp(){
   async function renderHistory(){
     signOutBtn.style.display="inline-block";
     brandTitle.textContent="History";
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
 
     const history=await getHistory(meUser.email);
     let items=history.map(h=>`
@@ -1821,12 +1681,103 @@ function startApp(){
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
   }
 
+  async function renderRules(){
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent="Game Rules";
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
+
+    const sh=GameRules.shanghai;
+    const ki=GameRules.killer;
+
+    function ruleCard(r, icon){
+      return `
+        <div class="card">
+          <div class="hero">
+            <div class="logoMark"><span>${esc(icon)}</span></div>
+            <div style="flex:1">
+              <div class="h1" style="margin:0">${esc(r.title)}</div>
+              <div class="sub">Quick rules</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <ul style="margin:0;padding-left:18px;color:#dbe9ff;font-weight:900;line-height:1.45">
+            ${r.bullets.map(b=>`<li>${esc(b)}</li>`).join("")}
+          </ul>
+        </div>
+      `;
+    }
+
+    appEl.innerHTML=`
+      <div class="row"><button class="btn ghost" id="rulesBack">Back</button></div>
+      <div class="divider"></div>
+      ${ruleCard(sh,"🎯")}
+      ${ruleCard(ki,"🔥")}
+      <div class="card"><div class="sub">More games will appear here when they go Active.</div></div>
+    `;
+    document.getElementById("rulesBack").onclick=()=>{ screen="home"; render(); };
+  }
+
+  async function renderLeaderboard(){
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent="Leaderboard";
+    brandSub.textContent="The Dart Room • Designed & Developed by Steve’s Graphic Designs";
+
+    const players=await getPlayers();
+    const all=await getAllStats();
+
+    const rows = players.map(p=>{
+      const s = all[normEmail(p.email)] || {};
+      const g = s.games || {};
+      const sh = g.shanghai || {};
+      const ki = g.killer || {};
+      return `
+        <tr>
+          <td class="l">${esc(p.name)}</td>
+          <td>${esc(sh.played||0)}</td>
+          <td>${esc(sh.best||0)}</td>
+          <td>${esc(ki.played||0)}</td>
+          <td>${esc(ki.wins||0)}</td>
+        </tr>
+      `;
+    }).join("");
+
+    appEl.innerHTML=`
+      <div class="row"><button class="btn ghost" id="leadBack">Back</button></div>
+      <div class="divider"></div>
+
+      <div class="card">
+        <div class="hero">
+          <div class="logoMark"><span>🏁</span></div>
+          <div style="flex:1">
+            <div class="h1" style="margin:0">Group stats</div>
+            <div class="sub">Shanghai (Played/Best) • Killer (Played/Wins)</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+          <table>
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Shanghai Played</th>
+                <th>Shanghai Best</th>
+                <th>Killer Played</th>
+                <th>Killer Wins</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+    document.getElementById("leadBack").onclick=()=>{ screen="home"; render(); };
+  }
+
   async function render(){
     try{
       homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
       signOutBtn.onclick=()=>{
         meUser=null; match=null; activeGameId=null; statsViewerEmail=null;
-        clearLocalMatch();
         screen="auth";
         render();
       };
@@ -1835,14 +1786,14 @@ function startApp(){
       if(screen==="signup") return renderSignup();
       if(!meUser){ screen="auth"; return renderAuth(); }
 
-      if(screen==="resume") return renderResume();
       if(screen==="home") return renderHome();
-      if(screen==="leaderboard") return renderLeaderboard();
       if(screen==="game.setup") return renderGameSetup();
       if(screen==="game.play") return renderGamePlay();
       if(screen==="stats") return renderStats();
       if(screen==="stats.game") return renderStatsGame();
       if(screen==="history") return renderHistory();
+      if(screen==="rules") return renderRules();
+      if(screen==="leaderboard") return renderLeaderboard();
 
       screen="home"; return renderHome();
     }catch(e){
