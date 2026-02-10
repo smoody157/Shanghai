@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Game Night Darts</title>
+<title>Game Night</title>
 
 <!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -47,6 +47,7 @@ body{
 .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
 .btn.ok{background:rgba(43,213,118,.20);border-color:rgba(43,213,118,.35)}
 .btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
+.btn:disabled{opacity:.45; cursor:not-allowed; transform:none}
 .wrap{max-width:920px;margin:0 auto;padding:14px}
 .card{
   background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
@@ -80,6 +81,7 @@ input, select{
   background:rgba(78,168,255,.08);
   color:var(--accent);font-weight:900;font-size:12px;
 }
+.pill.soon{background:rgba(255,255,255,.06); color:var(--muted)}
 .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
 
 /* Play UI bits */
@@ -109,13 +111,21 @@ td.l{font-weight:900}
   font-size:12px;font-weight:1000;
 }
 .activeCell{outline:2px solid rgba(78,168,255,.45); outline-offset:-2px; border-radius:10px}
+
+/* VERY noticeable active-number glow for Shanghai */
+@keyframes hotPulse {
+  0%   { opacity: .20; filter: brightness(1.0); }
+  50%  { opacity: .95; filter: brightness(2.1); }
+  100% { opacity: .20; filter: brightness(1.0); }
+}
+.hotWedge{ animation: hotPulse .85s ease-in-out infinite; }
 </style>
 </head>
 
 <body>
 <div class="topbar">
   <div class="brand">
-    <div class="t">Game Night Darts</div>
+    <div class="t" id="brandTitle">Game Night</div>
     <div class="s">The Dart Room • Designed by Steve’s Graphic Designs</div>
   </div>
   <div>
@@ -144,6 +154,7 @@ const db = firebase.firestore();
 function esc(s){ return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function normEmail(email){ return String(email ?? "").trim().toLowerCase(); }
 function now(){ return Date.now(); }
+function fmt(ts){ try { return new Date(ts).toLocaleString(); } catch { return ""; } }
 
 /* ===================== Firestore helpers ===================== */
 async function getPlayers(){
@@ -154,11 +165,11 @@ async function upsertPlayer(name,email){
   const e = normEmail(email);
   await db.collection("players").doc(e).set({ name, email: e, createdAt: now() }, { merge:true });
 }
-async function getStats(email){
+async function getStatsDoc(email){
   const doc = await db.collection("stats").doc(normEmail(email)).get();
   return doc.exists ? doc.data() : {};
 }
-async function saveStats(email,data){
+async function saveStatsDoc(email,data){
   await db.collection("stats").doc(normEmail(email)).set(data, { merge:true });
 }
 async function getHistory(email){
@@ -174,20 +185,6 @@ async function saveHistoryEntry(entry){
   await db.collection("history").add(entry);
 }
 
-/* ===================== App State ===================== */
-const appEl = document.getElementById("app");
-const homeBtn = document.getElementById("homeBtn");
-const signOutBtn = document.getElementById("signOutBtn");
-
-let toastMsg = "";
-let screen = "auth"; // auth | signup | home | match | play | stats | history
-let meUser = null;
-let match = null;
-
-/* ===================== Game constants ===================== */
-const BOARD_NUMS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-const TARGETS = [20,19,18,17,16,15,"B"];
-
 /* ===================== “Auth” (email as ID) ===================== */
 async function signInEmail(email){
   const e = normEmail(email);
@@ -200,7 +197,27 @@ async function signUpEmail(name,email){
   return { name, email: e };
 }
 
+/* ===================== App State ===================== */
+const appEl = document.getElementById("app");
+const homeBtn = document.getElementById("homeBtn");
+const signOutBtn = document.getElementById("signOutBtn");
+const brandTitle = document.getElementById("brandTitle");
+
+let toastMsg = "";
+let screen = "auth"; // auth | signup | home | game.setup | game.play | stats | stats.game | history
+let meUser = null;
+
+let activeGameId = null;
+let match = null;
+
+// Stats viewing
+let statsViewerEmail = null; // whose stats we are looking at
+
+const MAX_PLAYERS = 4;
+
 /* ===================== Dartboard SVG ===================== */
+const BOARD_NUMS = [20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+
 function polar(cx,cy,r,deg){
   const rad = (deg-90)*Math.PI/180;
   return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)};
@@ -212,18 +229,38 @@ function arcWedgePath(cx,cy,r0,r1,a0,a1){
   function f(n){ return (Math.round(n*1000)/1000).toFixed(3); }
   return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
 }
-function dartboardSVG(activeNumber){
+
+function dartboardSVG(activeTarget){
   const cx=100,cy=100;
   const outer=80, rDoubleOuter=74, rDoubleInner=66, rTripleOuter=48, rTripleInner=40, rSingleInner=12;
   const seg=360/20;
 
-  let activePath = "";
-  if(typeof activeNumber==="number"){
-    const idx = BOARD_NUMS.indexOf(activeNumber);
+  let activeOverlay = "";
+
+  // Wedge highlight for numbers
+  if(typeof activeTarget === "number"){
+    const idx = BOARD_NUMS.indexOf(activeTarget);
     if(idx>=0){
-      const a0=idx*seg+1.2, a1=(idx+1)*seg-1.2;
-      activePath = arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
+      const a0=idx*seg+1.0, a1=(idx+1)*seg-1.0;
+
+      const halo = arcWedgePath(cx,cy,rTripleOuter+8,rDoubleInner-8,a0,a1);
+      const core = arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
+
+      activeOverlay += `
+        <path class="hotWedge" d="${halo}"
+          fill="rgba(78,168,255,.45)" stroke="rgba(78,168,255,.98)" stroke-width="3.8" filter="url(#glow)"/>
+        <path class="hotWedge" d="${core}"
+          fill="rgba(78,168,255,.18)" stroke="rgba(255,255,255,.95)" stroke-width="2.8" filter="url(#glow)"/>`;
     }
+  }
+
+  // Bull highlight when target is "B"
+  if(activeTarget === "B"){
+    activeOverlay += `
+      <circle class="hotWedge" cx="100" cy="100" r="14.5"
+        fill="rgba(78,168,255,.28)" stroke="rgba(78,168,255,.98)" stroke-width="3.0" filter="url(#glow)"/>
+      <circle class="hotWedge" cx="100" cy="100" r="7.6"
+        fill="rgba(78,168,255,.22)" stroke="rgba(255,255,255,.95)" stroke-width="2.6" filter="url(#glow)"/>`;
   }
 
   function ringWedges(r0,r1,fillA,fillB){
@@ -250,13 +287,14 @@ function dartboardSVG(activeNumber){
         <stop offset="100%" stop-color="#060d18"/>
       </radialGradient>
       <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="3.5" result="b"/>
-        <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 .9 0" result="c"/>
+        <feGaussianBlur stdDeviation="4.2" result="b"/>
+        <feColorMatrix in="b" type="matrix"
+          values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
         <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
     </defs>
     <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
-    ${activePath?`<path d="${activePath}" fill="rgba(78,168,255,.25)" stroke="rgba(78,168,255,.55)" stroke-width="1.4" filter="url(#glow)"/>`:''}
+    ${activeOverlay}
     ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
     ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
     ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
@@ -267,75 +305,276 @@ function dartboardSVG(activeNumber){
   </svg>`;
 }
 
-/* ===================== Gameplay ===================== */
-function pts(hit){ return hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0; }
-
-function pushSnap(){
-  if(!match) return;
-  match.snaps = match.snaps || [];
-  match.snaps.push(JSON.stringify(match));
-  if(match.snaps.length > 60) match.snaps.shift();
+/* ===================== Shell helpers: snapshots for Undo ===================== */
+function pushSnap(m){
+  if(!m) return;
+  m.snaps = m.snaps || [];
+  m.snaps.push(JSON.stringify(m));
+  if(m.snaps.length > 80) m.snaps.shift();
 }
-function popSnap(){
-  if(!match?.snaps || match.snaps.length < 2) return false;
-  match.snaps.pop();               // drop current
-  const prev = match.snaps.pop();   // restore previous
-  try { match = JSON.parse(prev); return true; }
-  catch { return false; }
+function popSnap(m){
+  if(!m?.snaps || m.snaps.length < 2) return m;
+  m.snaps.pop();              // drop current
+  const prev = m.snaps.pop(); // restore previous
+  try { return JSON.parse(prev); } catch { return m; }
 }
 
-function initMatch(selectedPlayers){
-  const m = {
-    players: selectedPlayers.map(p => ({ name: p.name, email: p.email, total: 0 })),
-    startedAt: now(),
-    endedAt: null,
-    turnIndex: 0,
-    targetIndex: 0,
-    dartInTurn: 0,
-    finished: false,
-    grid: {},
-    snaps: []
-  };
-  m.players.forEach(p=>{
-    m.grid[p.email] = {};
-    TARGETS.forEach(t=>{
-      const key = String(t);
-      m.grid[p.email][key] = { throws: [], points: 0, shanghai: false };
+/* ===================== Games registry (plugins) ===================== */
+const Games = [
+  { id:"shanghai", name:"Shanghai", active:true,  tagline:"1 → 20 → Bull (score-based)" },
+  { id:"killer", name:"Killer", active:false, tagline:"Coming Soon" },
+  { id:"around", name:"Around the Clock", active:false, tagline:"Coming Soon" },
+  { id:"halve", name:"Halve-It", active:false, tagline:"Coming Soon" },
+  { id:"baseball", name:"Baseball", active:false, tagline:"Coming Soon" },
+];
+
+function getGame(id){ return Games.find(g=>g.id===id) || null; }
+
+/* ===================== Shanghai game plugin ===================== */
+/*
+Shanghai (score-based):
+- Targets 1..20 then Bull
+- 3 darts each turn
+- Points: T=3, D=2, S=1, M=0 (matches your existing scoring feel)
+- Game ends after Bull round completes
+*/
+const ShanghaiGame = (() => {
+  const TARGETS = Array.from({length:20},(_,i)=>i+1).concat(["B"]);
+  const pts = (hit)=> hit==="T"?3 : hit==="D"?2 : hit==="S"?1 : 0;
+
+  function initMatch(selectedPlayers){
+    const m = {
+      gameId: "shanghai",
+      players: selectedPlayers.map(p => ({ name: p.name, email: p.email, total: 0 })),
+      startedAt: now(),
+      endedAt: null,
+      turnIndex: 0,
+      targetIndex: 0,
+      dartInTurn: 0,
+      finished: false,
+      grid: {},
+      snaps: [],
+      _saved: false
+    };
+
+    m.players.forEach(p=>{
+      m.grid[p.email] = {};
+      TARGETS.forEach(t=>{
+        const key = String(t);
+        m.grid[p.email][key] = { throws: [], points: 0 };
+      });
     });
-  });
-  return m;
-}
 
-function addThrow(m, hit){
-  if(!m || m.finished) return;
-
-  const player = m.players[m.turnIndex];
-  const targetKey = String(TARGETS[m.targetIndex]);
-
-  const cell = m.grid[player.email][targetKey];
-  cell.throws.push(hit);
-  cell.points += pts(hit);
-  player.total += pts(hit);
-
-  m.dartInTurn += 1;
-
-  // advance turn after 3 darts
-  if(m.dartInTurn >= 3){
-    m.dartInTurn = 0;
-    m.turnIndex = (m.turnIndex + 1) % m.players.length;
-    if(m.turnIndex === 0) m.targetIndex += 1;
+    pushSnap(m); // initial snapshot
+    return m;
   }
 
-  // finish after last target completed
-  if(m.targetIndex >= TARGETS.length){
-    m.finished = true;
-    m.endedAt = now();
+  function addThrow(m, hit){
+    if(!m || m.finished) return;
+
+    const player = m.players[m.turnIndex];
+    const targetKey = String(TARGETS[m.targetIndex]);
+
+    const cell = m.grid[player.email][targetKey];
+    cell.throws.push(hit);
+    cell.points += pts(hit);
+    player.total += pts(hit);
+
+    m.dartInTurn += 1;
+
+    if(m.dartInTurn >= 3){
+      m.dartInTurn = 0;
+      m.turnIndex = (m.turnIndex + 1) % m.players.length;
+      if(m.turnIndex === 0) m.targetIndex += 1;
+    }
+
+    if(m.targetIndex >= TARGETS.length){
+      m.finished = true;
+      m.endedAt = now();
+    }
   }
-}
+
+  function summarize(m){
+    const summary = m.players
+      .slice()
+      .sort((a,b)=>b.total-a.total)
+      .map(p => `${p.name}: ${p.total}`)
+      .join(" | ");
+    return { summary, meta: { targets: TARGETS } };
+  }
+
+  async function saveFinish(ctx){
+    const m = ctx.match;
+    if(!m.finished || m._saved) return;
+    m._saved = true;
+
+    const { summary, meta } = summarize(m);
+
+    await saveHistoryEntry({
+      gameId: "shanghai",
+      gameName: "Shanghai",
+      startedAt: m.startedAt,
+      endedAt: m.endedAt,
+      players: m.players.map(p=>p.email),
+      summary,
+      meta
+    });
+
+    // per-game stats, stored under stats/{email}.games.shanghai
+    const stats = await getStatsDoc(ctx.meUser.email);
+    const games = stats.games || {};
+    const g = games.shanghai || {};
+    const played = (g.played || 0) + 1;
+
+    const meRow = m.players.find(p=>p.email===ctx.meUser.email);
+    const points = (g.points || 0) + (meRow ? meRow.total : 0);
+
+    const best = Math.max(g.best || 0, (meRow ? meRow.total : 0));
+
+    await saveStatsDoc(ctx.meUser.email, {
+      games: {
+        ...games,
+        shanghai: {
+          ...g,
+          played,
+          points,
+          best,
+          lastPlayedAt: m.endedAt || now()
+        }
+      },
+      updatedAt: now()
+    });
+  }
+
+  function renderPlay(ctx){
+    const m = ctx.match;
+    const t = TARGETS[m.targetIndex];
+    const activePlayer = m.players[m.turnIndex];
+
+    // Table header
+    let thead = `<tr><th>Target</th>`;
+    for(const p of m.players){
+      thead += `<th>${esc(p.name)}<div class="small">${p.total} pts</div></th>`;
+    }
+    thead += `</tr>`;
+
+    // Table body
+    let tbody = "";
+    for(const target of TARGETS){
+      const key = String(target);
+      tbody += `<tr><td class="l"><span class="badge">${esc(target==="B" ? "BULL" : target)}</span></td>`;
+      for(const p of m.players){
+        const cell = m.grid[p.email][key];
+        const txt = cell.throws.length ? cell.throws.join(" ") : "—";
+        const cls = String(t) === key ? ` class="activeCell"` : "";
+        tbody += `<td${cls}>${esc(txt)}<div class="small">${cell.points}</div></td>`;
+      }
+      tbody += `</tr>`;
+    }
+
+    const finishedBanner = m.finished
+      ? `<div class="divider"></div><div class="pill">Finished</div>`
+      : "";
+
+    return `
+      <div class="card">
+        <div class="row">
+          <button class="btn ghost" id="backToSetup">Back</button>
+          <button class="btn danger" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="pill">Shanghai</span>
+        <div class="divider"></div>
+        <div class="sub">
+          Target: <b>${esc(t==="B" ? "BULL" : t)}</b>
+          • Turn: <b>${esc(activePlayer.name)}</b>
+          • Dart ${m.dartInTurn + 1}/3
+        </div>
+        <div class="divider"></div>
+        <div class="boardBox">${dartboardSVG(t)}</div>
+        <div class="divider"></div>
+
+        <div class="hitRow">
+          <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>T</button>
+          <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>S</button>
+          <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>D</button>
+          <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>M</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="hitRow">
+          <button class="hitBtn undo" id="undoBtn">Undo</button>
+          <button class="hitBtn" disabled></button>
+          <button class="hitBtn" disabled></button>
+          <button class="hitBtn next" id="nextBtn" ${m.finished?"disabled":""}>Next</button>
+        </div>
+
+        ${finishedBanner}
+      </div>
+
+      <div class="card">
+        <div class="pill">Round table</div>
+        <div class="divider"></div>
+        <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+          <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
+        </div>
+      </div>
+    `;
+  }
+
+  function bindPlay(ctx){
+    const m = ctx.match;
+
+    function onHit(h){
+      if(m.finished) return;
+      pushSnap(m);
+      addThrow(m, h);
+      render();
+      saveFinish(ctx);
+    }
+
+    document.getElementById("hitT").onclick = ()=>onHit("T");
+    document.getElementById("hitS").onclick = ()=>onHit("S");
+    document.getElementById("hitD").onclick = ()=>onHit("D");
+    document.getElementById("hitM").onclick = ()=>onHit("M");
+
+    document.getElementById("undoBtn").onclick = ()=>{
+      match = popSnap(m);
+      render();
+    };
+
+    document.getElementById("nextBtn").onclick = ()=>{
+      while(!m.finished && m.dartInTurn < 3){
+        pushSnap(m);
+        addThrow(m, "M");
+      }
+      render();
+      saveFinish(ctx);
+    };
+
+    document.getElementById("resetBtn").onclick = ()=>{
+      const pls = m.players.map(p=>({name:p.name,email:p.email}));
+      match = initMatch(pls);
+      render();
+    };
+
+    document.getElementById("backToSetup").onclick = ()=>{
+      match = null;
+      screen = "game.setup";
+      render();
+    };
+  }
+
+  return { initMatch, renderPlay, bindPlay };
+})();
 
 /* ===================== Screens ===================== */
 async function renderAuth(){
   signOutBtn.style.display = "none";
+  brandTitle.textContent = "Game Night";
 
   let html = `${toastMsg ? `<div class="toast">${esc(toastMsg)}</div>` : ""}`;
   toastMsg = "";
@@ -363,6 +602,7 @@ async function renderAuth(){
     const player = await signInEmail(e);
     if(player){
       meUser = player;
+      statsViewerEmail = meUser.email;
       screen = "home";
       return render();
     }
@@ -374,6 +614,7 @@ async function renderAuth(){
 
 async function renderSignup(){
   signOutBtn.style.display = "none";
+  brandTitle.textContent = "Game Night";
 
   appEl.innerHTML = `
     <div class="card">
@@ -395,6 +636,7 @@ async function renderSignup(){
     const e = meUser?.email;
     if(!n){ toastMsg="Enter your name."; return render(); }
     meUser = await signUpEmail(n, e);
+    statsViewerEmail = meUser.email;
     screen = "home";
     return render();
   };
@@ -402,10 +644,33 @@ async function renderSignup(){
 
 async function renderHome(){
   signOutBtn.style.display = "inline-block";
+  brandTitle.textContent = "Game Night";
 
   const players = await getPlayers();
 
-  let html = `
+  const gameButtons = Games.map(g=>{
+    const soon = !g.active;
+    return `
+      <div class="card">
+        <div class="row">
+          <div style="flex:2">
+            <div class="h1" style="font-size:18px;margin:0">${esc(g.name)}</div>
+            <div class="sub">${esc(g.tagline || "")}</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            ${soon ? `<span class="pill soon">Coming soon</span>` : `<span class="pill">Active</span>`}
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn ok" data-play="${esc(g.id)}" ${soon?"disabled":""}>Play</button>
+          <button class="btn ghost" data-stats="${esc(g.id)}">Stats</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  appEl.innerHTML = `
     <div class="card">
       <span class="pill">Signed in</span>
       <div class="h1">${esc(meUser.name || "Player")}</div>
@@ -413,10 +678,13 @@ async function renderHome(){
     </div>
 
     <div class="row">
-      <button class="btn" id="playNowBtn">Play Now</button>
-      <button class="btn ghost" id="statsBtn">My Stats</button>
+      <button class="btn ghost" id="statsBtn">Stats</button>
       <button class="btn ghost" id="historyBtn">History</button>
     </div>
+
+    <div class="divider"></div>
+
+    ${gameButtons}
 
     <div class="card">
       <div class="h1">Other Players</div>
@@ -431,197 +699,184 @@ async function renderHome(){
     </div>
   `;
 
-  appEl.innerHTML = html;
-
-  document.getElementById("playNowBtn").onclick = ()=>{ screen="match"; render(); };
   document.getElementById("statsBtn").onclick = ()=>{ screen="stats"; render(); };
   document.getElementById("historyBtn").onclick = ()=>{ screen="history"; render(); };
+
+  appEl.querySelectorAll("button[data-play]").forEach(btn=>{
+    btn.onclick = ()=>{
+      activeGameId = btn.getAttribute("data-play");
+      match = null;
+      screen = "game.setup";
+      render();
+    };
+  });
+
+  appEl.querySelectorAll("button[data-stats]").forEach(btn=>{
+    btn.onclick = ()=>{
+      activeGameId = btn.getAttribute("data-stats");
+      screen = "stats.game";
+      render();
+    };
+  });
 }
 
-async function renderMatch(){
+async function renderGameSetup(){
+  const g = getGame(activeGameId);
+  if(!g){ screen="home"; return render(); }
+
   signOutBtn.style.display = "inline-block";
+  brandTitle.textContent = g.name;
 
   const players = await getPlayers();
 
-  let html = `
-    <div class="card"><div class="h1">New Match</div></div>
+  // default selection includes me
+  const meEmail = meUser.email;
+  const defaultCount = 2; // feels natural; user can set 1-4
+  const options = players.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("");
+
+  appEl.innerHTML = `
+    <div class="card">
+      <div class="row">
+        <button class="btn ghost" id="setupBack">Back</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="h1">${esc(g.name)}</div>
+      <div class="sub">Choose players (max ${MAX_PLAYERS}). You must select exactly the number you choose.</div>
+    </div>
+
     <div class="card">
       <div class="stack">
-        <label>Choose players</label>
-        <select id="matchPlayers" multiple size="6">
-          ${players.map(p => `<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("")}
-        </select>
-        <button class="btn ok" id="startMatchBtn">Start Match</button>
+        <div class="row">
+          <div>
+            <label>Number of players</label>
+            <select id="playerCount">
+              ${Array.from({length:MAX_PLAYERS},(_,i)=>i+1).map(n=>`<option value="${n}" ${n===defaultCount?"selected":""}>${n}</option>`).join("")}
+            </select>
+          </div>
+          <div>
+            <label>Selected</label>
+            <input id="selectedCount" type="text" value="0 / ${defaultCount}" disabled />
+          </div>
+        </div>
+
+        <label>Pick players</label>
+        <select id="matchPlayers" multiple size="6">${options}</select>
+
+        <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
+        <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
       </div>
     </div>
   `;
 
-  appEl.innerHTML = html;
+  // Pre-select me (if present in list)
+  const selectEl = document.getElementById("matchPlayers");
+  Array.from(selectEl.options).forEach(o=>{
+    if(o.value === meEmail) o.selected = true;
+  });
+
+  function updateStartState(){
+    const n = parseInt(document.getElementById("playerCount").value, 10);
+    const selectedEmails = Array.from(selectEl.selectedOptions).map(o=>o.value);
+
+    document.getElementById("selectedCount").value = `${selectedEmails.length} / ${n}`;
+
+    const ok = (selectedEmails.length === n);
+    const startBtn = document.getElementById("startMatchBtn");
+    startBtn.disabled = !ok;
+
+    const hint = document.getElementById("hintLine");
+    hint.textContent = ok ? "Ready." : `Select exactly ${n} players to continue.`;
+  }
+
+  document.getElementById("playerCount").onchange = updateStartState;
+  selectEl.onchange = updateStartState;
+
+  // initial update
+  updateStartState();
+
+  document.getElementById("setupBack").onclick = ()=>{ activeGameId=null; match=null; screen="home"; render(); };
 
   document.getElementById("startMatchBtn").onclick = ()=>{
-    const selectedEmails = Array.from(document.getElementById("matchPlayers").selectedOptions).map(o => o.value);
-    if(selectedEmails.length < 1){ toastMsg="Select at least one player."; return render(); }
+    const n = parseInt(document.getElementById("playerCount").value, 10);
+    const selectedEmails = Array.from(selectEl.selectedOptions).map(o=>o.value);
+
+    if(selectedEmails.length !== n){
+      toastMsg = `You must select exactly ${n} players.`;
+      return render();
+    }
 
     const selectedPlayers = selectedEmails
       .map(e => players.find(p => p.email === e))
       .filter(Boolean);
 
-    match = initMatch(selectedPlayers);
-    pushSnap(); // initial snapshot
-    screen = "play";
-    render();
+    // Start ONLY Shanghai for now (others are disabled anyway)
+    if(activeGameId === "shanghai"){
+      match = ShanghaiGame.initMatch(selectedPlayers);
+      screen = "game.play";
+      return render();
+    }
+
+    toastMsg = "Coming soon.";
+    return render();
   };
 }
 
-async function renderPlay(){
-  if(!match){ screen="home"; return render(); }
+async function renderGamePlay(){
+  const g = getGame(activeGameId);
+  if(!g || !match){ screen="home"; return render(); }
+
   signOutBtn.style.display = "inline-block";
+  brandTitle.textContent = g.name;
 
-  const t = TARGETS[match.targetIndex];
-  const activePlayer = match.players[match.turnIndex];
-
-  // Table header
-  let thead = `<tr><th>Target</th>`;
-  for(const p of match.players){
-    thead += `<th>${esc(p.name)}<div class="small">${p.total} pts</div></th>`;
-  }
-  thead += `</tr>`;
-
-  // Table body
-  let tbody = "";
-  for(const target of TARGETS){
-    const key = String(target);
-    tbody += `<tr><td class="l"><span class="badge">${esc(target==="B" ? "BULL" : target)}</span></td>`;
-    for(const p of match.players){
-      const cell = match.grid[p.email][key];
-      const txt = cell.throws.length ? cell.throws.join(" ") : "—";
-      const cls = String(t) === key ? ` class="activeCell"` : "";
-      tbody += `<td${cls}>${esc(txt)}<div class="small">${cell.points}</div></td>`;
-    }
-    tbody += `</tr>`;
+  if(activeGameId === "shanghai"){
+    const ctx = { meUser, match };
+    appEl.innerHTML = ShanghaiGame.renderPlay(ctx);
+    ShanghaiGame.bindPlay(ctx);
+    return;
   }
 
-  const finishedBanner = match.finished
-    ? `<div class="divider"></div><div class="pill">Finished</div>`
-    : "";
-
-  appEl.innerHTML = `
-    <div class="card">
-      <div class="row">
-        <button class="btn ghost" id="backHome">Back</button>
-        <button class="btn danger" id="resetBtn">Reset</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <span class="pill">Target Game</span>
-      <div class="divider"></div>
-      <div class="sub">
-        Target: <b>${esc(t==="B" ? "BULL" : t)}</b>
-        • Turn: <b>${esc(activePlayer.name)}</b>
-        • Dart ${match.dartInTurn + 1}/3
-      </div>
-      <div class="divider"></div>
-      <div class="boardBox">${dartboardSVG(t)}</div>
-      <div class="divider"></div>
-
-      <div class="hitRow">
-        <button class="hitBtn" id="hitT" ${match.finished?"disabled":""}>T</button>
-        <button class="hitBtn" id="hitS" ${match.finished?"disabled":""}>S</button>
-        <button class="hitBtn" id="hitD" ${match.finished?"disabled":""}>D</button>
-        <button class="hitBtn miss" id="hitM" ${match.finished?"disabled":""}>M</button>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="hitRow">
-        <button class="hitBtn undo" id="undoBtn">Undo</button>
-        <button class="hitBtn" disabled></button>
-        <button class="hitBtn" disabled></button>
-        <button class="hitBtn next" id="nextBtn" ${match.finished?"disabled":""}>Next</button>
-      </div>
-
-      ${finishedBanner}
-    </div>
-
-    <div class="card">
-      <div class="pill">Round table</div>
-      <div class="divider"></div>
-      <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
-        <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
-      </div>
-    </div>
-  `;
-
-  async function maybeSaveOnFinish(){
-    if(!match.finished || match._saved) return;
-    match._saved = true;
-
-    const summary = match.players
-      .slice()
-      .sort((a,b)=>b.total-a.total)
-      .map(p => `${p.name}: ${p.total}`)
-      .join(" | ");
-
-    await saveHistoryEntry({
-      gameId: "target",
-      startedAt: match.startedAt,
-      endedAt: match.endedAt,
-      players: match.players.map(p=>p.email),
-      summary
-    });
-
-    // Optional: basic cumulative stat
-    const stats = await getStats(meUser.email);
-    const played = (stats.played || 0) + 1;
-    await saveStats(meUser.email, { played });
-  }
-
-  function onHit(h){
-    if(match.finished) return;
-    pushSnap();
-    addThrow(match, h);
-    render(); // re-render immediately
-    maybeSaveOnFinish();
-  }
-
-  document.getElementById("hitT").onclick = ()=>onHit("T");
-  document.getElementById("hitS").onclick = ()=>onHit("S");
-  document.getElementById("hitD").onclick = ()=>onHit("D");
-  document.getElementById("hitM").onclick = ()=>onHit("M");
-
-  document.getElementById("undoBtn").onclick = ()=>{
-    popSnap();
-    render();
-  };
-
-  document.getElementById("nextBtn").onclick = ()=>{
-    // auto-miss remaining darts in the turn
-    while(!match.finished && match.dartInTurn < 3){
-      pushSnap();
-      addThrow(match, "M");
-    }
-    render();
-    maybeSaveOnFinish();
-  };
-
-  document.getElementById("resetBtn").onclick = ()=>{
-    const pls = match.players.map(p=>({name:p.name,email:p.email}));
-    match = initMatch(pls);
-    pushSnap();
-    render();
-  };
-
-  document.getElementById("backHome").onclick = ()=>{
-    match = null;
-    screen = "home";
-    render();
-  };
+  screen = "home";
+  return render();
 }
 
 async function renderStats(){
   signOutBtn.style.display = "inline-block";
-  const stats = await getStats(meUser.email);
+  brandTitle.textContent = "Stats";
+
+  const players = await getPlayers();
+  if(!statsViewerEmail) statsViewerEmail = meUser.email;
+
+  // read stats for selected player
+  const statsDoc = await getStatsDoc(statsViewerEmail);
+  const games = statsDoc.games || {};
+
+  const playerOptions = players
+    .map(p=>`<option value="${esc(p.email)}" ${p.email===statsViewerEmail?"selected":""}>${esc(p.name)}</option>`)
+    .join("");
+
+  const gameCards = Games.map(g=>{
+    const gs = (games[g.id] || {});
+    const played = gs.played || 0;
+    const line = g.id==="shanghai"
+      ? `Played: <b>${played}</b> • Best: <b>${esc(gs.best || 0)}</b> • Points: <b>${esc(gs.points || 0)}</b>`
+      : (g.active ? `Played: <b>${played}</b>` : `Coming soon`);
+
+    return `
+      <div class="card">
+        <div class="row">
+          <div style="flex:2">
+            <div class="h1" style="font-size:18px;margin:0">${esc(g.name)}</div>
+            <div class="sub">${line}</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end">
+            <button class="btn" data-open-stats="${esc(g.id)}">Open</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
 
   appEl.innerHTML = `
     <div class="card">
@@ -629,23 +884,90 @@ async function renderStats(){
         <button class="btn ghost" id="statsBack">Back</button>
       </div>
     </div>
+
     <div class="card">
-      <span class="pill">My Stats</span>
+      <span class="pill">Viewing</span>
       <div class="divider"></div>
-      <pre style="white-space:pre-wrap;margin:0">${esc(JSON.stringify(stats,null,2))}</pre>
+      <label>Player</label>
+      <select id="statsPlayer">${playerOptions}</select>
+      <div class="small">Pick a player, then pick a game.</div>
+    </div>
+
+    ${gameCards}
+  `;
+
+  document.getElementById("statsBack").onclick = ()=>{ screen="home"; render(); };
+  document.getElementById("statsPlayer").onchange = (e)=>{
+    statsViewerEmail = e.target.value;
+    render();
+  };
+
+  appEl.querySelectorAll("button[data-open-stats]").forEach(btn=>{
+    btn.onclick = ()=>{
+      activeGameId = btn.getAttribute("data-open-stats");
+      screen = "stats.game";
+      render();
+    };
+  });
+}
+
+async function renderStatsGame(){
+  const g = getGame(activeGameId);
+  if(!g){ screen="stats"; return render(); }
+
+  signOutBtn.style.display = "inline-block";
+  brandTitle.textContent = `${g.name} • Stats`;
+
+  const players = await getPlayers();
+  if(!statsViewerEmail) statsViewerEmail = meUser.email;
+
+  const viewer = players.find(p=>p.email===statsViewerEmail) || meUser;
+
+  const statsDoc = await getStatsDoc(statsViewerEmail);
+  const gs = (statsDoc.games || {})[g.id] || {};
+
+  let body = "";
+  if(g.id === "shanghai"){
+    body = `
+      <div class="sub">Played: <b>${esc(gs.played || 0)}</b></div>
+      <div class="sub">Points (you): <b>${esc(gs.points || 0)}</b></div>
+      <div class="sub">Best game: <b>${esc(gs.best || 0)}</b></div>
+      <div class="sub">Last played: <b>${esc(gs.lastPlayedAt ? fmt(gs.lastPlayedAt) : "—")}</b></div>
+    `;
+  } else {
+    body = g.active
+      ? `<div class="sub">Played: <b>${esc(gs.played || 0)}</b></div>`
+      : `<div class="sub">Coming soon.</div>`;
+  }
+
+  appEl.innerHTML = `
+    <div class="card">
+      <div class="row">
+        <button class="btn ghost" id="statsGameBack">Back</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="pill">${esc(viewer.name || "Player")}</span>
+      <div class="h1">${esc(g.name)}</div>
+      <div class="divider"></div>
+      ${body}
     </div>
   `;
-  document.getElementById("statsBack").onclick = ()=>{ screen="home"; render(); };
+
+  document.getElementById("statsGameBack").onclick = ()=>{ screen="stats"; render(); };
 }
 
 async function renderHistory(){
   signOutBtn.style.display = "inline-block";
+  brandTitle.textContent = "History";
+
   const history = await getHistory(meUser.email);
 
   let items = history.map(h => `
     <div class="card">
       <div class="h1" style="font-size:16px;margin:0">${esc(h.summary || "(no summary)")}</div>
-      <div class="sub">${esc(new Date(h.endedAt).toLocaleString())}</div>
+      <div class="sub">${esc(h.gameName || h.gameId || "Game")} • ${esc(h.endedAt ? fmt(h.endedAt) : "")}</div>
     </div>
   `).join("");
 
@@ -666,16 +988,19 @@ async function renderHistory(){
 async function render(){
   // topbar buttons
   homeBtn.onclick = ()=>{ screen = meUser ? "home" : "auth"; render(); };
-  signOutBtn.onclick = ()=>{ meUser=null; match=null; screen="auth"; render(); };
+  signOutBtn.onclick = ()=>{ meUser=null; match=null; activeGameId=null; statsViewerEmail=null; screen="auth"; render(); };
 
+  // Toast is only shown on auth screen in your original flow.
+  // We keep the same vibe: if toastMsg is set while on another screen, we just re-render that screen.
   if(screen==="auth") return renderAuth();
   if(screen==="signup") return renderSignup();
   if(!meUser) { screen="auth"; return renderAuth(); }
 
   if(screen==="home") return renderHome();
-  if(screen==="match") return renderMatch();
-  if(screen==="play") return renderPlay();
+  if(screen==="game.setup") return renderGameSetup();
+  if(screen==="game.play") return renderGamePlay();
   if(screen==="stats") return renderStats();
+  if(screen==="stats.game") return renderStatsGame();
   if(screen==="history") return renderHistory();
 
   screen = "home";
