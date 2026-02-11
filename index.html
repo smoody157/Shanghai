@@ -216,7 +216,6 @@ input,select{
 .pill,.badge,.kbd{ position:relative; }
 
 /* ===== Chrome text (HEADERS ONLY) ===== */
-/* IMPORTANT: removed `th` from this selector to prevent the “purple split” in table header text */
 .h1, .kTurnBig, .brand .t, td.l, .rosterName{
   background:var(--chrome-text);
   -webkit-background-clip:text;
@@ -510,7 +509,7 @@ th{
 </div>
 
 <script>
-/* ========= Robust script loader (prevents “blue wallpaper only”) ========= */
+/* ========= Robust script loader ========= */
 function loadScript(src){
   return new Promise((resolve,reject)=>{
     const s=document.createElement("script");
@@ -570,7 +569,6 @@ async function boot(){
 }
 
 function startApp(){
-  /* Firebase */
   const firebaseConfig = {
     apiKey: "AIzaSyCY3hTUNNlV6gAofPXY9BVGKb930WYz5RA",
     authDomain: "gamenightdarts-e7601.firebaseapp.com",
@@ -582,7 +580,6 @@ function startApp(){
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  /* Firestore helpers */
   async function getPlayers(){
     const snap = await db.collection("players").get();
     return snap.docs.map(d=>d.data());
@@ -628,7 +625,6 @@ function startApp(){
     return {name,email:e};
   }
 
-  /* Dartboard (straight: 20 top) */
   const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 
   function polar(cx,cy,r,deg){
@@ -712,7 +708,6 @@ function startApp(){
     </svg>`;
   }
 
-  /* Undo snaps */
   function pushSnap(m){
     m.snaps=m.snaps||[];
     m.snaps.push(JSON.stringify(m));
@@ -725,7 +720,6 @@ function startApp(){
     try{return JSON.parse(prev);}catch{return m;}
   }
 
-  /* Games registry */
   const Games=[
     {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
     {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles"},
@@ -735,7 +729,6 @@ function startApp(){
   ];
   const getGame=id=>Games.find(g=>g.id===id)||null;
 
-  /* Shanghai */
   const ShanghaiGame=(()=>{
     const TARGETS=[20,19,18,17,16,15,"B"];
     const pts=hit=>hit==="T"?3:hit==="D"?2:hit==="S"?1:0;
@@ -915,7 +908,6 @@ function startApp(){
     return {initMatch, renderPlay, bindPlay};
   })();
 
-  /* Killer (unchanged mechanics; only header typography/layout now consistent) */
   const KillerGame = (() => {
     const MAX_LIVES = 3;
 
@@ -1148,7 +1140,6 @@ function startApp(){
     function bindPlay(ctx){
       const m=ctx.match;
 
-      // Back/Reset (claim + play)
       const backBtn=document.getElementById("backToSetup");
       if(backBtn){
         backBtn.onclick=()=>{
@@ -1166,7 +1157,6 @@ function startApp(){
         };
       }
 
-      // Claim screen
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
         claimBtn.onclick=()=>{
@@ -1200,7 +1190,6 @@ function startApp(){
         return;
       }
 
-      // Simple undo snapshots for Killer too
       function pushK(m){ m.snaps=m.snaps||[]; m.snaps.push(JSON.stringify(m)); if(m.snaps.length>80) m.snaps.shift(); }
       function popK(m){
         if(!m?.snaps||m.snaps.length<2) return m;
@@ -1269,9 +1258,8 @@ function startApp(){
     return { initMatch, renderPlay, bindPlay };
   })();
 
-  /* App state */
   let toastMsg="";
-  let screen="auth"; // auth | signup | home | game.setup | game.play | stats | stats.game | history | rules | rules.game
+  let screen="auth";
   let meUser=null;
   let activeGameId=null;
   let match=null;
@@ -1288,7 +1276,6 @@ function startApp(){
     return (a+(b||"")).slice(0,2) || a || "?";
   }
 
-  /* Rules content */
   function rulesFor(gameId){
     if(gameId==="shanghai") return {
       title:"Shanghai",
@@ -1323,7 +1310,6 @@ function startApp(){
     };
   }
 
-  /* Screens */
   async function renderAuth(){
     signOutBtn.style.display="none";
     brandTitle.textContent="Game Night";
@@ -1539,7 +1525,8 @@ function startApp(){
       };
     });
   }
-    async function renderRules(){
+
+  async function renderRules(){
     signOutBtn.style.display="inline-block";
     brandTitle.textContent="Game rules";
 
@@ -1631,7 +1618,7 @@ function startApp(){
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
-            <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
+            <div class="logoMark"><span>${esc(g.icon || "🎯")}</span></div>
             <span class="kbd">${esc(g.name)}</span>
           </div>
 
