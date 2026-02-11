@@ -501,6 +501,14 @@ th{
 
 /* Tiny readability boost */
 .sub,.small,.brand .s{ text-shadow:0 2px 10px rgba(0,0,0,.30); }
+
+/* Keep key status lines on ONE line (ellipsis on small screens) */
+.statusLine{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 </style>
 </head>
 
@@ -550,8 +558,25 @@ const homeBtn=document.getElementById("homeBtn");
 const signOutBtn=document.getElementById("signOutBtn");
 const brandTitle=document.getElementById("brandTitle");
 
+function setHTML(html){
+  appEl.innerHTML = html;
+  // Light "swipe" / fade-in on every screen render (no delays, bindings still work)
+  try{
+    appEl.animate(
+      [
+        { opacity: 0, transform: "translateY(10px)" },
+        { opacity: 1, transform: "translateY(0px)" }
+      ],
+      { duration: 180, easing: "cubic-bezier(.2,.8,.2,1)" }
+    );
+  }catch(e){}
+  // keep view at top for new screens
+  try{ window.scrollTo({top:0, left:0, behavior:"instant"}); }catch(e){ window.scrollTo(0,0); }
+}
+
+
 function showFatal(title,msg){
-  appEl.innerHTML=`
+  setHTML(`
     <div class="card">
       <div class="hero">
         <div class="heroCornerLeft">
@@ -571,14 +596,14 @@ function showFatal(title,msg){
       <div class="divider"></div>
       <div class="sub">If you’re on iPhone/Safari, make sure content blockers aren’t blocking Google scripts.</div>
     </div>
-  `;
+  `);
   document.getElementById("retryBtn").onclick=()=>boot();
   document.getElementById("reloadBtn").onclick=()=>location.reload(true);
 }
 
 async function boot(){
   try{
-    appEl.innerHTML=`<div class="card"><div class="h1">Loading…</div><div class="sub">Starting Game Night…</div></div>`;
+    setHTML(`<div class="card"><div class="h1">Loading…</div><div class="sub">Starting Game Night…</div></div>`);
     await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js");
     await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js");
     await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js");
@@ -870,6 +895,8 @@ function startApp(){
       const m=ctx.match;
       const t=TARGETS[m.targetIndex];
       const activePlayer=m.players[m.turnIndex];
+      const nextPlayer = (!m.finished && m.players.length>1) ? m.players[(m.turnIndex+1)%m.players.length] : null;
+
 
       let thead=`<tr><th>Target</th>`;
       for(const p of m.players){
@@ -910,11 +937,13 @@ function startApp(){
             <div class="heroMain">
               <div class="gameTitleBig">Shanghai</div>
               <div class="h1 turnTitle3d turnNameBig" style="margin:0">${esc(activePlayer.name)}’s Turn</div>
-              <div class="sub">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+              <div class="small"><span class="badge">NOW THROWING</span></div>
+              <div class="sub statusLine">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
             <div class="heroCornerRight">
               <span class="pill" data-live="1">Live</span>
+              ${nextPlayer?`<span class="badge" title="Up next">Up next: ${esc(nextPlayer.name)}</span>`:""}
             </div>
           </div>
 
@@ -1108,6 +1137,14 @@ function startApp(){
 
       // Play phase header — aligned like all other screens
       const active=m.players[m.turnIndex];
+      const nextOnDeck = (!isFinished && m.players.length>1) ? (function(){
+        // next player who is not OUT
+        for(let step=1; step<=m.players.length; step++){
+          const i=(m.turnIndex+step)%m.players.length;
+          if(!m.players[i].out) return m.players[i];
+        }
+        return null;
+      })() : null;
       const isFinished = !!m.finished;
 
       const statusLine = isFinished
@@ -1163,11 +1200,13 @@ function startApp(){
 
             <div class="heroMain">
               <h2 class="kTurnBig turnTitle3d" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</h2>
-              <div class="kTurnSub">${statusLine}</div>
+              ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="kTurnSub statusLine">${statusLine}</div>
             </div>
 
             <div class="heroCornerRight">
               <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
+              ${nextOnDeck?`<span class="badge" title="Up next">Up next: ${esc(nextOnDeck.name)}</span>`:""}
             </div>
           </div>
 
@@ -1399,7 +1438,7 @@ function startApp(){
       const winnerRow=m.players.find(x=>x.email===m.winner?.email);
       const winnerDarts=winnerRow ? winnerRow.dartsThrown : null;
 
-      const summary = `🏁 ${winnerName} wins • Mode: ${modeName(m)}${winnerDarts!=null?` • ${winnerDarts} darts`:``}`;
+      const summary = `🏁 ${winnerName} wins • Format: ${modeName(m)}${winnerDarts!=null?` • ${winnerDarts} darts`:``}`;
 
       await saveHistoryEntry({
         gameId:"around",
@@ -1454,6 +1493,7 @@ function startApp(){
     function renderPlay(ctx){
       const m=ctx.match;
       const active=m.players[m.turnIndex];
+      const nextPlayer = (!m.finished && m.players.length>1) ? m.players[(m.turnIndex+1)%m.players.length] : null;
       const t=currentTarget(m, active);
       const tLabel = (t==="B" ? "BULL" : String(t));
 
@@ -1461,8 +1501,8 @@ function startApp(){
       const livePill = isFinished ? `<span class="pill">Ended</span>` : `<span class="pill" data-live="1">Live</span>`;
 
       const statusLine = isFinished
-        ? `Winner: <b>${esc(m.winner?.name||"")}</b> • Mode: <b>${esc(modeName(m))}</b>`
-        : `Target: <b>${esc(tLabel)}</b> • Mode: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
+        ? `Winner: <b>${esc(m.winner?.name||"")}</b> • Format: <b>${esc(modeName(m))}</b>`
+        : `Target: <b>${esc(tLabel)}</b> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
 
       const rows = m.players.map(p=>{
         const ct=currentTarget(m,p);
@@ -1505,11 +1545,13 @@ function startApp(){
             <div class="heroMain">
               <div class="gameTitleBig">Around the World</div>
               <div class="h1 turnTitle3d turnNameBig" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</div>
-              <div class="sub">${statusLine}</div>
+              ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="sub statusLine">${statusLine}</div>
             </div>
 
             <div class="heroCornerRight">
               ${livePill}
+              ${nextPlayer?`<span class="badge" title="Up next">Up next: ${esc(nextPlayer.name)}</span>`:""}
             </div>
           </div>
 
@@ -1687,7 +1729,7 @@ function startApp(){
         </div>
       </div>
     `;
-    appEl.innerHTML=html;
+    setHTML(html);
 
     document.getElementById("goBtn").onclick=async()=>{
       const e=normEmail(document.getElementById("inEmail").value);
@@ -1710,7 +1752,7 @@ function startApp(){
     signOutBtn.style.display="none";
     brandTitle.textContent="Game Night";
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
@@ -1734,7 +1776,7 @@ function startApp(){
           <button class="btn ghost" id="backBtn">Back</button>
         </div>
       </div>
-    `;
+    `);
     document.getElementById("backBtn").onclick=()=>{ meUser=null; screen="auth"; render(); };
 
     document.getElementById("createBtn").onclick=async()=>{
@@ -1793,7 +1835,7 @@ function startApp(){
         </div>
       `).join("");
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
@@ -1839,7 +1881,7 @@ function startApp(){
         <div class="divider"></div>
         <div class="rosterGrid">${roster || `<div class="sub">No other players yet.</div>`}</div>
       </div>
-    `;
+    `);
 
     document.getElementById("rulesBtn").onclick=()=>{ screen="rules"; render(); };
     document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
@@ -1897,7 +1939,7 @@ function startApp(){
     signOutBtn.style.display="inline-block";
     brandTitle.textContent="Game rules";
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
@@ -1927,7 +1969,7 @@ function startApp(){
         <div class="divider"></div>
         <button class="btn ghost" id="rulesBack">Back</button>
       </div>
-    `;
+    `);
     document.getElementById("rulesBack").onclick=()=>{ screen="home"; render(); };
     appEl.querySelectorAll("button[data-rule]").forEach(btn=>{
       btn.onclick=()=>{
@@ -1943,7 +1985,7 @@ function startApp(){
     const r=rulesFor(rulesGameId);
     brandTitle.textContent=`${r.title} • Rules`;
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
@@ -1964,7 +2006,7 @@ function startApp(){
         <div class="divider"></div>
         <button class="btn ghost" id="rulesGameBack">Back</button>
       </div>
-    `;
+    `);
     document.getElementById("rulesGameBack").onclick=()=>{ screen="rules"; render(); };
   }
 
@@ -1990,7 +2032,7 @@ function startApp(){
       <div class="small">Pick the format before starting.</div>
     ` : "";
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
 
       <div class="card">
@@ -2039,7 +2081,7 @@ function startApp(){
           <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
         </div>
       </div>
-    `;
+    `);
 
     const selectEl=document.getElementById("matchPlayers");
     Array.from(selectEl.options).forEach(o=>{ if(o.value===meEmail) o.selected=true; });
@@ -2098,21 +2140,21 @@ function startApp(){
 
     if(activeGameId==="shanghai"){
       const ctx={meUser, match};
-      appEl.innerHTML=ShanghaiGame.renderPlay(ctx);
+      setHTML(ShanghaiGame.renderPlay(ctx));
       ShanghaiGame.bindPlay(ctx);
       return;
     }
 
     if(activeGameId==="killer"){
       const ctx={meUser, match};
-      appEl.innerHTML=KillerGame.renderPlay(ctx);
+      setHTML(KillerGame.renderPlay(ctx));
       KillerGame.bindPlay(ctx);
       return;
     }
 
     if(activeGameId==="around"){
       const ctx={meUser, match};
-      appEl.innerHTML=AroundGame.renderPlay(ctx);
+      setHTML(AroundGame.renderPlay(ctx));
       AroundGame.bindPlay(ctx);
       return;
     }
@@ -2143,7 +2185,7 @@ screen="home"; render();
       return `Played: <b>${played}</b> • Wins: <b>${wins}</b> • Accuracy: <b>${acc}%</b> • Best: <b>${esc(best)}</b>`;
     }
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
@@ -2201,7 +2243,7 @@ screen="home"; render();
       <div class="row">
         <button class="btn ghost" id="statsBack">Back</button>
       </div>
-    `;
+    `);
 
     document.getElementById("statsBack").onclick=()=>{ screen="home"; render(); };
     document.getElementById("statsPlayer").onchange=(e)=>{ statsViewerEmail=e.target.value; render(); };
@@ -2297,7 +2339,7 @@ else{
       body=g.active?`<div class="sub">Played: <b>${esc(gs.played||0)}</b></div>`:`<div class="sub">Coming soon.</div>`;
     }
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
@@ -2320,7 +2362,7 @@ else{
           <button class="btn ghost" id="statsGameBack">Back</button>
         </div>
       </div>
-    `;
+    `);
 
     const resetBtn=document.getElementById("resetGameStatsBtn");
     if(resetBtn){
@@ -2355,11 +2397,11 @@ else{
     `).join("");
     if(!items) items=`<div class="card"><div class="sub">No matches yet.</div></div>`;
 
-    appEl.innerHTML=`
+    setHTML(`
       <div class="row"><button class="btn ghost" id="historyBack">Back</button></div>
       <div class="divider"></div>
       ${items}
-    `;
+    `);
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
   }
 
