@@ -3,175 +3,113 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Game Night</title>
+<title>Game Night | The Dart Room</title>
 
 <style>
 :root{
-  /* Core palette */
-  --bg:#070b14;
-  --bg2:#0a1224;
-  --text:#eaf2ff;
-  --muted:#b9cbe5;
-
-  /* Theme accents (NOT “all blue”) */
-  --accent:#59b2ff;          /* electric blue */
-  --accent2:#a855f7;         /* neon purple */
-  --warm:#ffb14a;            /* warm amber highlight */
-
-  --danger:#ff4d5a;
-  --ok:#2bd576;
-
-  --shadow: rgba(0,0,0,.35);
-  --glass: rgba(255,255,255,.07);
-  --glass2: rgba(255,255,255,.03);
+  --bg:#0b1a2e; --text:#eaf2ff; --muted:#b9cbe5;
+  --accent:#4ea8ff; --accent2:#a855f7; --accent3:#ffb14e;
+  --danger:#ff4d5a; --ok:#2bd576; --shadow: rgba(0,0,0,.25);
+  --glass: rgba(255,255,255,.06); --glass2: rgba(255,255,255,.03);
   --border: rgba(255,255,255,.12);
-
-  --glowB: rgba(89,178,255,.35);
-  --glowP: rgba(168,85,247,.26);
-  --glowW: rgba(255,177,74,.18);
+  --glowA: rgba(78,168,255,.35);
+  --glowB: rgba(168,85,247,.28);
+  --glowC: rgba(255,177,78,.22);
 }
-
-*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  color:var(--text);
-
-  /* Rich themed background (blue + purple + warm) */
   background:
-    radial-gradient(900px 520px at 18% 8%, rgba(89,178,255,.25) 0%, rgba(7,11,20,0) 60%),
-    radial-gradient(820px 520px at 84% 12%, rgba(168,85,247,.22) 0%, rgba(7,11,20,0) 62%),
-    radial-gradient(900px 520px at 55% 100%, rgba(255,177,74,.10) 0%, rgba(7,11,20,0) 60%),
-    radial-gradient(1200px 700px at 50% -10%, #0f2f63 0%, #070b14 60%),
-    linear-gradient(180deg, #070b14, #04060c);
+    radial-gradient(1000px 650px at 50% 0%, rgba(78,168,255,.55) 0%, rgba(11,26,46,1) 58%),
+    radial-gradient(900px 600px at 10% 20%, rgba(168,85,247,.22) 0%, rgba(11,26,46,0) 55%),
+    radial-gradient(900px 600px at 90% 35%, rgba(255,177,78,.14) 0%, rgba(11,26,46,0) 60%),
+    linear-gradient(180deg,#071423,#050a12);
+  color:var(--text);
   overflow-x:hidden;
 }
-
-/* Subtle texture overlay (arcade feel without images) */
 body:before{
-  content:"";
-  position:fixed; inset:0;
-  pointer-events:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
-  opacity:.09;
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
   mix-blend-mode:overlay;
 }
-
 .topbar{
   position:sticky;top:0;z-index:10;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:12px 14px;
-  background:rgba(6,10,18,.74);
-  backdrop-filter:blur(14px);
+  padding:12px 14px;background:rgba(5,12,22,.78);backdrop-filter:blur(16px);
   border-bottom:1px solid rgba(255,255,255,.10);
-  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 .brand{display:flex;flex-direction:column;line-height:1.05}
 .brand .t{
-  font-weight:1000;font-size:16px;
-  letter-spacing:-.3px;
-  text-shadow:
-    0 0 16px var(--glowB),
-    0 0 24px rgba(168,85,247,.16),
-    0 0 36px rgba(255,177,74,.08);
+  font-weight:1000;font-size:16px; letter-spacing:-.2px;
+  text-shadow:0 0 18px var(--glowA), 0 0 22px rgba(168,85,247,.16);
 }
-.brand .s{
-  font-size:11px;
-  color:rgba(233,243,255,.78);
-}
-
+.brand .s{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 .btn{
   border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.08);
-  color:var(--text);
-  border-radius:14px;
-  padding:10px 12px;
-  font-weight:900;
+  color:var(--text);border-radius:14px;padding:10px 12px;font-weight:900;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
   cursor:pointer;
-  transition: transform .06s ease, filter .2s ease, box-shadow .2s ease, border-color .2s ease;
+  transition:transform .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease, filter .2s ease;
 }
-.btn:hover{filter:brightness(1.08); border-color: rgba(89,178,255,.28); box-shadow:0 10px 22px rgba(0,0,0,.25);}
-.btn:active{transform:translateY(1px) scale(.99)}
+.btn:active{transform:translateY(1px) scale(.985); filter:brightness(1.15)}
 .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
 .btn.ok{
-  background:
-    linear-gradient(180deg, rgba(89,178,255,.95), rgba(89,178,255,.70));
-  color:#06101f;border-color:transparent;
-  box-shadow:
-    0 12px 26px rgba(89,178,255,.22),
-    0 0 18px rgba(89,178,255,.16);
+  background:linear-gradient(135deg, rgba(78,168,255,.95), rgba(168,85,247,.65));
+  border-color:rgba(255,255,255,.10);
+  color:#06101e;
+  text-shadow:none;
+  box-shadow:0 10px 26px rgba(78,168,255,.18), 0 10px 26px rgba(168,85,247,.12);
 }
-.btn.danger{background:rgba(255,77,90,.18);border-color:rgba(255,77,90,.35)}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;filter:none}
 
-.wrap{max-width:980px;margin:0 auto;padding:14px; position:relative; z-index:1}
-
+.wrap{max-width:980px;margin:0 auto;padding:14px;position:relative;z-index:1}
 .card{
   background:linear-gradient(180deg,var(--glass),var(--glass2));
   border:1px solid rgba(255,255,255,.10);
-  border-radius:18px;
-  padding:14px;
-  box-shadow:0 16px 34px rgba(0,0,0,.35);
+  border-radius:18px;padding:14px;
+  box-shadow:0 14px 30px rgba(0,0,0,.28);
   margin-bottom:12px;
 }
-
 .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
 .sub{color:var(--muted);font-size:13px}
 label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
 input,select{
   width:100%;
-  background:rgba(10,20,35,.55);
+  background:rgba(10,20,35,.65);
   border:1px solid rgba(255,255,255,.14);
   color:var(--text);
-  border-radius:14px;
-  padding:12px 12px;
-  font-size:16px;
-  outline:none;
-}
-input:focus,select:focus{
-  border-color: rgba(89,178,255,.42);
-  box-shadow:0 0 0 3px rgba(89,178,255,.12);
+  border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
 }
 .row{display:flex;gap:10px}
 .row>*{flex:1}
 .stack{display:flex;flex-direction:column;gap:10px}
-
 .toast{
   background:rgba(255,77,90,.12);
   border:1px solid rgba(255,77,90,.30);
   color:#ffd6da;
   border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
 }
-
 .pill{
-  display:inline-block;
-  padding:6px 10px;border-radius:999px;
+  display:inline-block;padding:6px 10px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
-  background:rgba(89,178,255,.10);
-  color:#cfeaff;
-  font-weight:1000;font-size:12px;
-  box-shadow:0 0 18px rgba(89,178,255,.10);
+  background:rgba(78,168,255,.10);
+  color:var(--accent);font-weight:900;font-size:12px;
 }
-.pill.purple{background:rgba(168,85,247,.12); color:#edd8ff; box-shadow:0 0 18px rgba(168,85,247,.10);}
-.pill.warm{background:rgba(255,177,74,.14); color:#ffe7c6; box-shadow:0 0 18px rgba(255,177,74,.10);}
 .pill.soon{background:rgba(255,255,255,.06); color:var(--muted)}
-
 .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
 
-/* Cinematic bits */
+/* Cinematic */
 .hero{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .logoMark{
   width:44px;height:44px;border-radius:14px;
-  background:
-    radial-gradient(60% 60% at 30% 20%, rgba(89,178,255,.50), rgba(255,255,255,.06)),
-    radial-gradient(70% 60% at 80% 20%, rgba(168,85,247,.26), rgba(255,255,255,0)),
-    radial-gradient(70% 60% at 50% 95%, rgba(255,177,74,.12), rgba(255,255,255,0));
+  background:radial-gradient(60% 60% at 30% 20%, rgba(78,168,255,.40), rgba(255,255,255,.06));
   border:1px solid rgba(255,255,255,.12);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:
-    0 14px 28px rgba(0,0,0,.35),
-    0 0 18px rgba(89,178,255,.12),
-    0 0 14px rgba(168,85,247,.10);
+  box-shadow:0 12px 28px rgba(0,0,0,.25);
   flex:0 0 auto;
 }
 .logoMark span{font-size:20px}
@@ -182,6 +120,13 @@ input:focus,select:focus{
   color:var(--muted); font-weight:900; font-size:12px;
 }
 
+/* Gradient text */
+.gradText{
+  background:linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 18px rgba(78,168,255,.12);
+}
+
 /* Game cards */
 .gameGrid{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:860px){ .gameGrid{grid-template-columns:1fr 1fr;} }
@@ -189,7 +134,7 @@ input:focus,select:focus{
   background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
   border:1px solid rgba(255,255,255,.10);
   border-radius:18px;padding:14px;
-  box-shadow:0 14px 30px rgba(0,0,0,.30);
+  box-shadow:0 10px 26px rgba(0,0,0,.25);
 }
 .gameHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .gameTitle{display:flex;align-items:center;gap:10px}
@@ -199,7 +144,6 @@ input:focus,select:focus{
   background:rgba(255,255,255,.06);
   display:flex;align-items:center;justify-content:center;
   font-size:18px;
-  box-shadow:0 0 18px rgba(89,178,255,.08);
 }
 .gameMeta{color:var(--muted);font-size:13px;margin-top:4px}
 .gameActions{display:flex;gap:10px;margin-top:10px}
@@ -218,121 +162,113 @@ input:focus,select:focus{
 .avatar{
   width:34px;height:34px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
-  background:rgba(89,178,255,.12);
+  background:rgba(78,168,255,.10);
   display:flex;align-items:center;justify-content:center;
-  font-weight:1000;color:#cfeaff;
+  font-weight:1000;color:var(--accent);
 }
 .rosterName{font-weight:1000}
 .rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
 
-/* Leader glow */
-@keyframes leaderGlow{0%{box-shadow:0 0 0 rgba(89,178,255,0)}50%{box-shadow:0 0 34px rgba(89,178,255,.20)}100%{box-shadow:0 0 0 rgba(89,178,255,0)}}
-.leaderGlow{animation:leaderGlow 1.2s ease-in-out infinite;}
+/* Active pulses / glows */
+@keyframes pulseSoft{0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 26px rgba(78,168,255,.28), 0 0 22px rgba(168,85,247,.18)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}}
+.pulseSoft{animation:pulseSoft 1.35s ease-in-out infinite;}
+@keyframes pulseTarget{0%{filter:brightness(1)}50%{filter:brightness(1.8)}100%{filter:brightness(1)}}
+.pulseTarget{animation:pulseTarget 1.25s ease-in-out infinite;}
+@keyframes pulseHot{0%{opacity:.25;filter:brightness(1)}50%{opacity:.95;filter:brightness(2.3)}100%{opacity:.25;filter:brightness(1)}}
+.hotWedge{animation:pulseHot .95s ease-in-out infinite;}
 
-/* Play UI */
+/* Play layout: keep everything visible */
+.playGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+}
+@media(min-width:860px){
+  .playGrid{grid-template-columns: 1.1fr .9fr;}
+}
+.playCardTight{padding:12px}
 .boardBox{display:flex;justify-content:center;align-items:center}
+.boardBox svg{max-width:100%; height:auto}
 .hitRow{display:flex;gap:10px;flex-wrap:wrap}
 .hitBtn{
   flex:1; min-width:120px;
-  border-radius:16px;border:1px solid rgba(255,255,255,.14);
-  background:rgba(255,255,255,.08);
-  color:var(--text);
-  font-weight:1000;
-  padding:12px;
-  box-shadow:0 10px 20px rgba(0,0,0,.18);
+  border-radius:14px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08);color:var(--text);
+  font-weight:1000;padding:14px;
+  box-shadow:0 10px 22px rgba(0,0,0,.18);
+  transition:transform .12s ease, filter .15s ease, border-color .2s ease;
 }
-.hitBtn:hover{filter:brightness(1.10); border-color: rgba(89,178,255,.28);}
+.hitBtn:active{transform:translateY(1px) scale(.99); filter:brightness(1.15)}
+.hitBtn:hover{border-color:rgba(78,168,255,.35)}
 .hitBtn.miss{border-color:rgba(255,77,90,.35);background:rgba(255,77,90,.16)}
 .hitBtn.undo{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:var(--muted)}
-
 table{width:100%;border-collapse:collapse}
 th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.10);vertical-align:top}
-th{position:sticky;top:0;background:rgba(6,10,18,.85);backdrop-filter:blur(10px)}
+th{position:sticky;top:0;background:rgba(10,20,35,.85);backdrop-filter:blur(10px)}
 td.l{font-weight:900}
 .small{font-size:12px;color:var(--muted);margin-top:4px}
 .badge{
   display:inline-block;padding:5px 10px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.06);
-  font-size:13px;font-weight:1100;
-  box-shadow:0 0 14px rgba(89,178,255,.06);
+  font-size:13px;font-weight:1000;
 }
-.badge.big{
-  font-size:16px;
-  padding:8px 14px;
-  background:rgba(255,177,74,.10);
-  border-color:rgba(255,177,74,.22);
-  box-shadow:0 0 18px rgba(255,177,74,.10);
-}
-
-.activeCell{outline:2px solid rgba(89,178,255,.45); outline-offset:-2px; border-radius:10px}
-
-/* Active target pulse on the board */
-@keyframes hotPulse{0%{opacity:.25;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.4)}100%{opacity:.25;filter:brightness(1)}}
-.hotWedge{animation:hotPulse .85s ease-in-out infinite;}
-
-/* ===== BIG, SIMPLE Killer layout ===== */
-.killerGrid{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap:12px;
-}
-@media(min-width:860px){
-  .killerGrid{ grid-template-columns: 1.15fr .85fr; }
-}
-.killerTurn{
-  border:1px solid rgba(89,178,255,.18);
-  background:
-    radial-gradient(700px 260px at 20% 0%, rgba(89,178,255,.16), rgba(255,255,255,0)),
-    radial-gradient(700px 260px at 80% 0%, rgba(168,85,247,.12), rgba(255,255,255,0)),
-    radial-gradient(700px 260px at 55% 100%, rgba(255,177,74,.08), rgba(255,255,255,0)),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-  box-shadow:0 18px 34px rgba(0,0,0,.35), 0 0 22px rgba(89,178,255,.08);
-}
+.badge.big{font-size:16px;padding:6px 12px}
+.activeCell{outline:2px solid rgba(78,168,255,.45); outline-offset:-2px; border-radius:10px}
 .turnName{
-  font-size:30px;
-  font-weight:1100;
-  letter-spacing:-.8px;
-  margin:0;
-  text-shadow:0 0 18px rgba(89,178,255,.20);
+  font-size:28px; font-weight:1000; margin:0;
+  text-shadow:0 0 22px rgba(78,168,255,.25), 0 0 18px rgba(168,85,247,.18);
 }
-.turnMeta{
-  margin-top:6px;
-  font-weight:1000;
-  color:rgba(233,243,255,.86);
+.turnSub{font-size:14px;color:var(--muted)}
+.hudRow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dartDots{display:flex;gap:6px;align-items:center}
+.dot{
+  width:12px;height:12px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.20);
+  background:rgba(255,255,255,.06);
+  box-shadow:none;
 }
-.bigHearts{
-  font-size:24px;
-  letter-spacing:2px;
-  text-shadow:0 0 12px rgba(255,77,90,.18);
+.dot.on{
+  background:linear-gradient(135deg, rgba(78,168,255,.95), rgba(168,85,247,.55));
+  border-color:rgba(255,255,255,.22);
+  box-shadow:0 0 18px rgba(78,168,255,.22), 0 0 16px rgba(168,85,247,.16);
 }
-.playerPill{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.04);
-}
-.playerPill .name{font-weight:1100; font-size:16px}
-.playerPill .num{
-  font-size:20px;
-  padding:6px 12px;
-  border-radius:999px;
+.statusPill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
-  background:rgba(89,178,255,.10);
-  box-shadow:0 0 18px rgba(89,178,255,.10);
+  background:rgba(255,255,255,.06);
+  font-weight:1000;font-size:12px;color:var(--muted);
 }
-.playerPill.out{opacity:.55; filter:grayscale(40%);}
+.statusPill.killer{
+  color:var(--accent3);
+  box-shadow:0 0 20px rgba(255,177,78,.18);
+  border-color:rgba(255,177,78,.28);
+}
+.statusPill.vulnerable{
+  color:#ffd6da;
+  box-shadow:0 0 20px rgba(255,77,90,.18);
+  border-color:rgba(255,77,90,.28);
+}
 
-.attackBtn{
-  border:1px solid rgba(255,177,74,.22);
-  background:rgba(255,177,74,.10);
-  box-shadow:0 0 18px rgba(255,177,74,.10);
+/* Collapsible table: keeps play screen non-scroll */
+details.accordion{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  background:rgba(255,255,255,.03);
+  overflow:hidden;
 }
-.attackBtn:hover{border-color: rgba(255,177,74,.40); filter:brightness(1.08);}
+details.accordion > summary{
+  list-style:none; cursor:pointer;
+  padding:12px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-weight:1000;color:var(--text);
+}
+details.accordion > summary::-webkit-details-marker{display:none}
+.accordionBody{
+  max-height:260px; overflow:auto;
+  border-top:1px solid rgba(255,255,255,.10);
+}
 </style>
 </head>
 
@@ -340,7 +276,7 @@ td.l{font-weight:900}
 <div class="topbar">
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed & Developed by Steve’s Graphic Designs</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs</div>
   </div>
   <div>
     <button class="btn ghost" id="homeBtn" type="button">Home</button>
@@ -353,6 +289,7 @@ td.l{font-weight:900}
 </div>
 
 <script>
+/* ========= Robust script loader ========= */
 function loadScript(src){
   return new Promise((resolve,reject)=>{
     const s=document.createElement("script");
@@ -496,15 +433,15 @@ function startApp(){
         const halo=arcWedgePath(cx,cy,rTripleOuter+8,rDoubleInner-8,a0,a1);
         const core=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
         activeOverlay+=`
-          <path class="hotWedge" d="${halo}" fill="rgba(255,177,74,.22)" stroke="rgba(255,177,74,.75)" stroke-width="3.8"/>
-          <path class="hotWedge" d="${core}" fill="rgba(89,178,255,.22)" stroke="rgba(89,178,255,.95)" stroke-width="2.8"/>
+          <path class="hotWedge" d="${halo}" fill="rgba(78,168,255,.45)" stroke="rgba(78,168,255,.98)" stroke-width="3.8" filter="url(#glow)"/>
+          <path class="hotWedge" d="${core}" fill="rgba(168,85,247,.18)" stroke="rgba(255,255,255,.95)" stroke-width="2.8" filter="url(#glow)"/>
         `;
       }
     }
     if(activeTarget==="B"){
       activeOverlay+=`
-        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(255,177,74,.18)" stroke="rgba(255,177,74,.78)" stroke-width="3.0"/>
-        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(89,178,255,.18)" stroke="rgba(255,255,255,.95)" stroke-width="2.6"/>
+        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(78,168,255,.28)" stroke="rgba(78,168,255,.98)" stroke-width="3.0" filter="url(#glow)"/>
+        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(168,85,247,.22)" stroke="rgba(255,255,255,.95)" stroke-width="2.6" filter="url(#glow)"/>
       `;
     }
 
@@ -525,8 +462,21 @@ function startApp(){
       numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
     }
 
-    return `<svg viewBox="0 0 200 200" width="70%">
-      <circle cx="100" cy="100" r="${outer}" fill="#0a1326" stroke="#2a3f5f" stroke-width="2"/>
+    return `<svg viewBox="0 0 200 200" width="100%">
+      <defs>
+        <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
+          <stop offset="0%" stop-color="#203a62"/>
+          <stop offset="55%" stop-color="#0d1a2e"/>
+          <stop offset="100%" stop-color="#060d18"/>
+        </radialGradient>
+        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="4.2" result="b"/>
+          <feColorMatrix in="b" type="matrix"
+            values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
+          <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
       ${activeOverlay}
       ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
       ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
@@ -642,6 +592,8 @@ function startApp(){
       const t=TARGETS[m.targetIndex];
       const activePlayer=m.players[m.turnIndex];
 
+      const dots = [0,1,2].map(i=>`<span class="dot ${i<=m.dartInTurn-1?'on':''}"></span>`).join("");
+
       let thead=`<tr><th>Target</th>`;
       for(const p of m.players) thead+=`<th>${esc(p.name)}<div class="small">${p.total} pts</div></th>`;
       thead+=`</tr>`;
@@ -659,8 +611,6 @@ function startApp(){
         tbody+=`</tr>`;
       }
 
-      const finishedBanner=m.finished?`<div class="divider"></div><div class="pill warm">Finished</div>`:"";
-
       return `
         <div class="card">
           <div class="row">
@@ -669,42 +619,51 @@ function startApp(){
           </div>
         </div>
 
-        <div class="card">
-          <div class="hero">
-            <div class="logoMark"><span>🎯</span></div>
-            <div style="flex:1">
-              <div class="h1" style="margin:0; text-shadow:0 0 18px rgba(89,178,255,.18)">${esc(activePlayer.name)}’s Turn</div>
-              <div class="sub" style="font-weight:900">
-                Target: <span class="badge big">${esc(t==="B"?"BULL":t)}</span>
-                &nbsp;•&nbsp; Dart <b>${m.dartInTurn+1}</b>/3
+        <div class="playGrid">
+          <div class="card playCardTight">
+            <div class="hudRow">
+              <div>
+                <div class="turnName gradText">${esc(activePlayer.name)}</div>
+                <div class="turnSub">
+                  Target:
+                  <span class="badge big pulseTarget">${esc(t==="B"?"BULL":t)}</span>
+                </div>
+              </div>
+              <div style="text-align:right;min-width:160px">
+                <div class="statusPill pulseSoft">LIVE • Shanghai</div>
+                <div style="height:8px"></div>
+                <div class="dartDots" title="Darts">${dots}</div>
               </div>
             </div>
-            <div style="text-align:right">
-              <span class="kbd">Shanghai</span><br/>
-              <span class="pill">Live</span>
+
+            <div class="divider"></div>
+            <div class="boardBox" style="max-width:420px;margin:0 auto">${dartboardSVG(t)}</div>
+
+            <div class="divider"></div>
+            <div class="hitRow">
+              <button class="hitBtn pulseSoft" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
+              <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
+              <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
+              <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
+              <button class="hitBtn undo" id="undoBtn">UNDO</button>
             </div>
+
+            ${m.finished?`<div class="divider"></div><div class="pill">Finished</div>`:""}
           </div>
 
-          <div class="divider"></div>
-          <div class="boardBox">${dartboardSVG(t)}</div>
-          <div class="divider"></div>
+          <div class="card playCardTight">
+            <details class="accordion">
+              <summary>
+                <span class="pill">Round table</span>
+                <span class="kbd">tap</span>
+              </summary>
+              <div class="accordionBody">
+                <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
+              </div>
+            </details>
 
-          <div class="hitRow">
-            <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
-            <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
-            <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
-            <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-            <button class="hitBtn undo" id="undoBtn">UNDO</button>
-          </div>
-
-          ${finishedBanner}
-        </div>
-
-        <div class="card">
-          <div class="pill purple">Round table</div>
-          <div class="divider"></div>
-          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
-            <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
+            <div class="divider"></div>
+            <div class="sub">Tip: keep the Round table collapsed during throws to avoid scrolling.</div>
           </div>
         </div>
       `;
@@ -738,7 +697,7 @@ function startApp(){
     return {initMatch, renderPlay, bindPlay};
   })();
 
-  /* Killer (same rules, but cleaner UI + per-opponent attack buttons) */
+  /* Killer */
   const KillerGame = (() => {
     const MAX_LIVES = 3;
 
@@ -809,7 +768,6 @@ function startApp(){
       const games=stats.games||{};
       const g=games.killer||{};
       const played=(g.played||0)+1;
-
       const iWon = (m.winner?.email === ctx.meUser.email);
       const wins = (g.wins||0) + (iWon?1:0);
 
@@ -821,6 +779,8 @@ function startApp(){
 
     function renderPlay(ctx){
       const m=ctx.match;
+
+      const dots = [0,1,2].map(i=>`<span class="dot ${i<=m.dartInTurn-1?'on':''}"></span>`).join("");
 
       if(m.phase==="claim"){
         const p=m.players[m.claimIndex];
@@ -838,47 +798,53 @@ function startApp(){
             </div>
           </div>
 
-          <div class="card killerTurn">
-            <div class="pill">Killer • Claim Numbers</div>
-            <div class="divider"></div>
-            <div class="turnName">${esc(p.name)}</div>
-            <div class="sub">Opposite-hand throw — pick the number you hit.</div>
+          <div class="card playCardTight">
+            <div class="hudRow">
+              <div>
+                <div class="turnName gradText">${esc(p.name)}</div>
+                <div class="turnSub">Opposite-hand throw — choose the number you hit.</div>
+              </div>
+              <div style="text-align:right;min-width:160px">
+                <div class="statusPill pulseSoft">LIVE • Killer</div>
+                <div style="height:8px"></div>
+                <div class="dartDots">${dots}</div>
+              </div>
+            </div>
+
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
-            <button class="btn ok" id="saveClaim" style="width:100%">Save & Next</button>
+            <button class="btn ok pulseSoft" id="saveClaim" style="width:100%">Save & Next</button>
           </div>
         `;
       }
 
       const active=m.players[m.turnIndex];
-      const lifeTxt = active.out ? "OUT" : "❤".repeat(active.lives);
-      const youNum = (active.number==null) ? "?" : active.number;
+      const isKiller = !!active.killer;
 
-      const statusTop = m.finished
-        ? `<span class="pill warm">🏆 Winner: ${esc(m.winner?.name||"")}</span>`
-        : `<span class="pill">Live</span> <span class="pill purple">${active.killer?"🔥 Killer":"Not a killer yet"}</span> <span class="pill warm">Dart ${m.dartInTurn+1}/3</span>`;
+      const statusPill =
+        m.finished ? `<span class="statusPill pulseSoft">FINISHED</span>` :
+        isKiller ? `<span class="statusPill killer pulseSoft">🔥 KILLER</span>` :
+                   `<span class="statusPill vulnerable pulseSoft">— NOT KILLER YET</span>`;
 
-      const opponents = m.players.filter(p=>!p.out && p.email!==active.email);
-      const oppButtons = opponents.map(p=>`
-        <button class="btn attackBtn" data-attack="${esc(p.email)}" ${(!active.killer||m.finished)?"disabled":""}>
-          ATTACK ${esc(p.name)} (D${esc(p.number??"?")})
-        </button>
-      `).join("");
+      const opps = m.players
+        .map((p,idx)=>({p,idx}))
+        .filter(x=>!x.p.out && x.p.email!==active.email);
+
+      const attackButtons = opps.map(x=>{
+        const label = `${x.p.name} (${x.p.number ?? "?"})`;
+        const disabled = (!isKiller || x.p.number==null) ? "disabled" : "";
+        return `<button class="hitBtn ${isKiller?'pulseSoft':''}" data-attack="${esc(String(x.idx))}" ${disabled}>ATTACK ${esc(label)}</button>`;
+      }).join("");
 
       const rows = m.players.map(p=>{
-        const hearts = p.out ? "OUT" : "❤".repeat(p.lives);
+        const lifeTxt = p.out ? "OUT" : "❤".repeat(p.lives);
         return `
-          <div class="playerPill ${p.out?"out":""}">
-            <div>
-              <div class="name">${esc(p.name)} ${p.killer?"🔥":""}</div>
-              <div class="sub" style="margin-top:2px">${p.out?"Out":"In"}</div>
-            </div>
-            <div style="text-align:right">
-              <div class="num">${esc(p.number??"?")}</div>
-              <div class="bigHearts" style="margin-top:6px">${esc(hearts)}</div>
-            </div>
-          </div>
+          <tr>
+            <td class="l">${esc(p.name)} <span class="badge big">${esc(p.number??"?")}</span></td>
+            <td>${p.killer?"🔥":""}</td>
+            <td style="font-size:18px;font-weight:1000">${esc(lifeTxt)}</td>
+          </tr>
         `;
       }).join("");
 
@@ -890,40 +856,55 @@ function startApp(){
           </div>
         </div>
 
-        <div class="card killerTurn">
-          <div class="hero">
-            <div class="logoMark"><span>🔥</span></div>
-            <div style="flex:1">
-              <div class="turnName">${esc(active.name)}</div>
-              <div class="turnMeta">Your number: <span class="badge big">D${esc(youNum)}</span> • Lives: <span class="bigHearts">${esc(lifeTxt)}</span></div>
+        <div class="playGrid">
+          <div class="card playCardTight">
+            <div class="hudRow">
+              <div>
+                <div class="turnName gradText">${esc(active.name)}</div>
+                <div class="turnSub">
+                  Your number: <span class="badge big">${esc(active.number ?? "?")}</span>
+                  &nbsp;•&nbsp; ${statusPill}
+                </div>
+              </div>
+              <div style="text-align:right;min-width:160px">
+                <div class="statusPill pulseSoft">LIVE • Killer</div>
+                <div style="height:8px"></div>
+                <div class="dartDots" title="Darts">${dots}</div>
+              </div>
             </div>
-            <div style="text-align:right">${statusTop}</div>
+
+            <div class="divider"></div>
+
+            <div class="hitRow">
+              <button class="hitBtn pulseSoft" id="myDouble" ${m.finished?"disabled":""}>MY DOUBLE</button>
+              <button class="hitBtn miss" id="miss" ${m.finished?"disabled":""}>MISS</button>
+            </div>
+
+            <div class="divider"></div>
+            <div class="sub" style="font-weight:900;color:var(--muted)">Attack (hit their double):</div>
+            <div class="hitRow" id="attackRow">
+              ${attackButtons || `<div class="sub">No valid opponents.</div>`}
+            </div>
+
+            ${m.finished ? `<div class="divider"></div><div class="pill">Winner: ${esc(m.winner?.name||"")}</div>` : ``}
           </div>
 
-          ${m.finished ? `<div class="divider"></div><div class="pill warm">Finished</div>` : `
-            <div class="divider"></div>
-            <div class="hitRow">
-              <button class="hitBtn" id="myDouble">MY DOUBLE</button>
-              <button class="hitBtn miss" id="miss">MISS</button>
-            </div>
-
-            <div class="divider"></div>
-            <div class="killerGrid">
-              <div>
-                <div class="pill warm">Attack buttons</div>
-                <div class="sub" style="margin-top:6px">
-                  ${active.killer ? "Tap who you hit (double) to remove 1 heart." : "Hit your double first to become a killer."}
-                </div>
-                <div class="divider"></div>
-                <div class="stack">${oppButtons || `<div class="sub">No opponents left.</div>`}</div>
+          <div class="card playCardTight">
+            <details class="accordion" open>
+              <summary>
+                <span class="pill">Players</span>
+                <span class="kbd">tap</span>
+              </summary>
+              <div class="accordionBody">
+                <table>
+                  <thead><tr><th>Player</th><th>K</th><th>Lives</th></tr></thead>
+                  <tbody>${rows}</tbody>
+                </table>
               </div>
-              <div>
-                <div class="pill purple">Players</div>
-                <div class="divider"></div>
-                <div class="stack">${rows}</div>
-              </div>
-            </div>
-          `}
+            </details>
+            <div class="divider"></div>
+            <div class="sub">Tip: “MY DOUBLE” makes you a Killer; after that it heals you (up to 3 hearts).</div>
+          </div>
         </div>
       `;
     }
@@ -993,29 +974,30 @@ function startApp(){
         }
       }
 
-      const missBtn=document.getElementById("miss");
-      if(missBtn) missBtn.onclick=()=>endDart();
+      document.getElementById("miss").onclick=()=>endDart();
 
-      const myDoubleBtn=document.getElementById("myDouble");
-      if(myDoubleBtn) myDoubleBtn.onclick=()=>{
+      document.getElementById("myDouble").onclick=()=>{
         const me=m.players[m.turnIndex];
         if(me.number==null) return;
+
         if(!me.killer) me.killer=true;
         else me.lives = Math.min(MAX_LIVES, me.lives+1);
         endDart();
       };
 
-      // Per-opponent attack buttons
-      document.querySelectorAll("button[data-attack]").forEach(btn=>{
+      // attack buttons per opponent
+      document.querySelectorAll("[data-attack]").forEach(btn=>{
         btn.onclick=()=>{
           const me=m.players[m.turnIndex];
-          if(!me.killer) return; // UI already explains
-          const victimEmail=btn.getAttribute("data-attack");
-          const victim=m.players.find(p=>p.email===victimEmail && !p.out);
-          if(victim && victim.email!==me.email){
-            victim.lives -= 1;
-            if(victim.lives<=0) victim.out=true;
-          }
+          if(!me.killer) return;
+
+          const idx=parseInt(btn.getAttribute("data-attack"),10);
+          const victim=m.players[idx];
+          if(!victim || victim.out || victim.email===me.email) return;
+
+          victim.lives -= 1;
+          if(victim.lives<=0) victim.out=true;
+
           endDart();
         };
       });
@@ -1052,22 +1034,19 @@ function startApp(){
 
     html += `
       <div class="card" style="text-align:center">
-        <div class="hero" style="justify-content:center">
-          <div class="logoMark"><span>🎯</span></div>
-          <div style="text-align:left">
-            <div class="h1" style="margin:0;text-shadow:0 0 18px rgba(89,178,255,.18), 0 0 16px rgba(168,85,247,.10)">The Dart Room</div>
-            <div class="sub" style="font-weight:900; color:rgba(233,243,255,.85)">presents <span style="color:#cfeaff;text-shadow:0 0 14px rgba(89,178,255,.12)">Game Night</span></div>
-          </div>
-        </div>
+        <div class="h1 gradText" style="margin:0">The Dart Room</div>
+        <div class="sub" style="margin-top:6px">presents</div>
+        <div class="h1" style="margin:8px 0 0">Game Night</div>
+        <div class="sub" style="margin-top:6px">Designed & Developed by Steve’s Graphic Designs</div>
         <div class="divider"></div>
-        <div class="sub">Designed & Developed by Steve’s Graphic Designs</div>
+        <div class="sub">Sign in with your email. Your stats and history stay with your account.</div>
       </div>
 
       <div class="card">
         <label>Email</label>
         <div class="stack">
           <input id="inEmail" type="email" placeholder="you@email.com" autocomplete="email"/>
-          <button class="btn ok" id="goBtn">Enter the Room</button>
+          <button class="btn ok pulseSoft" id="goBtn">Enter the Room</button>
         </div>
       </div>
     `;
@@ -1109,7 +1088,7 @@ function startApp(){
         <label>Name</label>
         <div class="stack">
           <input id="upName" type="text" placeholder="Your Name" autocomplete="name"/>
-          <button class="btn ok" id="createBtn">Create</button>
+          <button class="btn ok pulseSoft" id="createBtn">Create</button>
           <button class="btn ghost" id="backBtn">Back</button>
         </div>
       </div>
@@ -1134,12 +1113,12 @@ function startApp(){
     const myStats=await getStatsDoc(meUser.email);
     const sh=(myStats.games||{}).shanghai||{};
     const ki=(myStats.games||{}).killer||{};
-    const quickLine = `Shanghai • Played: ${sh.played||0} • Best: ${sh.best||0}  |  Killer • Played: ${ki.played||0} • Wins: ${ki.wins||0}`;
+    const quickLine = `Shanghai • Played: ${sh.played||0} • Best: ${sh.best||0}   |   Killer • Played: ${ki.played||0} • Wins: ${ki.wins||0}`;
 
     const gameCards = Games.map(g=>{
       const soon=!g.active;
       return `
-        <div class="gameCard ${soon?"":"leaderGlow"}" style="${soon?"animation:none":""}">
+        <div class="gameCard ${soon?"":"pulseSoft"}" style="${soon?"animation:none":""}">
           <div class="gameHead">
             <div class="gameTitle">
               <div class="gameIcon">${esc(g.icon||"🎯")}</div>
@@ -1178,7 +1157,7 @@ function startApp(){
         <div class="hero">
           <div class="logoMark"><span>👤</span></div>
           <div style="flex:1">
-            <div class="h1">${esc(meUser.name||"Player")}</div>
+            <div class="h1 gradText" style="margin:0">${esc(meUser.name||"Player")}</div>
             <div class="sub">${esc(meUser.email)} • <span class="kbd">${esc(quickLine)}</span></div>
           </div>
           <div style="text-align:right">
@@ -1285,7 +1264,7 @@ function startApp(){
             ${players.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("")}
           </select>
 
-          <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
+          <button class="btn ok pulseSoft" id="startMatchBtn" disabled>Start Match</button>
           <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
         </div>
       </div>
