@@ -2,108 +2,126 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" />
-<title>Game Night | The Dart Room</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Game Night</title>
 
 <style>
 :root{
-  /* Core */
-  --bg0:#050a12;
-  --bg1:#071423;
-  --bg2:#0b1a2e;
-
+  /* Core palette */
+  --bg:#070b14;
+  --bg2:#0a1224;
   --text:#eaf2ff;
-  --muted:#9fb2cf;
+  --muted:#b9cbe5;
 
-  /* “Dart Room” accent set (blue + warm gold) */
-  --accent:#59b2ff;
-  --accent2:#ffb54a;         /* warm highlight */
-  --accentGlow:rgba(89,178,255,.32);
-  --goldGlow:rgba(255,181,74,.22);
+  /* Theme accents (NOT “all blue”) */
+  --accent:#59b2ff;          /* electric blue */
+  --accent2:#a855f7;         /* neon purple */
+  --warm:#ffb14a;            /* warm amber highlight */
 
   --danger:#ff4d5a;
-  --success:#2bd576;
+  --ok:#2bd576;
 
-  --glass:rgba(255,255,255,.07);
-  --glass2:rgba(255,255,255,.03);
-  --glassBorder:rgba(255,255,255,.12);
+  --shadow: rgba(0,0,0,.35);
+  --glass: rgba(255,255,255,.07);
+  --glass2: rgba(255,255,255,.03);
+  --border: rgba(255,255,255,.12);
 
-  --shadow: 0 18px 45px rgba(0,0,0,.35);
-  --shadow2: 0 10px 30px rgba(0,0,0,.28);
-
-  --topbarH: 66px;
+  --glowB: rgba(89,178,255,.35);
+  --glowP: rgba(168,85,247,.26);
+  --glowW: rgba(255,177,74,.18);
 }
 
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:var(--bg0);overflow-x:hidden}
+*{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
 body{
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   color:var(--text);
+
+  /* Rich themed background (blue + purple + warm) */
   background:
-    radial-gradient(1200px 700px at 50% 0%, #1a4b8c 0%, var(--bg2) 68%),
-    radial-gradient(900px 520px at 80% 20%, rgba(255,181,74,.16) 0%, rgba(0,0,0,0) 60%),
-    linear-gradient(180deg,var(--bg1),var(--bg0));
-  background-attachment: fixed;
+    radial-gradient(900px 520px at 18% 8%, rgba(89,178,255,.25) 0%, rgba(7,11,20,0) 60%),
+    radial-gradient(820px 520px at 84% 12%, rgba(168,85,247,.22) 0%, rgba(7,11,20,0) 62%),
+    radial-gradient(900px 520px at 55% 100%, rgba(255,177,74,.10) 0%, rgba(7,11,20,0) 60%),
+    radial-gradient(1200px 700px at 50% -10%, #0f2f63 0%, #070b14 60%),
+    linear-gradient(180deg, #070b14, #04060c);
+  overflow-x:hidden;
 }
 
-/* Subtle texture overlay */
-body::before{
-  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+/* Subtle texture overlay (arcade feel without images) */
+body:before{
+  content:"";
+  position:fixed; inset:0;
+  pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E");
+  opacity:.09;
+  mix-blend-mode:overlay;
 }
 
-/* Topbar */
 .topbar{
-  position:sticky; top:0; z-index:50;
-  height:var(--topbarH);
-  display:flex; align-items:center; justify-content:space-between;
-  gap:12px;
-  padding:14px 16px;
-  background:rgba(5,13,24,.80);
-  backdrop-filter: blur(18px);
-  border-bottom:1px solid var(--glassBorder);
-  box-shadow: 0 6px 26px rgba(0,0,0,.35);
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 14px;
+  background:rgba(6,10,18,.74);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.10);
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
 }
 .brand{display:flex;flex-direction:column;line-height:1.05}
 .brand .t{
-  font-weight:1000; font-size:18px; letter-spacing:-.6px;
-  text-shadow: 0 0 16px var(--accentGlow);
+  font-weight:1000;font-size:16px;
+  letter-spacing:-.3px;
+  text-shadow:
+    0 0 16px var(--glowB),
+    0 0 24px rgba(168,85,247,.16),
+    0 0 36px rgba(255,177,74,.08);
 }
 .brand .s{
-  font-size:10px; letter-spacing:1px; text-transform:uppercase;
-  color:var(--muted); font-weight:800;
-}
-.wrap{
-  max-width:980px; margin:0 auto;
-  padding:14px;
-  position:relative; z-index:1;
+  font-size:11px;
+  color:rgba(233,243,255,.78);
 }
 
-/* Layout helpers */
-.row{display:flex; gap:10px; align-items:center}
-.row>*{flex:1}
-.stack{display:flex; flex-direction:column; gap:10px}
-.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+.btn{
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08);
+  color:var(--text);
+  border-radius:14px;
+  padding:10px 12px;
+  font-weight:900;
+  cursor:pointer;
+  transition: transform .06s ease, filter .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.btn:hover{filter:brightness(1.08); border-color: rgba(89,178,255,.28); box-shadow:0 10px 22px rgba(0,0,0,.25);}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
+.btn.ok{
+  background:
+    linear-gradient(180deg, rgba(89,178,255,.95), rgba(89,178,255,.70));
+  color:#06101f;border-color:transparent;
+  box-shadow:
+    0 12px 26px rgba(89,178,255,.22),
+    0 0 18px rgba(89,178,255,.16);
+}
+.btn.danger{background:rgba(255,77,90,.18);border-color:rgba(255,77,90,.35)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-/* Cards */
+.wrap{max-width:980px;margin:0 auto;padding:14px; position:relative; z-index:1}
+
 .card{
-  background: linear-gradient(180deg, var(--glass), var(--glass2));
-  border:1px solid var(--glassBorder);
-  border-radius:22px;
+  background:linear-gradient(180deg,var(--glass),var(--glass2));
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
   padding:14px;
-  box-shadow: var(--shadow2);
+  box-shadow:0 16px 34px rgba(0,0,0,.35);
   margin-bottom:12px;
 }
-.h1{font-size:22px;font-weight:1000;margin:0 0 6px;letter-spacing:-.5px}
-.sub{color:var(--muted);font-size:13px;font-weight:650}
-label{display:block;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
 
-/* Inputs */
+.h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
+.sub{color:var(--muted);font-size:13px}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
 input,select{
   width:100%;
-  background: rgba(0,0,0,.35);
-  border:1px solid var(--glassBorder);
+  background:rgba(10,20,35,.55);
+  border:1px solid rgba(255,255,255,.14);
   color:var(--text);
   border-radius:14px;
   padding:12px 12px;
@@ -111,94 +129,80 @@ input,select{
   outline:none;
 }
 input:focus,select:focus{
-  border-color: rgba(89,178,255,.65);
-  box-shadow: 0 0 0 4px rgba(89,178,255,.12), 0 0 18px var(--accentGlow);
+  border-color: rgba(89,178,255,.42);
+  box-shadow:0 0 0 3px rgba(89,178,255,.12);
 }
+.row{display:flex;gap:10px}
+.row>*{flex:1}
+.stack{display:flex;flex-direction:column;gap:10px}
 
-/* Buttons (more 3D) */
-.btn{
-  border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.08);
-  color:var(--text);
-  border-radius:16px;
-  padding:12px 14px;
-  font-weight:1000;
-  cursor:pointer;
-  box-shadow: 0 10px 18px rgba(0,0,0,.26);
-  transition: transform .08s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
-}
-.btn:active{transform:translateY(1px) scale(.99)}
-.btn.ghost{
-  background: transparent;
-  box-shadow:none;
-  color:var(--muted);
-}
-.btn.ok{
-  background: linear-gradient(180deg, rgba(89,178,255,.95), rgba(89,178,255,.70));
-  color:#06101d;
-  border:none;
-  box-shadow: 0 10px 22px var(--accentGlow);
-}
-.btn.danger{
-  background: rgba(255,77,90,.16);
-  border-color: rgba(255,77,90,.30);
+.toast{
+  background:rgba(255,77,90,.12);
+  border:1px solid rgba(255,77,90,.30);
   color:#ffd6da;
+  border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
 }
-.btn.small{
-  padding:8px 10px;
-  border-radius:14px;
-  font-size:12px;
-}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-/* Pills / badges */
 .pill{
   display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
+  padding:6px 10px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
-  background: rgba(89,178,255,.10);
-  color: var(--accent);
-  font-weight:1000;
-  font-size:11px;
-  letter-spacing:.8px;
-  text-transform:uppercase;
+  background:rgba(89,178,255,.10);
+  color:#cfeaff;
+  font-weight:1000;font-size:12px;
+  box-shadow:0 0 18px rgba(89,178,255,.10);
 }
-.pill.gold{background: rgba(255,181,74,.12); color: var(--accent2); border-color: rgba(255,181,74,.20)}
-.badge{
-  display:inline-block;
-  padding:6px 10px;
-  border-radius:999px;
+.pill.purple{background:rgba(168,85,247,.12); color:#edd8ff; box-shadow:0 0 18px rgba(168,85,247,.10);}
+.pill.warm{background:rgba(255,177,74,.14); color:#ffe7c6; box-shadow:0 0 18px rgba(255,177,74,.10);}
+.pill.soon{background:rgba(255,255,255,.06); color:var(--muted)}
+
+.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+
+/* Cinematic bits */
+.hero{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.logoMark{
+  width:44px;height:44px;border-radius:14px;
+  background:
+    radial-gradient(60% 60% at 30% 20%, rgba(89,178,255,.50), rgba(255,255,255,.06)),
+    radial-gradient(70% 60% at 80% 20%, rgba(168,85,247,.26), rgba(255,255,255,0)),
+    radial-gradient(70% 60% at 50% 95%, rgba(255,177,74,.12), rgba(255,255,255,0));
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.35),
+    0 0 18px rgba(89,178,255,.12),
+    0 0 14px rgba(168,85,247,.10);
+  flex:0 0 auto;
+}
+.logoMark span{font-size:20px}
+.kbd{
+  display:inline-block;padding:2px 8px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  font-size:14px;
-  font-weight:1000;
+  background:rgba(255,255,255,.06);
+  color:var(--muted); font-weight:900; font-size:12px;
 }
 
-/* Home game grid */
+/* Game cards */
 .gameGrid{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:860px){ .gameGrid{grid-template-columns:1fr 1fr;} }
 .gameCard{
-  background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius:22px;
-  padding:14px;
-  box-shadow: var(--shadow2);
-  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;padding:14px;
+  box-shadow:0 14px 30px rgba(0,0,0,.30);
 }
-.gameCard:hover{transform: translateY(-2px); border-color: rgba(89,178,255,.35); box-shadow: var(--shadow)}
-.gameHead{display:flex; align-items:center; justify-content:space-between; gap:10px}
-.gameTitle{display:flex; align-items:center; gap:10px}
+.gameHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gameTitle{display:flex;align-items:center;gap:10px}
 .gameIcon{
-  width:42px; height:42px; border-radius:16px;
+  width:38px;height:38px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
-  background: radial-gradient(65% 65% at 30% 20%, rgba(255,181,74,.18), rgba(255,255,255,.05));
-  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:center;
   font-size:18px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  box-shadow:0 0 18px rgba(89,178,255,.08);
 }
 .gameMeta{color:var(--muted);font-size:13px;margin-top:4px}
-.gameActions{display:flex;gap:10px;margin-top:12px}
+.gameActions{display:flex;gap:10px;margin-top:10px}
 .gameActions .btn{flex:1}
 
 /* Roster */
@@ -206,130 +210,129 @@ input:focus,select:focus{
 @media(min-width:860px){ .rosterGrid{grid-template-columns:1fr 1fr;} }
 .rosterCard{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:12px;border-radius:18px;
+  padding:12px 12px;border-radius:16px;
   border:1px solid rgba(255,255,255,.10);
-  background: rgba(255,255,255,.04);
+  background:rgba(255,255,255,.04);
 }
 .rosterLeft{display:flex;align-items:center;gap:10px}
 .avatar{
-  width:38px;height:38px;border-radius:16px;
+  width:34px;height:34px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
-  background: rgba(89,178,255,.10);
+  background:rgba(89,178,255,.12);
   display:flex;align-items:center;justify-content:center;
-  font-weight:1000;color:var(--accent);
+  font-weight:1000;color:#cfeaff;
 }
 .rosterName{font-weight:1000}
 .rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
 
-/* Tables */
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.10);vertical-align:top}
-th{position:sticky;top:0;background:rgba(5,13,24,.85);backdrop-filter:blur(12px)}
-td.l{font-weight:1000}
-.small{font-size:12px;color:var(--muted);margin-top:4px}
-.activeCell{outline:2px solid rgba(89,178,255,.55); outline-offset:-2px; border-radius:10px}
+/* Leader glow */
+@keyframes leaderGlow{0%{box-shadow:0 0 0 rgba(89,178,255,0)}50%{box-shadow:0 0 34px rgba(89,178,255,.20)}100%{box-shadow:0 0 0 rgba(89,178,255,0)}}
+.leaderGlow{animation:leaderGlow 1.2s ease-in-out infinite;}
 
-/* Hit buttons */
-.hitRow{display:flex; gap:10px; flex-wrap:wrap}
+/* Play UI */
+.boardBox{display:flex;justify-content:center;align-items:center}
+.hitRow{display:flex;gap:10px;flex-wrap:wrap}
 .hitBtn{
   flex:1; min-width:120px;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.14);
-  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+  border-radius:16px;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.08);
   color:var(--text);
   font-weight:1000;
-  padding:14px 12px;
-  box-shadow: 0 10px 18px rgba(0,0,0,.24);
-  cursor:pointer;
-  transition: transform .08s ease, border-color .18s ease, background .18s ease;
+  padding:12px;
+  box-shadow:0 10px 20px rgba(0,0,0,.18);
 }
-.hitBtn:active{transform:translateY(1px)}
-.hitBtn:hover{border-color: rgba(89,178,255,.35)}
-.hitBtn.miss{border-color: rgba(255,77,90,.35); background: rgba(255,77,90,.16); color:#ffd6da}
-.hitBtn.undo{border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.06); color:var(--muted)}
+.hitBtn:hover{filter:brightness(1.10); border-color: rgba(89,178,255,.28);}
+.hitBtn.miss{border-color:rgba(255,77,90,.35);background:rgba(255,77,90,.16)}
+.hitBtn.undo{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:var(--muted)}
 
-/* Target pulse on dartboard overlay */
-@keyframes hotPulse{0%{opacity:.18;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.4)}100%{opacity:.18;filter:brightness(1)}}
-.hotWedge{animation:hotPulse .9s ease-in-out infinite;}
-
-/* ===== Play screens: fit on ONE screen ===== */
-.playShell{
-  height: calc(100vh - var(--topbarH) - 24px);
-  display:grid;
-  grid-template-columns: 1.05fr .95fr;
-  gap:12px;
-}
-@media(max-width:860px){
-  .playShell{
-    grid-template-columns: 1fr;
-    height: auto; /* on very small screens, keep everything visible; we’ll compact inside cards */
-  }
-}
-.playCol{
-  display:flex; flex-direction:column; gap:12px;
-  min-height:0;
-}
-.playCard{
-  margin-bottom:0;
-  min-height:0;
-}
-.playMain{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-}
-.playScroll{
-  overflow:auto;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.10);
-  background: rgba(0,0,0,.18);
-}
-.boardBox{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:4px 0;
-}
-.turnBanner{
-  border:1px solid rgba(255,181,74,.22);
-  background: linear-gradient(180deg, rgba(255,181,74,.16), rgba(255,255,255,.03));
-  box-shadow: 0 10px 18px rgba(0,0,0,.18), 0 0 24px var(--goldGlow);
-}
-
-/* Make assigned numbers BIG */
-.bigNum{
-  font-size:18px;
-  font-weight:1000;
-  color: var(--accent2);
-  text-shadow: 0 0 14px rgba(255,181,74,.22);
-}
-
-/* Toast */
-.toast{
-  background:rgba(255,77,90,.12);
-  border:1px solid rgba(255,77,90,.30);
-  color:#ffd6da;
-  border-radius:14px;padding:10px 12px;font-weight:1000;margin-bottom:12px;
-}
-
-/* Hero mark */
-.hero{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logoMark{
-  width:44px;height:44px;border-radius:16px;
-  background: radial-gradient(60% 60% at 30% 20%, rgba(255,181,74,.20), rgba(255,255,255,.06));
-  border:1px solid rgba(255,255,255,.12);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow: 0 12px 26px rgba(0,0,0,.28);
-  flex:0 0 auto;
-}
-.logoMark span{font-size:20px}
-.kbd{
-  display:inline-block;padding:3px 8px;border-radius:999px;
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.10);vertical-align:top}
+th{position:sticky;top:0;background:rgba(6,10,18,.85);backdrop-filter:blur(10px)}
+td.l{font-weight:900}
+.small{font-size:12px;color:var(--muted);margin-top:4px}
+.badge{
+  display:inline-block;padding:5px 10px;border-radius:999px;
   border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.06);
-  color:var(--muted); font-weight:1000; font-size:12px;
+  font-size:13px;font-weight:1100;
+  box-shadow:0 0 14px rgba(89,178,255,.06);
 }
+.badge.big{
+  font-size:16px;
+  padding:8px 14px;
+  background:rgba(255,177,74,.10);
+  border-color:rgba(255,177,74,.22);
+  box-shadow:0 0 18px rgba(255,177,74,.10);
+}
+
+.activeCell{outline:2px solid rgba(89,178,255,.45); outline-offset:-2px; border-radius:10px}
+
+/* Active target pulse on the board */
+@keyframes hotPulse{0%{opacity:.25;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.4)}100%{opacity:.25;filter:brightness(1)}}
+.hotWedge{animation:hotPulse .85s ease-in-out infinite;}
+
+/* ===== BIG, SIMPLE Killer layout ===== */
+.killerGrid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+}
+@media(min-width:860px){
+  .killerGrid{ grid-template-columns: 1.15fr .85fr; }
+}
+.killerTurn{
+  border:1px solid rgba(89,178,255,.18);
+  background:
+    radial-gradient(700px 260px at 20% 0%, rgba(89,178,255,.16), rgba(255,255,255,0)),
+    radial-gradient(700px 260px at 80% 0%, rgba(168,85,247,.12), rgba(255,255,255,0)),
+    radial-gradient(700px 260px at 55% 100%, rgba(255,177,74,.08), rgba(255,255,255,0)),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  box-shadow:0 18px 34px rgba(0,0,0,.35), 0 0 22px rgba(89,178,255,.08);
+}
+.turnName{
+  font-size:30px;
+  font-weight:1100;
+  letter-spacing:-.8px;
+  margin:0;
+  text-shadow:0 0 18px rgba(89,178,255,.20);
+}
+.turnMeta{
+  margin-top:6px;
+  font-weight:1000;
+  color:rgba(233,243,255,.86);
+}
+.bigHearts{
+  font-size:24px;
+  letter-spacing:2px;
+  text-shadow:0 0 12px rgba(255,77,90,.18);
+}
+.playerPill{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);
+}
+.playerPill .name{font-weight:1100; font-size:16px}
+.playerPill .num{
+  font-size:20px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(89,178,255,.10);
+  box-shadow:0 0 18px rgba(89,178,255,.10);
+}
+.playerPill.out{opacity:.55; filter:grayscale(40%);}
+
+.attackBtn{
+  border:1px solid rgba(255,177,74,.22);
+  background:rgba(255,177,74,.10);
+  box-shadow:0 0 18px rgba(255,177,74,.10);
+}
+.attackBtn:hover{border-color: rgba(255,177,74,.40); filter:brightness(1.08);}
 </style>
 </head>
 
@@ -350,7 +353,6 @@ td.l{font-weight:1000}
 </div>
 
 <script>
-/* ========= Robust script loader ========= */
 function loadScript(src){
   return new Promise((resolve,reject)=>{
     const s=document.createElement("script");
@@ -374,7 +376,7 @@ function showFatal(title,msg){
   appEl.innerHTML=`
     <div class="card">
       <div class="hero">
-        <div class="logoMark"><span>⚠️</span></div>
+        <div class="logoMark"><span>⚠</span></div>
         <div style="flex:1">
           <div class="h1">${esc(title)}</div>
           <div class="sub" style="white-space:pre-wrap">${esc(msg)}</div>
@@ -386,128 +388,13 @@ function showFatal(title,msg){
         <button class="btn ghost" id="reloadBtn">Hard Reload</button>
       </div>
       <div class="divider"></div>
-      <div class="sub">If you’re on Safari, make sure content blockers aren’t blocking Google scripts.</div>
+      <div class="sub">If you’re on iPhone/Safari, make sure content blockers aren’t blocking Google scripts.</div>
     </div>
   `;
   document.getElementById("retryBtn").onclick=()=>boot();
   document.getElementById("reloadBtn").onclick=()=>location.reload(true);
 }
 
-/* ======= SVG dartboard (same logic as your working build) ======= */
-const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
-function polar(cx,cy,r,deg){
-  const rad=(deg-90)*Math.PI/180;
-  return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
-}
-function arcWedgePath(cx,cy,r0,r1,a0,a1){
-  const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1);
-  const p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
-  const large=(a1-a0)>180?1:0;
-  const f=n=>(Math.round(n*1000)/1000).toFixed(3);
-  return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
-}
-function dartboardSVG(activeTarget){
-  const cx=100,cy=100;
-  const outer=80, rDoubleOuter=74, rDoubleInner=66, rTripleOuter=48, rTripleInner=40, rSingleInner=12;
-  const seg=360/20;
-  const rot=-seg/2;
-
-  let activeOverlay="";
-  if(typeof activeTarget==="number"){
-    const idx=BOARD_NUMS.indexOf(activeTarget);
-    if(idx>=0){
-      const a0=idx*seg+rot+1.0;
-      const a1=(idx+1)*seg+rot-1.0;
-      const halo=arcWedgePath(cx,cy,rTripleOuter+8,rDoubleInner-8,a0,a1);
-      const core=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
-      activeOverlay+=`
-        <path class="hotWedge" d="${halo}" fill="rgba(255,181,74,.35)" stroke="rgba(255,181,74,.95)" stroke-width="3.8" filter="url(#glow)"/>
-        <path class="hotWedge" d="${core}" fill="rgba(89,178,255,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.8" filter="url(#glow)"/>
-      `;
-    }
-  }
-  if(activeTarget==="B"){
-    activeOverlay+=`
-      <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(255,181,74,.25)" stroke="rgba(255,181,74,.98)" stroke-width="3.0" filter="url(#glow)"/>
-      <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(89,178,255,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
-    `;
-  }
-
-  function ringWedges(r0,r1,fillA,fillB){
-    let out="";
-    for(let i=0;i<20;i++){
-      const a0=i*seg+rot+0.8;
-      const a1=(i+1)*seg+rot-0.8;
-      out+=`<path d="${arcWedgePath(cx,cy,r0,r1,a0,a1)}" fill="${i%2===0?fillA:fillB}" opacity="0.95"/>`;
-    }
-    return out;
-  }
-
-  let numText="";
-  for(let i=0;i<20;i++){
-    const ang=i*seg+rot+seg/2;
-    const p=polar(cx,cy,90,ang);
-    numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
-  }
-
-  /* Responsive sizing: smaller on narrow screens */
-  const w = (window.innerWidth<=420) ? "240" : "280";
-
-  return `<svg viewBox="0 0 200 200" width="${w}">
-    <defs>
-      <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
-        <stop offset="0%" stop-color="#203a62"/>
-        <stop offset="55%" stop-color="#0d1a2e"/>
-        <stop offset="100%" stop-color="#060d18"/>
-      </radialGradient>
-      <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="4.2" result="b"/>
-        <feColorMatrix in="b" type="matrix"
-          values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
-        <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-    <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
-    ${activeOverlay}
-    ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
-    ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
-    ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
-    ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
-    <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
-    <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
-    ${numText}
-  </svg>`;
-}
-
-/* Undo snaps (Shanghai) */
-function pushSnap(m){
-  m.snaps=m.snaps||[];
-  m.snaps.push(JSON.stringify(m));
-  if(m.snaps.length>80) m.snaps.shift();
-}
-function popSnap(m){
-  if(!m?.snaps||m.snaps.length<2) return m;
-  m.snaps.pop();
-  const prev=m.snaps.pop();
-  try{return JSON.parse(prev);}catch{return m;}
-}
-
-/* ===== Local resume (reconnect same device/browser) ===== */
-function resumeKey(email){ return "GN_RESUME_"+normEmail(email); }
-function saveResume(email, state){
-  try{ localStorage.setItem(resumeKey(email), JSON.stringify(state)); }catch{}
-}
-function loadResume(email){
-  try{
-    const raw=localStorage.getItem(resumeKey(email));
-    return raw?JSON.parse(raw):null;
-  }catch{ return null; }
-}
-function clearResume(email){
-  try{ localStorage.removeItem(resumeKey(email)); }catch{}
-}
-
-/* ========= Boot ========= */
 async function boot(){
   try{
     appEl.innerHTML=`<div class="card"><div class="h1">Loading…</div><div class="sub">Starting Game Night…</div></div>`;
@@ -580,6 +467,90 @@ function startApp(){
     return {name,email:e};
   }
 
+  /* Dartboard */
+  const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+
+  function polar(cx,cy,r,deg){
+    const rad=(deg-90)*Math.PI/180;
+    return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
+  }
+  function arcWedgePath(cx,cy,r0,r1,a0,a1){
+    const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1);
+    const p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
+    const large=(a1-a0)>180?1:0;
+    const f=n=>(Math.round(n*1000)/1000).toFixed(3);
+    return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
+  }
+  function dartboardSVG(activeTarget){
+    const cx=100,cy=100;
+    const outer=80, rDoubleOuter=74, rDoubleInner=66, rTripleOuter=48, rTripleInner=40, rSingleInner=12;
+    const seg=360/20;
+    const rot=-seg/2;
+
+    let activeOverlay="";
+    if(typeof activeTarget==="number"){
+      const idx=BOARD_NUMS.indexOf(activeTarget);
+      if(idx>=0){
+        const a0=idx*seg+rot+1.0;
+        const a1=(idx+1)*seg+rot-1.0;
+        const halo=arcWedgePath(cx,cy,rTripleOuter+8,rDoubleInner-8,a0,a1);
+        const core=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
+        activeOverlay+=`
+          <path class="hotWedge" d="${halo}" fill="rgba(255,177,74,.22)" stroke="rgba(255,177,74,.75)" stroke-width="3.8"/>
+          <path class="hotWedge" d="${core}" fill="rgba(89,178,255,.22)" stroke="rgba(89,178,255,.95)" stroke-width="2.8"/>
+        `;
+      }
+    }
+    if(activeTarget==="B"){
+      activeOverlay+=`
+        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(255,177,74,.18)" stroke="rgba(255,177,74,.78)" stroke-width="3.0"/>
+        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(89,178,255,.18)" stroke="rgba(255,255,255,.95)" stroke-width="2.6"/>
+      `;
+    }
+
+    function ringWedges(r0,r1,fillA,fillB){
+      let out="";
+      for(let i=0;i<20;i++){
+        const a0=i*seg+rot+0.8;
+        const a1=(i+1)*seg+rot-0.8;
+        out+=`<path d="${arcWedgePath(cx,cy,r0,r1,a0,a1)}" fill="${i%2===0?fillA:fillB}" opacity="0.95"/>`;
+      }
+      return out;
+    }
+
+    let numText="";
+    for(let i=0;i<20;i++){
+      const ang=i*seg+rot+seg/2;
+      const p=polar(cx,cy,90,ang);
+      numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
+    }
+
+    return `<svg viewBox="0 0 200 200" width="70%">
+      <circle cx="100" cy="100" r="${outer}" fill="#0a1326" stroke="#2a3f5f" stroke-width="2"/>
+      ${activeOverlay}
+      ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
+      ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
+      ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
+      ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
+      <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
+      <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
+      ${numText}
+    </svg>`;
+  }
+
+  /* Undo snaps (Shanghai) */
+  function pushSnap(m){
+    m.snaps=m.snaps||[];
+    m.snaps.push(JSON.stringify(m));
+    if(m.snaps.length>80) m.snaps.shift();
+  }
+  function popSnap(m){
+    if(!m?.snaps||m.snaps.length<2) return m;
+    m.snaps.pop();
+    const prev=m.snaps.pop();
+    try{return JSON.parse(prev);}catch{return m;}
+  }
+
   /* Games registry */
   const Games=[
     {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
@@ -589,25 +560,6 @@ function startApp(){
     {id:"baseball", name:"Baseball", icon:"⚾", active:false, tagline:"Coming soon"},
   ];
   const getGame=id=>Games.find(g=>g.id===id)||null;
-
-  /* Game rules (button on Home) */
-  const GameRules={
-    shanghai:[
-      "Targets go in order: 20, 19, 18, 17, 16, 15, then Bull.",
-      "Each round you throw 3 darts at the current target.",
-      "Scoring per hit: Triple = 3, Double = 2, Single = 1, Miss = 0 (not tied to board value).",
-      "After every player throws 3 darts, the game advances to the next target.",
-      "After Bull round ends, highest total points wins."
-    ],
-    killer:[
-      "First, each player claims a unique number (1–20) by hitting it with their opposite hand.",
-      "To become a Killer: hit your OWN double (MY DOUBLE).",
-      "Once you’re a Killer, you can attack by hitting an opponent’s double.",
-      "In the app: tap the opponent’s ATTACK button when you hit their double.",
-      "Each successful attack removes 1 life (❤). At 0 lives, that player is OUT.",
-      "Last player standing wins."
-    ]
-  };
 
   /* Shanghai */
   const ShanghaiGame=(()=>{
@@ -707,58 +659,52 @@ function startApp(){
         tbody+=`</tr>`;
       }
 
-      const statusLine = m.finished
-        ? `🏆 Finished • Winner: <b>${esc(m.players.slice().sort((a,b)=>b.total-a.total)[0]?.name||"")}</b>`
-        : `Target: <b class="bigNum">${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
+      const finishedBanner=m.finished?`<div class="divider"></div><div class="pill warm">Finished</div>`:"";
 
       return `
-        <div class="playShell">
-          <div class="playCol">
-            <div class="card playCard turnBanner">
-              <div class="row">
-                <button class="btn ghost" id="backToSetup">Back</button>
-                <button class="btn danger" id="resetBtn">Reset</button>
-              </div>
-              <div class="divider"></div>
-              <div class="hero">
-                <div class="logoMark"><span>🎯</span></div>
-                <div style="flex:1">
-                  <div class="h1" style="margin:0">${esc(activePlayer.name)}’s Turn</div>
-                  <div class="sub">${statusLine}</div>
-                </div>
-                <div style="text-align:right">
-                  <span class="pill gold">Shanghai</span><br/>
-                  <span class="pill">${m.finished?"Finished":"Live"}</span>
-                </div>
+        <div class="card">
+          <div class="row">
+            <button class="btn ghost" id="backToSetup">Back</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="hero">
+            <div class="logoMark"><span>🎯</span></div>
+            <div style="flex:1">
+              <div class="h1" style="margin:0; text-shadow:0 0 18px rgba(89,178,255,.18)">${esc(activePlayer.name)}’s Turn</div>
+              <div class="sub" style="font-weight:900">
+                Target: <span class="badge big">${esc(t==="B"?"BULL":t)}</span>
+                &nbsp;•&nbsp; Dart <b>${m.dartInTurn+1}</b>/3
               </div>
             </div>
-
-            <div class="card playCard playMain">
-              <div class="boardBox">${dartboardSVG(t)}</div>
-              <div class="divider"></div>
-              <div class="hitRow">
-                <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
-                <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
-                <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
-                <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-                <button class="hitBtn undo" id="undoBtn">UNDO</button>
-              </div>
+            <div style="text-align:right">
+              <span class="kbd">Shanghai</span><br/>
+              <span class="pill">Live</span>
             </div>
           </div>
 
-          <div class="playCol">
-            <div class="card playCard playMain">
-              <div class="pill">Round table</div>
-              <div class="divider"></div>
-              <div class="playScroll">
-                <table>
-                  <thead>${thead}</thead>
-                  <tbody>${tbody}</tbody>
-                </table>
-              </div>
-              <div class="divider"></div>
-              <div class="sub">Tip: The highlighted cells show the current target.</div>
-            </div>
+          <div class="divider"></div>
+          <div class="boardBox">${dartboardSVG(t)}</div>
+          <div class="divider"></div>
+
+          <div class="hitRow">
+            <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
+            <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
+            <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
+            <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
+            <button class="hitBtn undo" id="undoBtn">UNDO</button>
+          </div>
+
+          ${finishedBanner}
+        </div>
+
+        <div class="card">
+          <div class="pill purple">Round table</div>
+          <div class="divider"></div>
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+            <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
           </div>
         </div>
       `;
@@ -792,7 +738,7 @@ function startApp(){
     return {initMatch, renderPlay, bindPlay};
   })();
 
-  /* Killer */
+  /* Killer (same rules, but cleaner UI + per-opponent attack buttons) */
   const KillerGame = (() => {
     const MAX_LIVES = 3;
 
@@ -892,102 +838,92 @@ function startApp(){
             </div>
           </div>
 
-          <div class="card turnBanner">
-            <span class="pill gold">Killer • Claim Numbers</span>
+          <div class="card killerTurn">
+            <div class="pill">Killer • Claim Numbers</div>
             <div class="divider"></div>
-            <div class="h1" style="font-size:18px;margin:0">${esc(p.name)}</div>
+            <div class="turnName">${esc(p.name)}</div>
             <div class="sub">Opposite-hand throw — pick the number you hit.</div>
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
-            <button class="btn ok" id="saveClaim">Save & Next</button>
+            <button class="btn ok" id="saveClaim" style="width:100%">Save & Next</button>
           </div>
         `;
       }
 
       const active=m.players[m.turnIndex];
-      const status = m.finished
-        ? `🏆 Winner: <b>${esc(m.winner?.name||"")}</b>`
-        : `${esc(active.name)}’s turn • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?"🔥 Killer":"— Not killer yet"} • Your #: <span class="bigNum">${esc(active.number??"?")}</span>`;
+      const lifeTxt = active.out ? "OUT" : "❤".repeat(active.lives);
+      const youNum = (active.number==null) ? "?" : active.number;
 
-      const me=active;
-      const attackButtons = m.finished ? "" : (()=>{
-        if(!me.killer){
-          return `<div class="sub">You must become a Killer first: hit <b>MY DOUBLE</b>.</div>`;
-        }
-        const targets=m.players.filter(p=>!p.out && p.email!==me.email && p.number!=null);
-        if(!targets.length) return `<div class="sub">No valid targets.</div>`;
-        return `
-          <div class="sub" style="margin-bottom:8px">Tap who you hit (their double):</div>
-          <div class="hitRow">
-            ${targets.map(p=>`
-              <button class="hitBtn" data-attack="${esc(p.email)}">ATTACK ${esc(p.name)} <span class="badge" style="margin-left:6px">${esc(p.number)}</span></button>
-            `).join("")}
-          </div>
-        `;
-      })();
+      const statusTop = m.finished
+        ? `<span class="pill warm">🏆 Winner: ${esc(m.winner?.name||"")}</span>`
+        : `<span class="pill">Live</span> <span class="pill purple">${active.killer?"🔥 Killer":"Not a killer yet"}</span> <span class="pill warm">Dart ${m.dartInTurn+1}/3</span>`;
+
+      const opponents = m.players.filter(p=>!p.out && p.email!==active.email);
+      const oppButtons = opponents.map(p=>`
+        <button class="btn attackBtn" data-attack="${esc(p.email)}" ${(!active.killer||m.finished)?"disabled":""}>
+          ATTACK ${esc(p.name)} (D${esc(p.number??"?")})
+        </button>
+      `).join("");
 
       const rows = m.players.map(p=>{
-        const lifeTxt = p.out ? "OUT" : "❤".repeat(p.lives);
-        const dim = p.out ? `style="opacity:.55"` : "";
+        const hearts = p.out ? "OUT" : "❤".repeat(p.lives);
         return `
-          <tr ${dim}>
-            <td class="l">${esc(p.name)} <span class="badge">${esc(p.number??"?")}</span></td>
-            <td>${p.killer?"🔥":""}</td>
-            <td>${esc(lifeTxt)}</td>
-          </tr>
+          <div class="playerPill ${p.out?"out":""}">
+            <div>
+              <div class="name">${esc(p.name)} ${p.killer?"🔥":""}</div>
+              <div class="sub" style="margin-top:2px">${p.out?"Out":"In"}</div>
+            </div>
+            <div style="text-align:right">
+              <div class="num">${esc(p.number??"?")}</div>
+              <div class="bigHearts" style="margin-top:6px">${esc(hearts)}</div>
+            </div>
+          </div>
         `;
       }).join("");
 
       return `
-        <div class="playShell">
-          <div class="playCol">
-            <div class="card playCard turnBanner">
-              <div class="row">
-                <button class="btn ghost" id="backToSetup">Back</button>
-                <button class="btn danger" id="resetBtn">Reset</button>
-              </div>
-              <div class="divider"></div>
-              <div class="hero">
-                <div class="logoMark"><span>🔥</span></div>
-                <div style="flex:1">
-                  <div class="h1" style="margin:0">Killer</div>
-                  <div class="sub">${status}</div>
-                </div>
-                <div style="text-align:right">
-                  <span class="pill gold">${m.finished?"Finished":"Live"}</span>
-                </div>
-              </div>
+        <div class="card">
+          <div class="row">
+            <button class="btn ghost" id="backToSetup">Back</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="card killerTurn">
+          <div class="hero">
+            <div class="logoMark"><span>🔥</span></div>
+            <div style="flex:1">
+              <div class="turnName">${esc(active.name)}</div>
+              <div class="turnMeta">Your number: <span class="badge big">D${esc(youNum)}</span> • Lives: <span class="bigHearts">${esc(lifeTxt)}</span></div>
+            </div>
+            <div style="text-align:right">${statusTop}</div>
+          </div>
+
+          ${m.finished ? `<div class="divider"></div><div class="pill warm">Finished</div>` : `
+            <div class="divider"></div>
+            <div class="hitRow">
+              <button class="hitBtn" id="myDouble">MY DOUBLE</button>
+              <button class="hitBtn miss" id="miss">MISS</button>
             </div>
 
-            <div class="card playCard playMain">
-              ${m.finished ? `
-                <div class="sub">Game over.</div>
-              ` : `
-                <div class="hitRow">
-                  <button class="hitBtn" id="myDouble">MY DOUBLE</button>
-                  <button class="hitBtn miss" id="miss">MISS</button>
+            <div class="divider"></div>
+            <div class="killerGrid">
+              <div>
+                <div class="pill warm">Attack buttons</div>
+                <div class="sub" style="margin-top:6px">
+                  ${active.killer ? "Tap who you hit (double) to remove 1 heart." : "Hit your double first to become a killer."}
                 </div>
                 <div class="divider"></div>
-                ${attackButtons}
-              `}
-            </div>
-          </div>
-
-          <div class="playCol">
-            <div class="card playCard playMain">
-              <div class="pill">Players</div>
-              <div class="divider"></div>
-              <div class="playScroll">
-                <table>
-                  <thead><tr><th>Player</th><th>K</th><th>Lives</th></tr></thead>
-                  <tbody>${rows}</tbody>
-                </table>
+                <div class="stack">${oppButtons || `<div class="sub">No opponents left.</div>`}</div>
               </div>
-              <div class="divider"></div>
-              <div class="sub">Tip: Lives drop only when you tap the opponent you actually hit.</div>
+              <div>
+                <div class="pill purple">Players</div>
+                <div class="divider"></div>
+                <div class="stack">${rows}</div>
+              </div>
             </div>
-          </div>
+          `}
         </div>
       `;
     }
@@ -995,7 +931,6 @@ function startApp(){
     function bindPlay(ctx){
       const m=ctx.match;
 
-      // Back/Reset (claim + play)
       const backBtn=document.getElementById("backToSetup");
       if(backBtn){
         backBtn.onclick=()=>{
@@ -1013,7 +948,6 @@ function startApp(){
         };
       }
 
-      // Claim screen
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
         claimBtn.onclick=()=>{
@@ -1059,11 +993,11 @@ function startApp(){
         }
       }
 
-      const miss=document.getElementById("miss");
-      if(miss) miss.onclick=()=>endDart();
+      const missBtn=document.getElementById("miss");
+      if(missBtn) missBtn.onclick=()=>endDart();
 
-      const myDouble=document.getElementById("myDouble");
-      if(myDouble) myDouble.onclick=()=>{
+      const myDoubleBtn=document.getElementById("myDouble");
+      if(myDoubleBtn) myDoubleBtn.onclick=()=>{
         const me=m.players[m.turnIndex];
         if(me.number==null) return;
         if(!me.killer) me.killer=true;
@@ -1072,13 +1006,10 @@ function startApp(){
       };
 
       // Per-opponent attack buttons
-      document.querySelectorAll("[data-attack]").forEach(btn=>{
+      document.querySelectorAll("button[data-attack]").forEach(btn=>{
         btn.onclick=()=>{
           const me=m.players[m.turnIndex];
-          if(!me.killer){
-            alert("You must become a killer first (hit your double).");
-            return;
-          }
+          if(!me.killer) return; // UI already explains
           const victimEmail=btn.getAttribute("data-attack");
           const victim=m.players.find(p=>p.email===victimEmail && !p.out);
           if(victim && victim.email!==me.email){
@@ -1093,9 +1024,9 @@ function startApp(){
     return { initMatch, renderPlay, bindPlay };
   })();
 
-  /* ===== App state ===== */
+  /* App state */
   let toastMsg="";
-  let screen="auth"; // auth | signup | home | game.setup | game.play | stats | stats.game | history | rules | leaderboard
+  let screen="auth"; // auth | signup | home | game.setup | game.play | stats | stats.game | history
   let meUser=null;
   let activeGameId=null;
   let match=null;
@@ -1111,7 +1042,7 @@ function startApp(){
     return (a+(b||"")).slice(0,2) || a || "?";
   }
 
-  /* ===== Screens ===== */
+  /* Screens */
   async function renderAuth(){
     signOutBtn.style.display="none";
     brandTitle.textContent="Game Night";
@@ -1120,10 +1051,14 @@ function startApp(){
     toastMsg="";
 
     html += `
-      <div class="card turnBanner" style="text-align:center">
-        <div class="h1" style="margin:0 0 4px">The Dart Room</div>
-        <div class="sub">presents</div>
-        <div class="h1" style="margin:10px 0 0; font-size:26px">Game Night</div>
+      <div class="card" style="text-align:center">
+        <div class="hero" style="justify-content:center">
+          <div class="logoMark"><span>🎯</span></div>
+          <div style="text-align:left">
+            <div class="h1" style="margin:0;text-shadow:0 0 18px rgba(89,178,255,.18), 0 0 16px rgba(168,85,247,.10)">The Dart Room</div>
+            <div class="sub" style="font-weight:900; color:rgba(233,243,255,.85)">presents <span style="color:#cfeaff;text-shadow:0 0 14px rgba(89,178,255,.12)">Game Night</span></div>
+          </div>
+        </div>
         <div class="divider"></div>
         <div class="sub">Designed & Developed by Steve’s Graphic Designs</div>
       </div>
@@ -1146,16 +1081,6 @@ function startApp(){
       if(player){
         meUser=player;
         statsViewerEmail=meUser.email;
-
-        // Resume if a match exists on this device
-        const res=loadResume(meUser.email);
-        if(res?.match && res?.activeGameId && res?.screen==="game.play"){
-          activeGameId=res.activeGameId;
-          match=res.match;
-          screen="game.play";
-          return render();
-        }
-
         screen="home";
         return render();
       }
@@ -1207,19 +1132,14 @@ function startApp(){
 
     const players=await getPlayers();
     const myStats=await getStatsDoc(meUser.email);
-    const gamesStats=(myStats.games||{});
-    const sh=gamesStats.shanghai||{};
-    const ki=gamesStats.killer||{};
-
-    const quickLines = [
-      `Shanghai • Played: ${sh.played||0} • Best: ${sh.best||0}`,
-      `Killer • Played: ${ki.played||0} • Wins: ${ki.wins||0}`
-    ];
+    const sh=(myStats.games||{}).shanghai||{};
+    const ki=(myStats.games||{}).killer||{};
+    const quickLine = `Shanghai • Played: ${sh.played||0} • Best: ${sh.best||0}  |  Killer • Played: ${ki.played||0} • Wins: ${ki.wins||0}`;
 
     const gameCards = Games.map(g=>{
       const soon=!g.active;
       return `
-        <div class="gameCard">
+        <div class="gameCard ${soon?"":"leaderGlow"}" style="${soon?"animation:none":""}">
           <div class="gameHead">
             <div class="gameTitle">
               <div class="gameIcon">${esc(g.icon||"🎯")}</div>
@@ -1228,11 +1148,11 @@ function startApp(){
                 <div class="gameMeta">${esc(g.tagline||"")}</div>
               </div>
             </div>
-            <div>${soon?`<span class="pill">Coming soon</span>`:`<span class="pill gold">Active</span>`}</div>
+            <div>${soon?`<span class="pill soon">Coming soon</span>`:`<span class="pill">Active</span>`}</div>
           </div>
           <div class="gameActions">
             <button class="btn ok" data-play="${esc(g.id)}" ${soon?"disabled":""}>Play</button>
-            <button class="btn" data-stats="${esc(g.id)}">Stats</button>
+            <button class="btn ghost" data-stats="${esc(g.id)}">Stats</button>
           </div>
         </div>
       `;
@@ -1249,24 +1169,20 @@ function startApp(){
               <div class="rosterSub">${esc(p.email)}</div>
             </div>
           </div>
-          <button class="btn ghost small" data-view-player="${esc(p.email)}">View stats</button>
+          <button class="btn ghost" data-view-player="${esc(p.email)}">View stats</button>
         </div>
       `).join("");
 
     appEl.innerHTML=`
-      <div class="card turnBanner">
+      <div class="card">
         <div class="hero">
           <div class="logoMark"><span>👤</span></div>
           <div style="flex:1">
             <div class="h1">${esc(meUser.name||"Player")}</div>
-            <div class="sub">${esc(meUser.email)}</div>
-            <div class="sub" style="margin-top:6px">
-              <span class="kbd">${esc(quickLines[0])}</span>
-              <span class="kbd" style="margin-left:6px">${esc(quickLines[1])}</span>
-            </div>
+            <div class="sub">${esc(meUser.email)} • <span class="kbd">${esc(quickLine)}</span></div>
           </div>
           <div style="text-align:right">
-            <span class="pill gold">Signed in</span>
+            <span class="pill">Signed in</span>
           </div>
         </div>
       </div>
@@ -1274,8 +1190,6 @@ function startApp(){
       <div class="row">
         <button class="btn ghost" id="statsBtn">Stats</button>
         <button class="btn ghost" id="historyBtn">History</button>
-        <button class="btn ghost" id="rulesBtn">Game rules</button>
-        <button class="btn ghost" id="leaderBtn">Leaderboard</button>
       </div>
 
       <div class="divider"></div>
@@ -1299,8 +1213,6 @@ function startApp(){
 
     document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
     document.getElementById("historyBtn").onclick=()=>{ screen="history"; render(); };
-    document.getElementById("rulesBtn").onclick=()=>{ screen="rules"; render(); };
-    document.getElementById("leaderBtn").onclick=()=>{ screen="leaderboard"; render(); };
 
     appEl.querySelectorAll("button[data-play]").forEach(btn=>{
       btn.onclick=()=>{
@@ -1328,109 +1240,6 @@ function startApp(){
     });
   }
 
-  async function renderRules(){
-    signOutBtn.style.display="inline-block";
-    brandTitle.textContent="Game rules";
-    appEl.innerHTML=`
-      <div class="card">
-        <div class="hero">
-          <div class="logoMark"><span>📜</span></div>
-          <div style="flex:1">
-            <div class="h1">Game Rules</div>
-            <div class="sub">Quick rules so anyone can jump in and play.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="pill gold">Shanghai</div>
-        <div class="divider"></div>
-        <ul style="margin:0; padding-left:18px; color:var(--text); line-height:1.55">
-          ${GameRules.shanghai.map(x=>`<li>${esc(x)}</li>`).join("")}
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="pill gold">Killer</div>
-        <div class="divider"></div>
-        <ul style="margin:0; padding-left:18px; color:var(--text); line-height:1.55">
-          ${GameRules.killer.map(x=>`<li>${esc(x)}</li>`).join("")}
-        </ul>
-      </div>
-
-      <div class="row">
-        <button class="btn ghost" id="rulesBack">Back</button>
-      </div>
-    `;
-    document.getElementById("rulesBack").onclick=()=>{ screen="home"; render(); };
-  }
-
-  async function renderLeaderboard(){
-    signOutBtn.style.display="inline-block";
-    brandTitle.textContent="Leaderboard";
-
-    const players=await getPlayers();
-    const rows = [];
-    for(const p of players){
-      const s=await getStatsDoc(p.email);
-      const gs=(s.games||{});
-      const sh=gs.shanghai||{};
-      const ki=gs.killer||{};
-      rows.push({
-        name:p.name,
-        email:p.email,
-        shPlayed: sh.played||0,
-        shBest: sh.best||0,
-        shPoints: sh.points||0,
-        kiPlayed: ki.played||0,
-        kiWins: ki.wins||0
-      });
-    }
-    rows.sort((a,b)=> (b.shBest - a.shBest) || (b.kiWins - a.kiWins) || a.name.localeCompare(b.name));
-
-    appEl.innerHTML=`
-      <div class="card">
-        <div class="hero">
-          <div class="logoMark"><span>🏅</span></div>
-          <div style="flex:1">
-            <div class="h1">Leaderboard</div>
-            <div class="sub">Compare everyone’s stats (Shanghai + Killer).</div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="playScroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Player</th>
-                <th>Shanghai<br><span class="small">Best</span></th>
-                <th>Shanghai<br><span class="small">Played</span></th>
-                <th>Killer<br><span class="small">Wins</span></th>
-                <th>Killer<br><span class="small">Played</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map(r=>`
-                <tr>
-                  <td class="l">${esc(r.name)}<div class="small">${esc(r.email)}</div></td>
-                  <td><span class="badge">${esc(r.shBest)}</span></td>
-                  <td>${esc(r.shPlayed)}</td>
-                  <td><span class="badge">${esc(r.kiWins)}</span></td>
-                  <td>${esc(r.kiPlayed)}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="row">
-        <button class="btn ghost" id="lbBack">Back</button>
-      </div>
-    `;
-    document.getElementById("lbBack").onclick=()=>{ screen="home"; render(); };
-  }
-
   async function renderGameSetup(){
     const g=getGame(activeGameId);
     if(!g){ screen="home"; return render(); }
@@ -1445,14 +1254,14 @@ function startApp(){
     appEl.innerHTML=`
       <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
 
-      <div class="card turnBanner">
+      <div class="card">
         <div class="hero">
           <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
           <div style="flex:1">
             <div class="h1">${esc(g.name)}</div>
             <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
           </div>
-          <div>${g.active?`<span class="pill gold">Ready</span>`:`<span class="pill">Coming soon</span>`}</div>
+          <div>${g.active?`<span class="pill">Ready</span>`:`<span class="pill soon">Coming soon</span>`}</div>
         </div>
       </div>
 
@@ -1537,6 +1346,7 @@ function startApp(){
       ShanghaiGame.bindPlay(ctx);
       return;
     }
+
     if(activeGameId==="killer"){
       const ctx={meUser, match};
       appEl.innerHTML=KillerGame.renderPlay(ctx);
@@ -1626,8 +1436,6 @@ function startApp(){
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
 
     const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
-    const isMe = normEmail(statsViewerEmail)===normEmail(meUser.email);
-
     const statsDoc=await getStatsDoc(statsViewerEmail);
     const gs=(statsDoc.games||{})[g.id]||{};
 
@@ -1661,29 +1469,10 @@ function startApp(){
         <div class="divider"></div>
         ${body}
         <div class="divider"></div>
-
-        <div class="row">
-          <button class="btn ghost" id="statsGameBack">Back</button>
-          ${isMe ? `<button class="btn danger" id="resetStatsBtn">Reset ${esc(g.name)} stats</button>` : ``}
-        </div>
-
-        ${isMe ? `<div class="small">Reset removes only your stats for this game (history stays).</div>` : ``}
+        <button class="btn ghost" id="statsGameBack">Back</button>
       </div>
     `;
-
     document.getElementById("statsGameBack").onclick=()=>{ screen="stats"; render(); };
-
-    const resetBtn=document.getElementById("resetStatsBtn");
-    if(resetBtn){
-      resetBtn.onclick=async()=>{
-        if(!confirm(`Reset your ${g.name} stats? This cannot be undone.`)) return;
-        const stats=await getStatsDoc(meUser.email);
-        const games=stats.games||{};
-        delete games[g.id];
-        await saveStatsDoc(meUser.email,{games, updatedAt:now()});
-        render();
-      };
-    }
   }
 
   async function renderHistory(){
@@ -1707,27 +1496,16 @@ function startApp(){
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
   }
 
-  /* ===== Render router ===== */
   async function render(){
     try{
-      homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; match=null; activeGameId=null; render(); };
-      signOutBtn.onclick=()=>{
-        if(meUser?.email) clearResume(meUser.email);
-        meUser=null; match=null; activeGameId=null; statsViewerEmail=null; screen="auth"; render();
-      };
-
-      // persist match for reconnect on same device/browser
-      if(meUser?.email){
-        saveResume(meUser.email,{screen, activeGameId, match});
-      }
+      homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
+      signOutBtn.onclick=()=>{ meUser=null; match=null; activeGameId=null; statsViewerEmail=null; screen="auth"; render(); };
 
       if(screen==="auth") return renderAuth();
       if(screen==="signup") return renderSignup();
       if(!meUser){ screen="auth"; return renderAuth(); }
 
       if(screen==="home") return renderHome();
-      if(screen==="rules") return renderRules();
-      if(screen==="leaderboard") return renderLeaderboard();
       if(screen==="game.setup") return renderGameSetup();
       if(screen==="game.play") return renderGamePlay();
       if(screen==="stats") return renderStats();
