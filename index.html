@@ -188,17 +188,17 @@ input,select{
 .btn:active{transform:translateY(1px)}
 .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
 .btn.ok{
-  background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.12));
-  border-color:rgba(34,197,94,.40);
+  background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.12)) !important;
+  border-color:rgba(34,197,94,.40) !important;
 }
 .btn.danger{
-  background:linear-gradient(135deg, rgba(239,68,68,.22), rgba(249,115,22,.12));
-  border-color:rgba(239,68,68,.42);
+  background:linear-gradient(135deg, rgba(239,68,68,.22), rgba(249,115,22,.12)) !important;
+  border-color:rgba(239,68,68,.42) !important;
 }
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
 /* “Chrome” surface + highlight for primary clickable UI */
-.btn:not(.ghost),
+.btn:not(.ghost):not(.ok):not(.danger),
 .hitBtn,
 .kAttackBtn,
 .pill,
@@ -485,7 +485,13 @@ th{
   100% { box-shadow:0 0 0 rgba(0,0,0,0); }
 }
 @keyframes glowGreen{
-  0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 18px rgba(34,197,94,.50)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}
+  0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 26px rgba(34,197,94,.65)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}
+}
+
+@keyframes glowRed{
+  0%{box-shadow:0 0 0 rgba(0,0,0,0)}
+  50%{box-shadow:0 0 26px rgba(239,68,68,.60)}
+  100%{box-shadow:0 0 0 rgba(0,0,0,0)}
 }
 @keyframes glowPurple{
   0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 18px rgba(139,92,246,.55)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}
@@ -496,6 +502,7 @@ th{
 
 /* Primary actions glow */
 .btn.ok:not(:disabled){ animation:glowGreen 2.2s ease-in-out infinite; }
+.btn.danger:not(:disabled){ animation:glowRed 2.1s ease-in-out infinite; }
 .hitBtn:not(:disabled):not(.undo){ animation:glowCycle 2.4s ease-in-out infinite; }
 .kAttackBtn:not(:disabled){ animation:glowPurple 2.3s ease-in-out infinite; }
 
