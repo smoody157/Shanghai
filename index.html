@@ -912,7 +912,7 @@ function startApp(){
         : `${esc(active.name)} • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?"🔥 Killer":"Not killer yet"}`;
 
       const rows = m.players.map(p=>{
-        const lifeTxt = p.out ? "OUT" : "❤".repeat(p.lives);
+        const lifeTxt = p.out ? "OUT" : `<span style="color:#ef4444;">${"❤".repeat(p.lives)}</span>`;
         return `
           <tr>
             <td class="l">
