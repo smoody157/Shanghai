@@ -614,6 +614,47 @@ function startApp(){
   }
   async function saveHistoryEntry(entry){ await db.collection("history").add(entry); }
 
+  // ===== Admin helpers (delete players / reset stats) =====
+  async function resetStatsAll(email){
+    const e=normEmail(email);
+    await db.collection("stats").doc(e).set({games:{}, updatedAt:now()});
+  }
+  async function resetStatsGame(email, gameId){
+    const e=normEmail(email);
+    const doc=await db.collection("stats").doc(e).get();
+    const cur=doc.exists?doc.data():{};
+    const games=cur.games||{};
+    const nextGames={...games};
+    delete nextGames[gameId];
+    await db.collection("stats").doc(e).set({games:nextGames, updatedAt:now()},{merge:true});
+  }
+  async function deleteHistoryForPlayer(email){
+    const e=normEmail(email);
+    const snap=await db.collection("history").where("players","array-contains",e).get();
+    if(snap.empty) return;
+    // Batch delete in chunks (Firestore batch limit is 500 ops)
+    let batch=db.batch();
+    let count=0;
+    for(const d of snap.docs){
+      batch.delete(d.ref);
+      count++;
+      if(count>=450){
+        await batch.commit();
+        batch=db.batch();
+        count=0;
+      }
+    }
+    if(count>0) await batch.commit();
+  }
+  async function deletePlayerAndData(email){
+    const e=normEmail(email);
+    // delete player + stats + their match history entries
+    await db.collection("players").doc(e).delete().catch(()=>{});
+    await db.collection("stats").doc(e).delete().catch(()=>{});
+    await deleteHistoryForPlayer(e).catch(()=>{});
+  }
+
+
   async function signInEmail(email){
     const e=normEmail(email);
     const doc=await db.collection("players").doc(e).get();
@@ -723,7 +764,7 @@ function startApp(){
   const Games=[
     {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
     {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles"},
-    {id:"around",   name:"Around the Clock", icon:"🕒", active:false, tagline:"Coming soon"},
+    {id:"around",   name:"Around the Clock", icon:"🕒", active:true,  tagline:"1 → 20 → Bull • Singles/Doubles/Triples"},
     {id:"halve",    name:"Halve-It", icon:"➗", active:false, tagline:"Coming soon"},
     {id:"baseball", name:"Baseball", icon:"⚾", active:false, tagline:"Coming soon"},
   ];
@@ -1259,6 +1300,492 @@ function startApp(){
     return { initMatch, renderPlay, bindPlay };
   })();
 
+  // ===== Around the Clock (NEW, ACTIVE) =====
+  const AroundGame = (()=>{
+    const TARGETS = Array.from({length:20},(_,i)=>i+1).concat(["B"]);
+    const modeName = m => (m.mode==="D" ? "Doubles" : m.mode==="T" ? "Triples" : "Singles");
+
+    function initMatch(selectedPlayers, mode){
+      const m={
+        gameId:"around",
+        mode: (mode==="D"||mode==="T") ? mode : "S",
+        players: selectedPlayers.map(p=>({
+          name:p.name,
+          email:p.email,
+          progressIndex:0, // 0..20 (20 means B is current, 21 means finished)
+          dartsThrown:0,
+          hits:0
+        })),
+        turnIndex:0,
+        dartInTurn:0,
+        finished:false,
+        winner:null,
+        startedAt:now(),
+        endedAt:null,
+        snaps:[],
+        _saved:false
+      };
+      pushSnap(m);
+      return m;
+    }
+
+    function currentTarget(m, p){
+      const idx = Math.min(p.progressIndex, TARGETS.length-1);
+      return TARGETS[idx];
+    }
+
+    function finishIfDone(m, p){
+      if(p.progressIndex>=TARGETS.length){
+        m.finished=true;
+        m.winner={name:p.name,email:p.email};
+        m.endedAt=now();
+      }
+    }
+
+    function endDart(m){
+      m.dartInTurn += 1;
+      if(m.dartInTurn>=3){
+        m.dartInTurn=0;
+        m.turnIndex = (m.turnIndex+1) % m.players.length;
+      }
+    }
+
+    function addThrow(m, wasHit){
+      if(!m || m.finished) return;
+      const p=m.players[m.turnIndex];
+
+      p.dartsThrown += 1;
+
+      if(wasHit){
+        p.hits += 1;
+        p.progressIndex += 1; // advance one target per HIT
+        finishIfDone(m,p);
+        if(m.finished) return; // game ends immediately when someone finishes
+      }
+
+      endDart(m);
+    }
+
+    async function saveFinish(ctx){
+      const m=ctx.match;
+      if(!m.finished || m._saved) return;
+      m._saved=true;
+
+      const winnerName=m.winner?.name || "Unknown";
+      const winnerRow=m.players.find(x=>x.email===m.winner?.email);
+      const winnerDarts=winnerRow ? winnerRow.dartsThrown : null;
+
+      const summary = `🏁 ${winnerName} wins • Mode: ${modeName(m)}${winnerDarts!=null?` • ${winnerDarts} darts`:``}`;
+
+      await saveHistoryEntry({
+        gameId:"around",
+        gameName:"Around the Clock",
+        startedAt:m.startedAt,
+        endedAt:m.endedAt,
+        players:m.players.map(p=>p.email),
+        summary,
+        meta:{
+          mode:m.mode,
+          winnerEmail:m.winner?.email||null,
+          darts:m.players.map(p=>({email:p.email, dartsThrown:p.dartsThrown, hits:p.hits}))
+        }
+      });
+
+      // Stats for the signed-in viewer only (matches existing pattern)
+      const stats=await getStatsDoc(ctx.meUser.email);
+      const games=stats.games||{};
+      const g=games.around||{};
+      const played=(g.played||0)+1;
+
+      const meRow=m.players.find(p=>p.email===ctx.meUser.email);
+      const myDarts=meRow?meRow.dartsThrown:0;
+      const myHits=meRow?meRow.hits:0;
+
+      const wins=(g.wins||0) + ((m.winner?.email===ctx.meUser.email) ? 1 : 0);
+      const totalDarts=(g.totalDarts||0)+myDarts;
+      const totalHits=(g.totalHits||0)+myHits;
+
+      let bestFewestDarts = g.bestFewestDarts||null;
+      if(m.winner?.email===ctx.meUser.email){
+        if(bestFewestDarts==null || myDarts<bestFewestDarts) bestFewestDarts=myDarts;
+      }
+
+      await saveStatsDoc(ctx.meUser.email,{
+        games:{
+          ...games,
+          around:{
+            ...g,
+            played,
+            wins,
+            totalDarts,
+            totalHits,
+            bestFewestDarts,
+            lastPlayedAt:m.endedAt||now()
+          }
+        },
+        updatedAt:now()
+      });
+    }
+
+    function renderPlay(ctx){
+      const m=ctx.match;
+      const active=m.players[m.turnIndex];
+      const t=currentTarget(m, active);
+      const tLabel = (t==="B" ? "BULL" : String(t));
+
+      const isFinished = !!m.finished;
+      const livePill = isFinished ? `<span class="pill">Ended</span>` : `<span class="pill" data-live="1">Live</span>`;
+
+      const statusLine = isFinished
+        ? `Winner: <b>${esc(m.winner?.name||"")}</b> • Mode: <b>${esc(modeName(m))}</b>`
+        : `Target: <b>${esc(tLabel)}</b> • Mode: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
+
+      const rows = m.players.map(p=>{
+        const ct=currentTarget(m,p);
+        const lbl=(ct==="B"?"BULL":String(ct));
+        const acc = p.dartsThrown ? Math.round((p.hits/p.dartsThrown)*100) : 0;
+        const isAct = p.email===active.email && !isFinished;
+        return `
+          <tr>
+            <td class="l">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                <div>
+                  <div style="font-size:16px;font-weight:1000">${esc(p.name)}${isAct?` <span class="badge">TURN</span>`:""}</div>
+                  <div class="small">Current target: <b>${esc(lbl)}</b></div>
+                </div>
+                <div style="text-align:right">
+                  <div class="small"><b>${esc(p.hits)}</b> hits / <b>${esc(p.dartsThrown)}</b> darts</div>
+                  <div class="small">Accuracy: <b>${esc(acc)}%</b></div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div class="card">
+          <div class="row">
+            <button class="btn ghost" id="backToSetup">Back</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
+          <div class="hero">
+            <div class="heroCornerLeft">
+              <div class="logoMark"><span>🕒</span></div>
+              <span class="kbd">Around the Clock</span>
+            </div>
+
+            <div class="heroMain">
+              <div class="h1 turnTitle3d" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</div>
+              <div class="sub">${statusLine}</div>
+            </div>
+
+            <div class="heroCornerRight">
+              ${livePill}
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="boardBox">${dartboardSVG(t==="B"?"B":t)}</div>
+          <div class="divider"></div>
+
+          ${isFinished ? "" : `
+            <div class="hitRow">
+              <button class="hitBtn" id="hitBtn">HIT</button>
+              <button class="hitBtn miss" id="missBtn">MISS</button>
+              <button class="hitBtn undo" id="undoBtn">UNDO</button>
+            </div>
+          `}
+        </div>
+
+        <div class="card">
+          <div class="pill">Players</div>
+          <div class="divider"></div>
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+            <table>
+              <thead><tr><th>Progress</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindPlay(ctx){
+      const m=ctx.match;
+
+      document.getElementById("backToSetup").onclick=()=>{
+        match=null;
+        screen="game.setup";
+        render();
+      };
+      document.getElementById("resetBtn").onclick=()=>{
+        const pls=m.players.map(p=>({name:p.name,email:p.email}));
+        match=initMatch(pls, m.mode);
+        render();
+      };
+
+      if(m.finished){
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        return;
+      }
+
+      const undoBtn=document.getElementById("undoBtn");
+      if(undoBtn){
+        undoBtn.onclick=()=>{ match=popSnap(ctx.match); render(); };
+      }
+
+      document.getElementById("hitBtn").onclick=()=>{
+        if(m.finished) return;
+        pushSnap(m);
+        addThrow(m,true);
+        render();
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+      };
+      document.getElementById("missBtn").onclick=()=>{
+        if(m.finished) return;
+        pushSnap(m);
+        addThrow(m,false);
+        render();
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+      };
+    }
+
+    return { initMatch, renderPlay, bindPlay };
+
+  const AroundGame = (()=>{
+    const TARGETS = Array.from({length:20},(_,i)=>i+1).concat(["B"]);
+    const modeLabel = m => m==="T" ? "TRIPLES" : m==="D" ? "DOUBLES" : "SINGLES";
+
+    function initMatch(selectedPlayers, mode){
+      const m={
+        gameId:"around",
+        mode: (mode==="D"||mode==="T") ? mode : "S",
+        players: selectedPlayers.map(p=>({
+          name:p.name,
+          email:p.email,
+          pos:0,          // index into TARGETS (0=1, ..., 19=20, 20=B)
+          darts:0,
+          hits:0
+        })),
+        startedAt:now(),
+        endedAt:null,
+        turnIndex:0,
+        dartInTurn:0,
+        pendingHits:0,
+        turnThrows:[],    // current turn: ["H","M",...]
+        finished:false,
+        winner:null,
+        snaps:[],
+        _saved:false
+      };
+      pushSnap(m);
+      return m;
+    }
+
+    function currentTargetFor(m, player){
+      const idx=Math.max(0, Math.min(TARGETS.length-1, player.pos||0));
+      return TARGETS[idx];
+    }
+
+    function addThrow(m, isHit){
+      if(!m || m.finished) return;
+      const p=m.players[m.turnIndex];
+
+      // record
+      p.darts += 1;
+      if(isHit){ p.hits += 1; m.pendingHits += 1; }
+      m.turnThrows.push(isHit?"H":"M");
+      m.dartInTurn += 1;
+
+      // end of turn: apply pendingHits to position (scoreboard update after 3 darts)
+      if(m.dartInTurn>=3){
+        // move forward by pendingHits (cap at last target)
+        p.pos = Math.min(TARGETS.length-1, (p.pos||0) + (m.pendingHits||0));
+
+        // winner check
+        if(p.pos>=TARGETS.length-1 && (m.pendingHits||0)>0){
+          m.finished=true;
+          m.winner={name:p.name,email:p.email};
+          m.endedAt=now();
+        }else{
+          // next player
+          m.turnIndex = (m.turnIndex+1) % m.players.length;
+        }
+
+        // reset turn counters
+        m.dartInTurn=0;
+        m.pendingHits=0;
+        m.turnThrows=[];
+      }
+    }
+
+    async function saveFinish(ctx){
+      const m=ctx.match;
+      if(!m.finished || m._saved) return;
+      m._saved=true;
+
+      const winnerName=m.winner?.name||"Unknown";
+      const summary = `🕒 ${winnerName} wins • ` + m.players
+        .map(p=>`${p.name}: ${currentTargetFor(m,p)==="B" ? "BULL" : currentTargetFor(m,p)} (${p.hits}/${p.darts})`)
+        .join(" | ");
+
+      await saveHistoryEntry({
+        gameId:"around",
+        gameName:"Around the Clock",
+        startedAt:m.startedAt,
+        endedAt:m.endedAt,
+        players:m.players.map(p=>p.email),
+        summary,
+        meta:{mode:m.mode}
+      });
+
+      const stats=await getStatsDoc(ctx.meUser.email);
+      const games=stats.games||{};
+      const g=games.around||{};
+      const played=(g.played||0)+1;
+
+      const meRow=m.players.find(p=>p.email===ctx.meUser.email);
+      const iWon = (m.winner?.email === ctx.meUser.email);
+      const wins = (g.wins||0) + (iWon?1:0);
+
+      const myDarts = (g.darts||0) + (meRow?.darts||0);
+      const myHits  = (g.hits||0)  + (meRow?.hits||0);
+
+      await saveStatsDoc(ctx.meUser.email,{
+        games:{
+          ...games,
+          around:{
+            ...g,
+            played,
+            wins,
+            darts: myDarts,
+            hits: myHits,
+            lastPlayedAt: m.endedAt||now()
+          }
+        },
+        updatedAt:now()
+      });
+    }
+
+    function renderPlay(ctx){
+      const m=ctx.match;
+      const active=m.players[m.turnIndex];
+      const target=currentTargetFor(m, active);
+      const isFinished=!!m.finished;
+
+      const modeTxt = modeLabel(m.mode);
+      const throwTxt = m.turnThrows.length ? m.turnThrows.join(" ") : "—";
+
+      const rows = m.players.map(p=>{
+        const t=currentTargetFor(m,p);
+        const done = (t==="B");
+        const pct = p.darts ? Math.round((p.hits/p.darts)*100) : 0;
+        return `
+          <tr ${p.email===active.email && !isFinished ? 'class="activeCell"' : ''}>
+            <td class="l">${esc(p.name)}</td>
+            <td>${esc(done ? "BULL" : t)}</td>
+            <td>${esc(p.hits)} / ${esc(p.darts)} <div class="small">${esc(pct)}%</div></td>
+          </tr>
+        `;
+      }).join("");
+
+      return `
+        <div class="card">
+          <div class="row">
+            <button class="btn ghost" id="backToSetup">Back</button>
+            <button class="btn danger" id="resetBtn">Reset</button>
+          </div>
+        </div>
+
+        <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
+          <div class="hero">
+            <div class="heroCornerLeft">
+              <div class="logoMark"><span>🕒</span></div>
+              <span class="kbd">Around the Clock</span>
+            </div>
+
+            <div class="heroMain">
+              <div class="h1 turnTitle3d" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</div>
+              <div class="sub">
+                Mode: <b>${esc(modeTxt)}</b> • Target: <b>${esc(target==="B"?"BULL":target)}</b>
+                ${isFinished ? ` • Winner: <b>${esc(m.winner?.name||"")}</b>` : ` • Dart <b>${m.dartInTurn+1}</b>/3`}
+              </div>
+            </div>
+
+            <div class="heroCornerRight">
+              <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="boardBox">${dartboardSVG(target)}</div>
+          <div class="divider"></div>
+
+          ${isFinished ? "" : `
+            <div class="sub">This turn: <b>${esc(throwTxt)}</b> • Pending advances: <b>${esc(m.pendingHits)}</b></div>
+            <div class="divider"></div>
+            <div class="hitRow">
+              <button class="hitBtn" id="hitBtn">HIT ${esc(modeTxt)}</button>
+              <button class="hitBtn miss" id="missBtn">MISS</button>
+              <button class="hitBtn undo" id="undoBtn">UNDO</button>
+            </div>
+          `}
+        </div>
+
+        <div class="card">
+          <div class="pill">Progress</div>
+          <div class="divider"></div>
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+            <table>
+              <thead><tr><th>Player</th><th>Next Target</th><th>Hits / Darts</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindPlay(ctx){
+      const m=ctx.match;
+
+      document.getElementById("resetBtn").onclick=()=>{
+        const pls=m.players.map(p=>({name:p.name,email:p.email}));
+        match=initMatch(pls, m.mode);
+        render();
+      };
+      document.getElementById("backToSetup").onclick=()=>{
+        match=null; screen="game.setup"; render();
+      };
+
+      if(m.finished){
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        return;
+      }
+
+      document.getElementById("hitBtn").onclick=()=>{
+        pushSnap(m);
+        addThrow(m,true);
+        render();
+        if(m.finished) saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+      };
+      document.getElementById("missBtn").onclick=()=>{
+        pushSnap(m);
+        addThrow(m,false);
+        render();
+        if(m.finished) saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+      };
+      document.getElementById("undoBtn").onclick=()=>{ match=popSnap(ctx.match); render(); };
+    }
+
+    return {initMatch, renderPlay, bindPlay, modeLabel};
+  })();
+
+  })();
+
   let toastMsg="";
   let screen="auth";
   let meUser=null;
@@ -1301,6 +1828,32 @@ function startApp(){
         "When you hit an opponent’s double: tap their attack button to remove 1 life.",
         "If a player reaches 0 lives, they are OUT.",
         "Last player alive wins."
+      ]
+    };
+    if(gameId==="around") return {
+      title:"Around the Clock",
+      icon:"🕒",
+      bullets:[
+        "Before starting, choose a mode: Singles, Doubles, or Triples.",
+        "Players take turns. Each turn is 3 darts.",
+        "Your goal is to hit your current target number, starting at 1 and going up to 20, then BULL.",
+        "Tap HIT if you hit the current target (any segment for Singles / double ring for Doubles / triple ring for Triples).",
+        "Tap MISS if you miss the current target.",
+        "Each HIT advances you to the next target immediately (you can advance up to 3 targets in one turn).",
+        "Game ends immediately when someone hits BULL and finishes."
+      ]
+    };
+
+    if(gameId==="around") return {
+      title:"Around the Clock",
+      icon:"🕒",
+      bullets:[
+        "Before starting, choose a format: SINGLES, DOUBLES, or TRIPLES.",
+        "Players take turns. Each turn is 3 darts.",
+        "During your turn you tap HIT or MISS for each dart.",
+        "The scoreboard only updates after all 3 darts are entered (matches real play flow).",
+        "Each HIT advances you forward by 1 target (1 → 20 → BULL).",
+        "First player to reach BULL wins — game ends immediately."
       ]
     };
     const g=getGame(gameId);
@@ -1445,7 +1998,10 @@ function startApp(){
               <div class="rosterSub">${esc(p.email)}</div>
             </div>
           </div>
-          <button class="btn ghost" data-view-player="${esc(p.email)}">View stats</button>
+          <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
+            <button class="btn ghost" data-view-player="${esc(p.email)}">View stats</button>
+            <button class="btn danger" data-del-player="${esc(p.email)}">Remove</button>
+          </div>
         </div>
       `).join("");
 
@@ -1525,6 +2081,28 @@ function startApp(){
         render();
       };
     });
+
+    appEl.querySelectorAll("button[data-del-player]").forEach(btn=>{
+      btn.onclick=async()=>{
+        const email=btn.getAttribute("data-del-player");
+        const p=players.find(x=>x.email===email);
+        const name=p?.name||email;
+        if(!confirm(`Remove ${name}? This deletes the player, their stats, and their history.`)) return;
+        try{
+          await deletePlayerAndData(email);
+          // If you deleted the currently signed-in user, sign out.
+          if(normEmail(email)===normEmail(meUser.email)){
+            meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth";
+            return render();
+          }
+          toastMsg=`Removed ${name}.`;
+          render();
+        }catch(e){
+          showFatal("Delete error", e?.message||String(e));
+        }
+      };
+    });
+
   }
 
   async function renderRules(){
@@ -1613,6 +2191,17 @@ function startApp(){
     const meEmail=meUser.email;
     const defaultCount=2;
 
+    const aroundModeUI = (activeGameId==="around" && g.active) ? `
+      <div class="divider"></div>
+      <label>Around the Clock mode</label>
+      <select id="aroundMode">
+        <option value="S" selected>Singles</option>
+        <option value="D">Doubles</option>
+        <option value="T">Triples</option>
+      </select>
+      <div class="small">Pick the format before starting.</div>
+    ` : "";
+
     appEl.innerHTML=`
       <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
 
@@ -1653,6 +2242,18 @@ function startApp(){
           <select id="matchPlayers" multiple size="6">
             ${players.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("")}
           </select>
+
+          ${aroundModeUI}
+
+          ${g.id==="around" ? `
+          <label>Format</label>
+          <select id="aroundMode">
+            <option value="S" selected>SINGLES</option>
+            <option value="D">DOUBLES</option>
+            <option value="T">TRIPLES</option>
+          </select>
+          <div class="small">Choose how you want to play Around the Clock.</div>
+          ` : ``}
 
           <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
           <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
@@ -1696,6 +2297,13 @@ function startApp(){
         screen="game.play";
         return render();
       }
+      if(activeGameId==="around"){
+        const modeEl=document.getElementById("aroundMode");
+        const mode=modeEl ? modeEl.value : "S";
+        match=AroundGame.initMatch(selectedPlayers, mode);
+        screen="game.play";
+        return render();
+      }
       toastMsg="Coming soon.";
       render();
     };
@@ -1722,6 +2330,21 @@ function startApp(){
       return;
     }
 
+    if(activeGameId==="around"){
+      const ctx={meUser, match};
+      appEl.innerHTML=AroundGame.renderPlay(ctx);
+      AroundGame.bindPlay(ctx);
+      return;
+    }
+
+
+    if(activeGameId==="around"){
+      const ctx={meUser, match};
+      appEl.innerHTML=AroundGame.renderPlay(ctx);
+      AroundGame.bindPlay(ctx);
+      return;
+    }
+
     screen="home"; render();
   }
 
@@ -1735,6 +2358,16 @@ function startApp(){
     const statsDoc=await getStatsDoc(statsViewerEmail);
     const games=statsDoc.games||{};
     const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
+
+    function aroundLine(gs){
+      const played=gs.played||0;
+      const wins=gs.wins||0;
+      const td=gs.totalDarts||0;
+      const th=gs.totalHits||0;
+      const acc=td?Math.round((th/td)*100):0;
+      const best=gs.bestFewestDarts!=null?gs.bestFewestDarts:"—";
+      return `Played: <b>${played}</b> • Wins: <b>${wins}</b> • Accuracy: <b>${acc}%</b> • Best: <b>${esc(best)}</b>`;
+    }
 
     appEl.innerHTML=`
       <div class="card">
@@ -1756,6 +2389,12 @@ function startApp(){
           ${players.map(p=>`<option value="${esc(p.email)}" ${p.email===statsViewerEmail?"selected":""}>${esc(p.name)}</option>`).join("")}
         </select>
         <div class="small">Viewing: <b>${esc(viewer.name||"Player")}</b></div>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn danger" id="resetAllStatsBtn">Reset stats</button>
+          <button class="btn danger" id="deletePlayerBtn">Delete player</button>
+        </div>
+        <div class="small">Reset clears this player’s stats. Delete removes the player + stats + history.</div>
       </div>
 
       ${Games.map(g=>{
@@ -1766,6 +2405,10 @@ function startApp(){
             ? `Played: <b>${played}</b> • Best: <b>${esc(gs.best||0)}</b> • Points: <b>${esc(gs.points||0)}</b>`
           : g.id==="killer"
             ? `Played: <b>${played}</b> • Wins: <b>${esc(gs.wins||0)}</b>`
+          : g.id==="around"
+            ? (()=>{ const hits=gs.hits||0, darts=gs.darts||0; const pct=darts?Math.round((hits/darts)*100):0; return `Played: <b>${played}</b> • Wins: <b>${esc(gs.wins||0)}</b> • Hit%: <b>${esc(pct)}%</b>`; })()
+          : g.id==="around"
+            ? aroundLine(gs)
           : (g.active ? `Played: <b>${played}</b>` : `Coming soon`);
         return `
           <div class="gameCard">
@@ -1790,6 +2433,42 @@ function startApp(){
 
     document.getElementById("statsBack").onclick=()=>{ screen="home"; render(); };
     document.getElementById("statsPlayer").onchange=(e)=>{ statsViewerEmail=e.target.value; render(); };
+
+
+    document.getElementById("resetAllStatsBtn").onclick=async()=>{
+      const email=statsViewerEmail;
+      const p=players.find(x=>x.email===email);
+      const name=p?.name||email;
+      if(!confirm(`Reset ALL stats for ${name}?`)) return;
+      try{
+        await resetStatsAll(email);
+        toastMsg=`Stats reset for ${name}.`;
+        render();
+      }catch(e){
+        showFatal("Reset error", e?.message||String(e));
+      }
+    };
+
+    document.getElementById("deletePlayerBtn").onclick=async()=>{
+      const email=statsViewerEmail;
+      const p=players.find(x=>x.email===email);
+      const name=p?.name||email;
+      if(!confirm(`Delete ${name}? This deletes the player, their stats, and their history.`)) return;
+      try{
+        await deletePlayerAndData(email);
+        if(normEmail(email)===normEmail(meUser.email)){
+          meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth";
+          return render();
+        }
+        // After deleting someone else, go back to home.
+        statsViewerEmail=meUser.email;
+        toastMsg=`Deleted ${name}.`;
+        screen="home";
+        render();
+      }catch(e){
+        showFatal("Delete error", e?.message||String(e));
+      }
+    };
 
     appEl.querySelectorAll("button[data-open]").forEach(btn=>{
       btn.onclick=()=>{ activeGameId=btn.getAttribute("data-open"); screen="stats.game"; render(); };
@@ -1824,6 +2503,33 @@ function startApp(){
         <div class="sub">Wins: <b>${esc(gs.wins||0)}</b></div>
         <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
       `;
+    }else if(g.id==="around"){
+      const played=gs.played||0;
+      const wins=gs.wins||0;
+      const td=gs.totalDarts||0;
+      const th=gs.totalHits||0;
+      const acc=td?Math.round((th/td)*100):0;
+      const best=gs.bestFewestDarts!=null?gs.bestFewestDarts:"—";
+      body=`
+        <div class="sub">Played: <b>${esc(played)}</b></div>
+        <div class="sub">Wins: <b>${esc(wins)}</b></div>
+        <div class="sub">Total darts: <b>${esc(td)}</b></div>
+        <div class="sub">Total hits: <b>${esc(th)}</b></div>
+        <div class="sub">Accuracy: <b>${esc(acc)}%</b></div>
+        <div class="sub">Best (fewest darts to win): <b>${esc(best)}</b></div>
+        <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
+      `;
+
+    }else if(g.id==="around"){
+      const hits=gs.hits||0;
+      const darts=gs.darts||0;
+      const pct=darts?Math.round((hits/darts)*100):0;
+      body=`
+        <div class="sub">Played: <b>${esc(gs.played||0)}</b></div>
+        <div class="sub">Wins: <b>${esc(gs.wins||0)}</b></div>
+        <div class="sub">Hits / Darts: <b>${esc(hits)}</b> / <b>${esc(darts)}</b> (<b>${esc(pct)}%</b>)</div>
+        <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
+      `;
     }else{
       body=g.active?`<div class="sub">Played: <b>${esc(gs.played||0)}</b></div>`:`<div class="sub">Coming soon.</div>`;
     }
@@ -1846,9 +2552,30 @@ function startApp(){
         <div class="divider"></div>
         ${body}
         <div class="divider"></div>
-        <button class="btn ghost" id="statsGameBack">Back</button>
+        <div class="row">
+          <button class="btn danger" id="resetGameStatsBtn">Reset this game</button>
+          <button class="btn ghost" id="statsGameBack">Back</button>
+        </div>
       </div>
     `;
+
+    const resetBtn=document.getElementById("resetGameStatsBtn");
+    if(resetBtn){
+      resetBtn.onclick=async()=>{
+        const email=statsViewerEmail;
+        const p=players.find(x=>x.email===email);
+        const name=p?.name||email;
+        if(!confirm(`Reset ${g.name} stats for ${name}?`)) return;
+        try{
+          await resetStatsGame(email, g.id);
+          toastMsg=`${g.name} stats reset for ${name}.`;
+          render();
+        }catch(e){
+          showFatal("Reset error", e?.message||String(e));
+        }
+      };
+    }
+
     document.getElementById("statsGameBack").onclick=()=>{ screen="stats"; render(); };
   }
 
