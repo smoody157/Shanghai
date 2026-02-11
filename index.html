@@ -239,6 +239,25 @@ input,select{
   filter:contrast(1.05) saturate(1.05);
 }
 
+
+/* ===== Bigger game + turn titles ===== */
+.gameTitleBig{
+  font-size:22px;
+  font-weight:1000;
+  letter-spacing:.6px;
+  background:var(--chrome-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 2px 14px rgba(0,0,0,.55);
+}
+.turnNameBig{ font-size:28px; }
+@media(max-width:520px){
+  .gameTitleBig{ font-size:20px; }
+  .turnNameBig{ font-size:24px; }
+}
+
+
 /* ===== Pills / tags ===== */
 .pill{
   display:inline-block;padding:6px 10px;border-radius:999px;
@@ -887,7 +906,8 @@ function startApp(){
             </div>
 
             <div class="heroMain">
-              <div class="h1 turnTitle3d" style="margin:0">${esc(activePlayer.name)}’s Turn</div>
+              <div class="gameTitleBig">Shanghai</div>
+              <div class="h1 turnTitle3d turnNameBig" style="margin:0">${esc(activePlayer.name)}’s Turn</div>
               <div class="sub">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
@@ -1479,7 +1499,8 @@ function startApp(){
             </div>
 
             <div class="heroMain">
-              <div class="h1 turnTitle3d" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</div>
+              <div class="gameTitleBig">Around the Clock</div>
+              <div class="h1 turnTitle3d turnNameBig" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</div>
               <div class="sub">${statusLine}</div>
             </div>
 
@@ -1555,235 +1576,6 @@ function startApp(){
     }
 
     return { initMatch, renderPlay, bindPlay };
-
-  const AroundGame = (()=>{
-    const TARGETS = Array.from({length:20},(_,i)=>i+1).concat(["B"]);
-    const modeLabel = m => m==="T" ? "TRIPLES" : m==="D" ? "DOUBLES" : "SINGLES";
-
-    function initMatch(selectedPlayers, mode){
-      const m={
-        gameId:"around",
-        mode: (mode==="D"||mode==="T") ? mode : "S",
-        players: selectedPlayers.map(p=>({
-          name:p.name,
-          email:p.email,
-          pos:0,          // index into TARGETS (0=1, ..., 19=20, 20=B)
-          darts:0,
-          hits:0
-        })),
-        startedAt:now(),
-        endedAt:null,
-        turnIndex:0,
-        dartInTurn:0,
-        pendingHits:0,
-        turnThrows:[],    // current turn: ["H","M",...]
-        finished:false,
-        winner:null,
-        snaps:[],
-        _saved:false
-      };
-      pushSnap(m);
-      return m;
-    }
-
-    function currentTargetFor(m, player){
-      const idx=Math.max(0, Math.min(TARGETS.length-1, player.pos||0));
-      return TARGETS[idx];
-    }
-
-    function addThrow(m, isHit){
-      if(!m || m.finished) return;
-      const p=m.players[m.turnIndex];
-
-      // record
-      p.darts += 1;
-      if(isHit){ p.hits += 1; m.pendingHits += 1; }
-      m.turnThrows.push(isHit?"H":"M");
-      m.dartInTurn += 1;
-
-      // end of turn: apply pendingHits to position (scoreboard update after 3 darts)
-      if(m.dartInTurn>=3){
-        // move forward by pendingHits (cap at last target)
-        p.pos = Math.min(TARGETS.length-1, (p.pos||0) + (m.pendingHits||0));
-
-        // winner check
-        if(p.pos>=TARGETS.length-1 && (m.pendingHits||0)>0){
-          m.finished=true;
-          m.winner={name:p.name,email:p.email};
-          m.endedAt=now();
-        }else{
-          // next player
-          m.turnIndex = (m.turnIndex+1) % m.players.length;
-        }
-
-        // reset turn counters
-        m.dartInTurn=0;
-        m.pendingHits=0;
-        m.turnThrows=[];
-      }
-    }
-
-    async function saveFinish(ctx){
-      const m=ctx.match;
-      if(!m.finished || m._saved) return;
-      m._saved=true;
-
-      const winnerName=m.winner?.name||"Unknown";
-      const summary = `🕒 ${winnerName} wins • ` + m.players
-        .map(p=>`${p.name}: ${currentTargetFor(m,p)==="B" ? "BULL" : currentTargetFor(m,p)} (${p.hits}/${p.darts})`)
-        .join(" | ");
-
-      await saveHistoryEntry({
-        gameId:"around",
-        gameName:"Around the Clock",
-        startedAt:m.startedAt,
-        endedAt:m.endedAt,
-        players:m.players.map(p=>p.email),
-        summary,
-        meta:{mode:m.mode}
-      });
-
-      const stats=await getStatsDoc(ctx.meUser.email);
-      const games=stats.games||{};
-      const g=games.around||{};
-      const played=(g.played||0)+1;
-
-      const meRow=m.players.find(p=>p.email===ctx.meUser.email);
-      const iWon = (m.winner?.email === ctx.meUser.email);
-      const wins = (g.wins||0) + (iWon?1:0);
-
-      const myDarts = (g.darts||0) + (meRow?.darts||0);
-      const myHits  = (g.hits||0)  + (meRow?.hits||0);
-
-      await saveStatsDoc(ctx.meUser.email,{
-        games:{
-          ...games,
-          around:{
-            ...g,
-            played,
-            wins,
-            darts: myDarts,
-            hits: myHits,
-            lastPlayedAt: m.endedAt||now()
-          }
-        },
-        updatedAt:now()
-      });
-    }
-
-    function renderPlay(ctx){
-      const m=ctx.match;
-      const active=m.players[m.turnIndex];
-      const target=currentTargetFor(m, active);
-      const isFinished=!!m.finished;
-
-      const modeTxt = modeLabel(m.mode);
-      const throwTxt = m.turnThrows.length ? m.turnThrows.join(" ") : "—";
-
-      const rows = m.players.map(p=>{
-        const t=currentTargetFor(m,p);
-        const done = (t==="B");
-        const pct = p.darts ? Math.round((p.hits/p.darts)*100) : 0;
-        return `
-          <tr ${p.email===active.email && !isFinished ? 'class="activeCell"' : ''}>
-            <td class="l">${esc(p.name)}</td>
-            <td>${esc(done ? "BULL" : t)}</td>
-            <td>${esc(p.hits)} / ${esc(p.darts)} <div class="small">${esc(pct)}%</div></td>
-          </tr>
-        `;
-      }).join("");
-
-      return `
-        <div class="card">
-          <div class="row">
-            <button class="btn ghost" id="backToSetup">Back</button>
-            <button class="btn danger" id="resetBtn">Reset</button>
-          </div>
-        </div>
-
-        <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
-          <div class="hero">
-            <div class="heroCornerLeft">
-              <div class="logoMark"><span>🕒</span></div>
-              <span class="kbd">Around the Clock</span>
-            </div>
-
-            <div class="heroMain">
-              <div class="h1 turnTitle3d" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</div>
-              <div class="sub">
-                Mode: <b>${esc(modeTxt)}</b> • Target: <b>${esc(target==="B"?"BULL":target)}</b>
-                ${isFinished ? ` • Winner: <b>${esc(m.winner?.name||"")}</b>` : ` • Dart <b>${m.dartInTurn+1}</b>/3`}
-              </div>
-            </div>
-
-            <div class="heroCornerRight">
-              <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-          <div class="boardBox">${dartboardSVG(target)}</div>
-          <div class="divider"></div>
-
-          ${isFinished ? "" : `
-            <div class="sub">This turn: <b>${esc(throwTxt)}</b> • Pending advances: <b>${esc(m.pendingHits)}</b></div>
-            <div class="divider"></div>
-            <div class="hitRow">
-              <button class="hitBtn" id="hitBtn">HIT ${esc(modeTxt)}</button>
-              <button class="hitBtn miss" id="missBtn">MISS</button>
-              <button class="hitBtn undo" id="undoBtn">UNDO</button>
-            </div>
-          `}
-        </div>
-
-        <div class="card">
-          <div class="pill">Progress</div>
-          <div class="divider"></div>
-          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
-            <table>
-              <thead><tr><th>Player</th><th>Next Target</th><th>Hits / Darts</th></tr></thead>
-              <tbody>${rows}</tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }
-
-    function bindPlay(ctx){
-      const m=ctx.match;
-
-      document.getElementById("resetBtn").onclick=()=>{
-        const pls=m.players.map(p=>({name:p.name,email:p.email}));
-        match=initMatch(pls, m.mode);
-        render();
-      };
-      document.getElementById("backToSetup").onclick=()=>{
-        match=null; screen="game.setup"; render();
-      };
-
-      if(m.finished){
-        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
-        return;
-      }
-
-      document.getElementById("hitBtn").onclick=()=>{
-        pushSnap(m);
-        addThrow(m,true);
-        render();
-        if(m.finished) saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
-      };
-      document.getElementById("missBtn").onclick=()=>{
-        pushSnap(m);
-        addThrow(m,false);
-        render();
-        if(m.finished) saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
-      };
-      document.getElementById("undoBtn").onclick=()=>{ match=popSnap(ctx.match); render(); };
-    }
-
-    return {initMatch, renderPlay, bindPlay, modeLabel};
-  })();
-
   })();
 
   let toastMsg="";
@@ -2601,6 +2393,8 @@ function startApp(){
   }
 
   async function render(){
+    if(window.__rendering){ window.__renderAgain=true; return; }
+    window.__rendering=true;
     try{
       homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
       signOutBtn.onclick=()=>{ meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
@@ -2621,6 +2415,10 @@ function startApp(){
       screen="home"; return renderHome();
     }catch(e){
       showFatal("App error", e?.message || String(e));
+    }
+    finally{
+      window.__rendering=false;
+      if(window.__renderAgain){ window.__renderAgain=false; render(); }
     }
   }
 
