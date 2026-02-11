@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v7-20260211</title>
-<!-- BUILD: v7-20260211 -->
+<title>Game Night • v8-2026-02-11</title>
+<!-- BUILD: v9-20260211 -->
 
 <style>
 :root{
@@ -564,6 +564,41 @@ th{
   0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 18px rgba(139,92,246,.55)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}
 }
 
+
+/* ===== Turn header (pills above title) ===== */
+.turnHeader{display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
+.turnTopRow{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.turnTopRow .pill{max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+.turnTitleRow{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.turnIconMini{
+  width:38px;height:38px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
+  flex:0 0 auto;
+  transform:translateY(6px); /* tucks under the title a touch */
+}
+.turnNameRow{margin-top:2px}
+.turnNowRow{margin-top:2px}
+.turnNowRow .pill{letter-spacing:.6px}
+.turnMetaLine{margin-top:2px}
+.targetPulse{
+  display:inline-block;
+  color:var(--c-cyan);
+  font-weight:1000;
+  padding:1px 8px;
+  border-radius:999px;
+  border:1px solid rgba(34,211,238,.28);
+  background:rgba(34,211,238,.10);
+  animation:glowCycle 2.0s ease-in-out infinite;
+}
+
+/* Slightly lower the meta line on small screens for breathing room */
+@media(max-width:520px){
+  .turnMetaLine{margin-top:4px}
+}
+
 /* Live pills glow */
 .pill[data-live="1"]{ animation:glowCycle 2.4s ease-in-out infinite; }
 
@@ -636,7 +671,7 @@ th{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v7-20260211</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v9-20260211</div>
   </div>
 
   <div class="topActions right">
@@ -650,7 +685,7 @@ th{
 
 <!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
-  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs.</div>
+  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v8-2026-02-11</div>
 </div>
 
 <script>
@@ -753,6 +788,7 @@ async function boot(){
 }
 
 function startApp(){
+  console.log('GameNight build v8-2026-02-11 loaded');
   const firebaseConfig = {
     apiKey: "AIzaSyCY3hTUNNlV6gAofPXY9BVGKb930WYz5RA",
     authDomain: "gamenightdarts-e7601.firebaseapp.com",
@@ -1066,24 +1102,26 @@ function startApp(){
         </div>
 
         <div class="card">
-          <div class="hero">
-            <div class="heroCornerLeft">
-              <div class="cornerStack">
-                <span class="pill">Shanghai</span>
-                <div class="cornerIcon">🎯</div>
-              </div>
+          <div class="turnHeader">
+            <div class="turnTopRow">
+              <div><span class="pill">Shanghai</span></div>
+              <div><span class="pill" data-live="1">Live</span></div>
             </div>
 
-            <div class="heroMain">
+            <div class="turnTitleRow">
+              <div class="turnIconMini"><span>🎯</span></div>
               <div class="gameTitleBig">Shanghai</div>
-              ${turnSwipe("shanghai", activePlayer.name)}
-              ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="sub statusLine">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
-            <div class="heroCornerRight">
-              <span class="pill" data-live="1">Live</span>
+            <div class="turnNameRow">
+              ${turnSwipe("shanghai", activePlayer.name)}
             </div>
+
+            <div class="turnNowRow">
+              <span class="pill now">NOW THROWING</span>
+            </div>
+
+            <div class="sub turnMetaLine">Target: <span class="targetPulse">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
           </div>
 
           <div class="divider"></div>
@@ -1406,7 +1444,7 @@ function startApp(){
 
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
-        claimBtn.onclick=()=>{
+        const handler=()=>{
           const p=m.players[m.claimIndex];
           const raw=document.getElementById("claimNum").value;
           const n=parseInt(raw,10);
@@ -1429,7 +1467,13 @@ function startApp(){
           }
           render();
         };
+
+        // iOS Safari sometimes prefers touchend; bind both safely.
+        claimBtn.onclick=null;
+        claimBtn.addEventListener("click",(e)=>{ e.preventDefault(); handler(); }, {passive:false});
+        claimBtn.addEventListener("touchend",(e)=>{ e.preventDefault(); handler(); }, {passive:false});
         return;
+      }
       }
 
       if(m.finished){
@@ -1678,23 +1722,27 @@ function startApp(){
         </div>
 
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
-          <div class="hero">
-            <div class="heroCornerLeft">
-              <div class="cornerStack">
-                <span class="pill">Around the World</span>
-                <div class="cornerIcon">🌍</div>
-              </div>
+          <div class="turnHeader">
+            <div class="turnTopRow">
+              <div><span class="pill">Around the World</span></div>
+              <div>${livePill}</div>
             </div>
 
-            <div class="heroMain">
+            <div class="turnTitleRow">
+              <div class="turnIconMini"><span>🌍</span></div>
               <div class="gameTitleBig">Around the World</div>
-              ${turnSwipe("around", active.name)}
-              ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="sub statusLine">${statusLine}</div>
             </div>
 
-            <div class="heroCornerRight">
-              ${livePill}
+            <div class="turnNameRow">
+              ${isFinished ? "" : turnSwipe("around", active.name)}
+            </div>
+
+            <div class="turnNowRow">
+              <span class="pill now">${isFinished ? "GAME OVER" : "NOW THROWING"}</span>
+            </div>
+
+            <div class="sub turnMetaLine">
+              Target: <span class="targetPulse">${esc(tLabel)}</span> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3
             </div>
           </div>
 
