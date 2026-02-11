@@ -133,7 +133,9 @@ body{
   background:linear-gradient(180deg,var(--glass),var(--glass2));
   border:1px solid rgba(255,255,255,.10);
   border-radius:18px;padding:14px;
-  box-shadow:0 10px 28px rgba(0,0,0,.34);
+  position:relative;
+  box-shadow:0 16px 34px rgba(0,0,0,.42), 0 2.card::before{content:"";position:absolute;left:14px;right:14px;bottom:-12px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);filter:blur(16px);opacity:.42;pointer-events:none;}
+8px 60px rgba(0,0,0,.28);
   margin-bottom:12px;
 }
 
@@ -190,14 +192,12 @@ input,select{
 .kAttackBtn,
 .pill,
 .badge,
-.kbd{
-  background:var(--chrome-fill);
+.kbd{background:var(--chrome-fill);
   border:1px solid var(--chrome-border);
   box-shadow:
     0 10px 22px rgba(0,0,0,.32),
     inset 0 1px 0 rgba(255,255,255,.20),
-    inset 0 -12px 18px rgba(0,0,0,.38);
-}
+    inset 0 -12px 18px rgba(0,0,0,.38); white-space:nowrap;}
 .btn:not(.ghost)::after,
 .hitBtn::after,
 .kAttackBtn::after,
@@ -241,17 +241,8 @@ input,select{
 
 
 /* ===== Bigger game + turn titles ===== */
-.gameTitleBig{
-  font-size:22px;
-  font-weight:1000;
-  letter-spacing:.6px;
-  background:var(--chrome-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  text-shadow:0 2px 14px rgba(0,0,0,.55);
-}
-.turnNameBig{ font-size:28px; }
+.gameTitleBig{font-size:30px;font-weight:1000;letter-spacing:.6px;margin:0;white-space:nowrap;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 20%,#ffffff 42%,#a8b9de 78%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.25),0 10px 24px rgba(0,0,0,.60);}
+.turnNameBig{font-size:34px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
 @media(max-width:520px){
   .gameTitleBig{ font-size:20px; }
   .turnNameBig{ font-size:24px; }
@@ -783,7 +774,7 @@ function startApp(){
   const Games=[
     {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
     {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles"},
-    {id:"around",   name:"Around the Clock", icon:"🕒", active:true,  tagline:"1 → 20 → Bull • Singles/Doubles/Triples"},
+    {id:"around",   name:"Around the World", icon:"🌍", active:true,  tagline:"1 → 20 → Bull • Singles/Doubles/Triples"},
     {id:"halve",    name:"Halve-It", icon:"➗", active:false, tagline:"Coming soon"},
     {id:"baseball", name:"Baseball", icon:"⚾", active:false, tagline:"Coming soon"},
   ];
@@ -956,12 +947,12 @@ function startApp(){
       document.getElementById("hitM").onclick=()=>onHit("M");
       document.getElementById("undoBtn").onclick=()=>{ match=popSnap(ctx.match); render(); };
 
-      document.getElementById("resetBtn").onclick=()=>{
+      const resetBtn=$("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{
         const pls=ctx.match.players.map(p=>({name:p.name,email:p.email}));
         match=initMatch(pls);
         render();
       };
-      document.getElementById("backToSetup").onclick=()=>{
+      const backBtn=$("backToSetup"); if(backBtn) backBtn.onclick=()=>{
         match=null; screen="game.setup"; render();
       };
     }
@@ -1200,7 +1191,9 @@ function startApp(){
     }
 
     function bindPlay(ctx){
+      const $=(id)=>document.getElementById(id);
       const m=ctx.match;
+      if(!m) return;
 
       const backBtn=document.getElementById("backToSetup");
       if(backBtn){
@@ -1320,7 +1313,7 @@ function startApp(){
     return { initMatch, renderPlay, bindPlay };
   })();
 
-  // ===== Around the Clock (NEW, ACTIVE) =====
+  // ===== Around the World (NEW, ACTIVE) =====
   const AroundGame = (()=>{
     const TARGETS = Array.from({length:20},(_,i)=>i+1).concat(["B"]);
     const modeName = m => (m.mode==="D" ? "Doubles" : m.mode==="T" ? "Triples" : "Singles");
@@ -1399,7 +1392,7 @@ function startApp(){
 
       await saveHistoryEntry({
         gameId:"around",
-        gameName:"Around the Clock",
+        gameName:"Around the World",
         startedAt:m.startedAt,
         endedAt:m.endedAt,
         players:m.players.map(p=>p.email),
@@ -1495,11 +1488,11 @@ function startApp(){
           <div class="hero">
             <div class="heroCornerLeft">
               <div class="logoMark"><span>🕒</span></div>
-              <span class="kbd">Around the Clock</span>
+              <span class="kbd">Around the World</span>
             </div>
 
             <div class="heroMain">
-              <div class="gameTitleBig">Around the Clock</div>
+              <div class="gameTitleBig">Around the World</div>
               <div class="h1 turnTitle3d turnNameBig" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</div>
               <div class="sub">${statusLine}</div>
             </div>
@@ -1536,14 +1529,16 @@ function startApp(){
     }
 
     function bindPlay(ctx){
+      const $=(id)=>document.getElementById(id);
       const m=ctx.match;
+      if(!m) return;
 
-      document.getElementById("backToSetup").onclick=()=>{
+      const backBtn=$("backToSetup"); if(backBtn) backBtn.onclick=()=>{
         match=null;
         screen="game.setup";
         render();
       };
-      document.getElementById("resetBtn").onclick=()=>{
+      const resetBtn=$("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{
         const pls=m.players.map(p=>({name:p.name,email:p.email}));
         match=initMatch(pls, m.mode);
         render();
@@ -1559,14 +1554,14 @@ function startApp(){
         undoBtn.onclick=()=>{ match=popSnap(ctx.match); render(); };
       }
 
-      document.getElementById("hitBtn").onclick=()=>{
+      const hitBtn=$("hitBtn"); if(hitBtn) hitBtn.onclick=()=>{
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,true);
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
       };
-      document.getElementById("missBtn").onclick=()=>{
+      const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,false);
@@ -1623,8 +1618,8 @@ function startApp(){
       ]
     };
     if(gameId==="around") return {
-      title:"Around the Clock",
-      icon:"🕒",
+      title:"Around the World",
+      icon:"🌍",
       bullets:[
         "Before starting, choose a mode: Singles, Doubles, or Triples.",
         "Players take turns. Each turn is 3 darts.",
@@ -1637,8 +1632,8 @@ function startApp(){
     };
 
     if(gameId==="around") return {
-      title:"Around the Clock",
-      icon:"🕒",
+      title:"Around the World",
+      icon:"🌍",
       bullets:[
         "Before starting, choose a format: SINGLES, DOUBLES, or TRIPLES.",
         "Players take turns. Each turn is 3 darts.",
@@ -1985,7 +1980,7 @@ function startApp(){
 
     const aroundModeUI = (activeGameId==="around" && g.active) ? `
       <div class="divider"></div>
-      <label>Around the Clock mode</label>
+      <label>Format (Singles / Doubles / Triples)</label>
       <select id="aroundMode">
         <option value="S" selected>Singles</option>
         <option value="D">Doubles</option>
@@ -2044,7 +2039,7 @@ function startApp(){
             <option value="D">DOUBLES</option>
             <option value="T">TRIPLES</option>
           </select>
-          <div class="small">Choose how you want to play Around the Clock.</div>
+          <div class="small">Choose how you want to play Around the World.</div>
           ` : ``}
 
           <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
