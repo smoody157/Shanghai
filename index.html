@@ -6,81 +6,72 @@
 <title>Game Night</title>
 
 :root{
-  /* Base */
-  --bg:#0b1a2e;
-  --text:#eaf2ff;
-  --muted:#b9cbe5;
 
-  /* New color energy (multi-tone, not just blue) */
+  /* BACKGROUND */
+  --bg:#0f172a;
+  --bg-soft:#111827;
+
+  /* TEXT */
+  --text:#f1f5ff;
+  --muted:#9fb3d9;
+
+  /* PRIMARY ACCENTS */
   --accent:#4ea8ff;
-  --accent2:#9b5cff;
-  --accent3:#00d4ff;
-  --accent4:#ff7a18;
-  --accent5:#2bd576;
+  --accent2:#7c5cff;
+  --accent3:#22c55e;
 
-  /* Status */
+  /* GLOW COLORS */
+  --glow-blue:0 0 18px rgba(78,168,255,.45);
+  --glow-purple:0 0 18px rgba(124,92,255,.45);
+  --glow-green:0 0 18px rgba(34,197,94,.45);
+
+  /* STATUS */
   --danger:#ff4d5a;
-  --ok:#2bd576;
+  --ok:#22c55e;
 
-  /* Glass */
-  --shadow: rgba(0,0,0,.25);
+  /* GLASS UI */
   --glass: rgba(255,255,255,.06);
   --glass2: rgba(255,255,255,.03);
-
-  /* Glow layers */
-  --glow-blue: 0 0 18px rgba(78,168,255,.45);
-  --glow-purple: 0 0 18px rgba(155,92,255,.45);
-  --glow-green: 0 0 18px rgba(43,213,118,.45);
-  --glow-orange: 0 0 18px rgba(255,122,24,.45);
+  --shadow: rgba(0,0,0,.35);
 }
+  /* ===== ACTIVE GLOW SYSTEM ===== */
 
-/* ACTIVE BUTTON GLOW */
-.btn.ok{
-  background:linear-gradient(135deg,var(--accent),var(--accent3));
-  box-shadow:var(--glow-blue);
-}
-
-/* LIVE / ACTIVE STATE PULSE */
-@keyframes activeGlow{
+@keyframes pulseGlowBlue{
   0%{box-shadow:0 0 0 rgba(78,168,255,0)}
-  50%{box-shadow:0 0 22px rgba(78,168,255,.55)}
+  50%{box-shadow:var(--glow-blue)}
   100%{box-shadow:0 0 0 rgba(78,168,255,0)}
 }
 
-.pill{
-  background:linear-gradient(120deg,var(--accent2),var(--accent));
-  color:white;
-  box-shadow:var(--glow-purple);
+@keyframes pulseGlowPurple{
+  0%{box-shadow:0 0 0 rgba(124,92,255,0)}
+  50%{box-shadow:var(--glow-purple)}
+  100%{box-shadow:0 0 0 rgba(124,92,255,0)}
 }
 
-/* TURN VISIBILITY BOOST */
-.kTurnBig{
-  background:linear-gradient(90deg,#fff,var(--accent3),var(--accent2));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-shadow:0 0 12px rgba(0,212,255,.35);
+@keyframes pulseGlowGreen{
+  0%{box-shadow:0 0 0 rgba(34,197,94,0)}
+  50%{box-shadow:var(--glow-green)}
+  100%{box-shadow:0 0 0 rgba(34,197,94,0)}
 }
 
-/* HIT BUTTON COLOR VARIETY */
-.hitBtn{
-  background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+.pill:not(.soon){
+  animation:pulseGlowBlue 2.6s ease-in-out infinite;
 }
 
-.hitBtn:hover{
-  box-shadow:var(--glow-blue);
+.leaderGlow{
+  animation:pulseGlowPurple 2.8s ease-in-out infinite;
 }
 
-.hitBtn.miss{
-  background:linear-gradient(135deg,rgba(255,77,90,.35),rgba(255,77,90,.15));
-  box-shadow:0 0 16px rgba(255,77,90,.45);
+.btn.ok:not(:disabled){
+  animation:pulseGlowGreen 2.4s ease-in-out infinite;
 }
 
-/* HERO TITLE CHROME EFFECT */
-.h1{
-  letter-spacing:.4px;
-  background:linear-gradient(90deg,#ffffff,#9ed0ff,#d7b8ff,#ffffff);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+.hitBtn:not(:disabled){
+  animation:pulseGlowBlue 2.4s ease-in-out infinite;
+}
+
+.kAttackBtn:not(:disabled){
+  animation:pulseGlowPurple 2.4s ease-in-out infinite;
 }
 *{box-sizing:border-box;}
 body{
