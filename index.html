@@ -132,11 +132,22 @@ body{
 .card{
   background:linear-gradient(180deg,var(--glass),var(--glass2));
   border:1px solid rgba(255,255,255,.10);
-  border-radius:18px;padding:14px;
+  border-radius:18px;
+  padding:14px;
   position:relative;
-  box-shadow:0 16px 34px rgba(0,0,0,.42), 0 2.card::before{content:"";position:absolute;left:14px;right:14px;bottom:-12px;height:22px;border-radius:50%;background:rgba(0,0,0,.65);filter:blur(16px);opacity:.42;pointer-events:none;}
-8px 60px rgba(0,0,0,.28);
+  box-shadow:0 16px 34px rgba(0,0,0,.42), 0 8px 60px rgba(0,0,0,.28);
   margin-bottom:12px;
+}
+.card::before{
+  content:"";
+  position:absolute;
+  left:14px; right:14px; bottom:-12px;
+  height:22px;
+  border-radius:50%;
+  background:rgba(0,0,0,.65);
+  filter:blur(16px);
+  opacity:.42;
+  pointer-events:none;
 }
 
 .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
@@ -1631,18 +1642,8 @@ function startApp(){
       ]
     };
 
-    if(gameId==="around") return {
-      title:"Around the World",
-      icon:"🌍",
-      bullets:[
-        "Before starting, choose a format: SINGLES, DOUBLES, or TRIPLES.",
-        "Players take turns. Each turn is 3 darts.",
-        "During your turn you tap HIT or MISS for each dart.",
-        "The scoreboard only updates after all 3 darts are entered (matches real play flow).",
-        "Each HIT advances you forward by 1 target (1 → 20 → BULL).",
-        "First player to reach BULL wins — game ends immediately."
-      ]
-    };
+    
+
     const g=getGame(gameId);
     return {
       title:g?.name||"Game",
@@ -2032,15 +2033,7 @@ function startApp(){
 
           ${aroundModeUI}
 
-          ${g.id==="around" ? `
-          <label>Format</label>
-          <select id="aroundMode">
-            <option value="S" selected>SINGLES</option>
-            <option value="D">DOUBLES</option>
-            <option value="T">TRIPLES</option>
-          </select>
-          <div class="small">Choose how you want to play Around the World.</div>
-          ` : ``}
+          
 
           <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
           <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
@@ -2125,14 +2118,8 @@ function startApp(){
     }
 
 
-    if(activeGameId==="around"){
-      const ctx={meUser, match};
-      appEl.innerHTML=AroundGame.renderPlay(ctx);
-      AroundGame.bindPlay(ctx);
-      return;
-    }
-
-    screen="home"; render();
+    
+screen="home"; render();
   }
 
   async function renderStats(){
@@ -2192,8 +2179,6 @@ function startApp(){
             ? `Played: <b>${played}</b> • Best: <b>${esc(gs.best||0)}</b> • Points: <b>${esc(gs.points||0)}</b>`
           : g.id==="killer"
             ? `Played: <b>${played}</b> • Wins: <b>${esc(gs.wins||0)}</b>`
-          : g.id==="around"
-            ? (()=>{ const hits=gs.hits||0, darts=gs.darts||0; const pct=darts?Math.round((hits/darts)*100):0; return `Played: <b>${played}</b> • Wins: <b>${esc(gs.wins||0)}</b> • Hit%: <b>${esc(pct)}%</b>`; })()
           : g.id==="around"
             ? aroundLine(gs)
           : (g.active ? `Played: <b>${played}</b>` : `Coming soon`);
@@ -2307,17 +2292,8 @@ function startApp(){
         <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
       `;
 
-    }else if(g.id==="around"){
-      const hits=gs.hits||0;
-      const darts=gs.darts||0;
-      const pct=darts?Math.round((hits/darts)*100):0;
-      body=`
-        <div class="sub">Played: <b>${esc(gs.played||0)}</b></div>
-        <div class="sub">Wins: <b>${esc(gs.wins||0)}</b></div>
-        <div class="sub">Hits / Darts: <b>${esc(hits)}</b> / <b>${esc(darts)}</b> (<b>${esc(pct)}%</b>)</div>
-        <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
-      `;
-    }else{
+    }
+else{
       body=g.active?`<div class="sub">Played: <b>${esc(gs.played||0)}</b></div>`:`<div class="sub">Coming soon.</div>`;
     }
 
