@@ -251,35 +251,6 @@ input,select{
 }
 
 
-
-/* ===== Turn swap animation (player change) ===== */
-.turnSwap{
-  position:relative;
-  overflow:hidden;
-  width:100%;
-  max-width:100%;
-  min-height:64px;
-}
-.turnSwap .turnCard{
-  position:absolute;
-  left:0; right:0; top:0;
-}
-.turnSwap .turnCard .sub{ margin-top:6px; }
-
-@keyframes turnInRight{
-  0%{ transform:translateX(28%); opacity:0; filter:blur(1.5px); }
-  100%{ transform:translateX(0%); opacity:1; filter:blur(0px); }
-}
-@keyframes turnOutLeft{
-  0%{ transform:translateX(0%); opacity:1; filter:blur(0px); }
-  100%{ transform:translateX(-28%); opacity:0; filter:blur(1.5px); }
-}
-.turnSwap .turnCard.in{ animation:turnInRight .36s ease-out both; }
-.turnSwap .turnCard.out{ animation:turnOutLeft .30s ease-in both; }
-
-.turnSwapOne .sub{ margin-top:6px; }
-
-
 /* ===== Bigger game + turn titles ===== */
 .gameTitleBig{font-size:30px;font-weight:1000;letter-spacing:.6px;margin:0;white-space:nowrap;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 20%,#ffffff 42%,#a8b9de 78%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.25),0 10px 24px rgba(0,0,0,.60);}
 .turnNameBig{font-size:34px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
@@ -348,6 +319,69 @@ input,select{
     max-width:100%;
   }
 }
+/* ===== Play header (turn swipe) ===== */
+.titleRow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:4px;
+}
+.logoMini{
+  width:34px;height:34px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.04);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
+  flex:0 0 auto;
+  font-size:18px;
+}
+.turnSwipe{
+  position:relative;
+  height:44px;
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.turnName{
+  position:absolute;
+  left:50%;
+  transform:translate3d(-50%,0,0);
+  font-size:34px;
+  font-weight:1000;
+  letter-spacing:.5px;
+  background:var(--chrome-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);
+  white-space:nowrap;
+  max-width:min(90vw, 720px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.turnIn{ animation:turnIn .36s cubic-bezier(.2,.9,.2,1) both; }
+.turnOut{ animation:turnOut .36s cubic-bezier(.4,0,.2,1) both; }
+
+@keyframes turnIn{
+  from{ transform:translate3d(140%,0,0); opacity:.0; }
+  to  { transform:translate3d(-50%,0,0); opacity:1; }
+}
+@keyframes turnOut{
+  from{ transform:translate3d(-50%,0,0); opacity:1; }
+  to  { transform:translate3d(-220%,0,0); opacity:0; }
+}
+
+/* target label glow */
+.targetGlow{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  box-shadow:0 0 18px rgba(34,211,238,.40), 0 0 18px rgba(139,92,246,.35);
+}
+
 
 /* ===== Shanghai table header name styling (prevents split) ===== */
 .thName{
@@ -589,39 +623,18 @@ function normEmail(e){ return String(e??"").trim().toLowerCase(); }
 function now(){ return Date.now(); }
 function fmt(ts){ try{return new Date(ts).toLocaleString();}catch{return "";} }
 
-// ===== Turn swap (player change) =====
-let __lastTurnInfo = null; // {sig,title,sub}
-function computeTurnSwap(next){
-  const changed = !!(__lastTurnInfo && __lastTurnInfo.sig !== next.sig);
-  const prev = changed ? __lastTurnInfo : null;
-  __lastTurnInfo = next;
-  return {changed, prev, next};
-}
-function renderTurnSwap(s, titleClass){
-  if(!s || !s.next) return "";
-  const titleCls = titleClass || "";
-  if(!s.changed || !s.prev){
-    return `
-      <div class="turnSwapOne">
-        <div class="${titleCls}">${s.next.title}</div>
-        <div class="sub">${s.next.sub}</div>
-      </div>
-    `;
+function turnSwipe(gameId, name){
+  window.__turnMem = window.__turnMem || {};
+  const prev = window.__turnMem[gameId];
+  window.__turnMem[gameId] = name;
+  if(prev && prev !== name){
+    return `<div class="turnSwipe">
+      <div class="turnName turnOut">${esc(prev)}</div>
+      <div class="turnName turnIn dangerPulse">${esc(name)}</div>
+    </div>`;
   }
-  return `
-    <div class="turnSwap">
-      <div class="turnCard out">
-        <div class="${titleCls}">${s.prev.title}</div>
-        <div class="sub">${s.prev.sub}</div>
-      </div>
-      <div class="turnCard in">
-        <div class="${titleCls}">${s.next.title}</div>
-        <div class="sub">${s.next.sub}</div>
-      </div>
-    </div>
-  `;
+  return `<div class="turnSwipe"><div class="turnName turnIn dangerPulse">${esc(name)}</div></div>`;
 }
-
 
 const appEl=document.getElementById("app");
 const homeBtn=document.getElementById("homeBtn");
@@ -1000,19 +1013,21 @@ function startApp(){
         <div class="card">
           <div class="hero">
             <div class="heroCornerLeft">
-              <div class="logoMark"><span>🎯</span></div>
               <span class="kbd">Shanghai</span>
             </div>
 
             <div class="heroMain">
-              <div class="gameTitleBig">Shanghai</div>
-              ${renderTurnSwap(ctx.turnSwap,"h1 turnTitle3d turnNameBig")}
+              <div class="titleRow">
+                <div class="logoMini" aria-hidden="true">🎯</div>
+                <div class="gameTitleBig">Shanghai</div>
+              </div>
+              ${turnSwipe("shanghai", activePlayer.name)}
               <div class="small"><span class="badge">NOW THROWING</span></div>
+              <div class="sub statusLine">Target: <b><span class="targetGlow">${esc(t==="B"?"BULL":t)}</span></b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
             <div class="heroCornerRight">
               <span class="pill" data-live="1">Live</span>
-              ${nextPlayer?`<span class="badge" title="Up next">Up next: ${esc(nextPlayer.name)}</span>`:""}
             </div>
           </div>
 
@@ -1263,18 +1278,22 @@ function startApp(){
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
           <div class="hero">
             <div class="heroCornerLeft">
-              <div class="logoMark"><span>🔥</span></div>
               <span class="kbd">Killer</span>
             </div>
 
             <div class="heroMain">
-              ${renderTurnSwap(ctx.turnSwap,"kTurnBig turnTitle3d")}
+              <div class="titleRow">
+                <div class="logoMini" aria-hidden="true">🔥</div>
+                <div class="gameTitleBig">Killer</div>
+              </div>
+
+              ${isFinished ? `<div class="turnSwipe"><div class="turnName turnIn">${esc("Game Over")}</div></div>` : turnSwipe("killer", active.name)}
               ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="kTurnSub statusLine">${statusLine}</div>
             </div>
 
             <div class="heroCornerRight">
               <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
-              ${nextOnDeck?`<span class="badge" title="Up next">Up next: ${esc(nextOnDeck.name)}</span>`:""}
             </div>
           </div>
 
@@ -1606,19 +1625,22 @@ function startApp(){
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
           <div class="hero">
             <div class="heroCornerLeft">
-              <div class="logoMark"><span>🕒</span></div>
               <span class="kbd">Around the World</span>
             </div>
 
             <div class="heroMain">
-              <div class="gameTitleBig">Around the World</div>
-              ${renderTurnSwap(ctx.turnSwap,"h1 turnTitle3d turnNameBig")}
+              <div class="titleRow">
+                <div class="logoMini" aria-hidden="true">🌍</div>
+                <div class="gameTitleBig">Around the World</div>
+              </div>
+
+              ${isFinished ? `<div class="turnSwipe"><div class="turnName turnIn">${esc("Game Over")}</div></div>` : turnSwipe("around", active.name)}
               ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="sub statusLine">${statusLine}</div>
             </div>
 
             <div class="heroCornerRight">
               ${livePill}
-              ${nextPlayer?`<span class="badge" title="Up next">Up next: ${esc(nextPlayer.name)}</span>`:""}
             </div>
           </div>
 
@@ -2205,67 +2227,22 @@ function startApp(){
     signOutBtn.style.display="inline-block";
     brandTitle.textContent=g.name;
 
-    // Turn swap (player change) for animated headers
-    let turnSwap=null;
-    try{
-      let sig="", title="", sub="";
-      if(activeGameId==="shanghai"){
-        const p=match.players[match.turnIndex];
-        const SH=[20,19,18,17,16,15,"B"];
-        const t=SH[match.targetIndex];
-        const tLabel=(t==="B"?"BULL":String(t));
-        sig=`shanghai:${p.email}`;
-        title=`${esc(p.name)}’s Turn`;
-        sub=`Target: <b>${esc(tLabel)}</b> • Dart <b>${match.dartInTurn+1}</b>/3`;
-      }else if(activeGameId==="killer"){
-        if(match.phase==="claim"){
-          const p=match.players[match.claimIndex];
-          sig=`killer:claim:${p.email}`;
-          title=`${esc(p.name)}`;
-          sub=`Claim your number`;
-        }else{
-          const isFinished=!!match.finished;
-          const p=match.players[match.turnIndex];
-          sig=isFinished?`killer:finished:${match.winner?.email||"?"}`:`killer:${p.email}`;
-          title=isFinished?`Game Over`:`${esc(p.name)}’s Turn`;
-          sub=isFinished
-            ? `Winner: <b>${esc(match.winner?.name||"")}</b>`
-            : `Dart <b>${match.dartInTurn+1}</b>/3 • ${p.killer?"🔥 Killer":"Not killer yet"}`;
-        }
-      }else if(activeGameId==="around"){
-        const isFinished=!!match.finished;
-        const p=match.players[match.turnIndex];
-        sig=isFinished?`around:finished:${match.winner?.email||"?"}`:`around:${p.email}`;
-        const modeName = (match.mode==="D" ? "Doubles" : match.mode==="T" ? "Triples" : "Singles");
-        const TARGETS = Array.from({length:20},(_,i)=>i+1).concat(["B"]);
-        const cur = (pp)=>TARGETS[Math.min(pp.progressIndex, TARGETS.length-1)];
-        const t = isFinished ? null : cur(p);
-        const tLabel = (t==="B"?"BULL":String(t));
-        title=isFinished?`Game Over`:`${esc(p.name)}’s Turn`;
-        sub=isFinished
-          ? `Winner: <b>${esc(match.winner?.name||"")}</b> • Mode: <b>${esc(modeName)}</b>`
-          : `Target: <b>${esc(tLabel)}</b> • Mode: <b>${esc(modeName)}</b> • Dart <b>${match.dartInTurn+1}</b>/3`;
-      }
-      if(title) turnSwap = computeTurnSwap({sig, title, sub});
-    }catch(e){}
-
-
     if(activeGameId==="shanghai"){
-      const ctx={meUser, match, turnSwap};
+      const ctx={meUser, match};
       setHTML(ShanghaiGame.renderPlay(ctx));
       ShanghaiGame.bindPlay(ctx);
       return;
     }
 
     if(activeGameId==="killer"){
-      const ctx={meUser, match, turnSwap};
+      const ctx={meUser, match};
       setHTML(KillerGame.renderPlay(ctx));
       KillerGame.bindPlay(ctx);
       return;
     }
 
     if(activeGameId==="around"){
-      const ctx={meUser, match, turnSwap};
+      const ctx={meUser, match};
       setHTML(AroundGame.renderPlay(ctx));
       AroundGame.bindPlay(ctx);
       return;
