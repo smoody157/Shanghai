@@ -1,3 +1,4 @@
+<!-- PART 1 / 2 -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,7 +16,7 @@
   --text:#eef4ff;
   --muted:#9fb0d0;
 
-  /* MULTI-COLOR ACCENTS */
+  /* MULTI-COLOR ACCENTS (NOT “ALL BLUE”) */
   --c-cyan:#22d3ee;
   --c-purple:#8b5cf6;
   --c-pink:#ec4899;
@@ -33,7 +34,7 @@
   --glass2: rgba(255,255,255,.025);
   --shadow: rgba(0,0,0,.45);
 
-  /* CHROME MATERIAL */
+  /* CHROME MATERIAL (SUBTLE, DARK) */
   --chrome-border: rgba(255,255,255,.18);
   --chrome-fill: linear-gradient(180deg,
     rgba(255,255,255,.18) 0%,
@@ -66,7 +67,7 @@ body{
     radial-gradient(1100px 720px at 50% 115%, rgba(249,115,22,.10), transparent 60%),
     linear-gradient(180deg, #040610, var(--bg));
   color:var(--text);
-  padding-bottom:56px; 
+  padding-bottom:56px; /* room for footer */
 }
 
 /* ===== Footer legal ===== */
@@ -89,11 +90,11 @@ body{
   max-width:980px;
 }
 
-/* ===== Topbar (FIXED: cleaner mobile header) ===== */
+/* ===== Topbar (FIXED: true center alignment) ===== */
 .topbar{
   position:sticky;top:0;z-index:10;
   display:grid;
-  grid-template-columns: 80px 1fr 80px;
+  grid-template-columns: 110px 1fr 110px; /* FIX: stable center */
   align-items:center;
   gap:10px;
   padding:10px 12px;
@@ -102,39 +103,49 @@ body{
   backdrop-filter:blur(12px);
   border-bottom:1px solid rgba(255,255,255,.08);
 }
+@media(max-width:420px){
+  .topbar{ grid-template-columns: 92px 1fr 92px; }
+  .brand .t{ font-size:15px; }
+  .brand .s{ font-size:11px; }
+}
+
+/* keep side areas consistent width */
 .topActions{
   display:flex;
   align-items:center;
+  gap:10px;
+  width:100%;
 }
 .topActions.left{justify-content:flex-start}
 .topActions.right{justify-content:flex-end}
 
 .brand{
+  grid-column:2;
+  width:100%;
   display:flex;
   flex-direction:column;
-  line-height:1.2;
+  line-height:1.05;
   align-items:center;
   text-align:center;
 }
-.brand .t{font-weight:900;font-size:17px;letter-spacing:0.5px}
+.brand .t{font-weight:900;font-size:16px}
 .brand .s{
-  font-size:10px;
-  font-weight:600;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
+  font-size:12px;
   color:var(--muted);
+  white-space:normal;
+  overflow-wrap:anywhere;
 }
 
 .wrap{max-width:980px;margin:0 auto;padding:14px}
 .card{
   background:linear-gradient(180deg,var(--glass),var(--glass2));
   border:1px solid rgba(255,255,255,.10);
-  border-radius:18px;padding:16px;
+  border-radius:18px;padding:14px;
   box-shadow:0 10px 28px rgba(0,0,0,.34);
   margin-bottom:12px;
 }
 
-.h1{font-size:24px;font-weight:1000;margin:0 0 4px 0}
+.h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
 .sub{color:var(--muted);font-size:13px}
 label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
 
@@ -157,9 +168,9 @@ input,select{
   border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
 }
 
-.divider{height:1px;background:rgba(255,255,255,.10);margin:16px 0}
+.divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
 
-/* ===== Buttons ===== */
+/* ===== Chrome UI (buttons/badges) ===== */
 .btn{
   border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.06);
@@ -168,10 +179,9 @@ input,select{
   box-shadow:0 6px 16px var(--shadow);
   cursor:pointer;
   position:relative;
-  font-size: 13px;
 }
 .btn:active{transform:translateY(1px)}
-.btn.ghost{background:transparent;box-shadow:none;color:var(--muted); border: 1px solid transparent;}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
 .btn.ok{
   background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.12));
   border-color:rgba(34,197,94,.40);
@@ -182,16 +192,40 @@ input,select{
 }
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-.btn:not(.ghost), .hitBtn, .kAttackBtn, .pill, .badge, .kbd{
+/* “Chrome” surface + highlight for primary clickable UI */
+.btn:not(.ghost),
+.hitBtn,
+.kAttackBtn,
+.pill,
+.badge,
+.kbd{
   background:var(--chrome-fill);
   border:1px solid var(--chrome-border);
   box-shadow:
-    0 8px 16px rgba(0,0,0,.32),
-    inset 0 1px 0 rgba(255,255,255,.20);
+    0 10px 22px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -12px 18px rgba(0,0,0,.38);
 }
+.btn:not(.ghost)::after,
+.hitBtn::after,
+.kAttackBtn::after,
+.pill::after,
+.badge::after,
+.kbd::after{
+  content:"";
+  position:absolute;
+  left:10px; right:10px; top:7px;
+  height:38%;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0));
+  pointer-events:none;
+  opacity:.85;
+}
+.pill,.badge,.kbd{ position:relative; }
 
-/* ===== Chrome text ===== */
-.h1, .kTurnBig, .brand .t, th, td.l, .rosterName{
+/* ===== Chrome text (HEADERS ONLY) ===== */
+/* FIX: removed `th` so table headers don’t go transparent + “cut” weird */
+.h1, .kTurnBig, .brand .t, td.l, .rosterName, .thName{
   background:var(--chrome-text);
   -webkit-background-clip:text;
   background-clip:text;
@@ -199,21 +233,13 @@ input,select{
   text-shadow:0 2px 12px rgba(0,0,0,.45);
 }
 
-/* ===== Pills / Badges (FIXED ALIGNMENT) ===== */
+/* ===== Pills / tags ===== */
 .pill{
-  display:inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding:4px 10px;
-  border-radius:999px;
-  color:var(--text);
-  font-weight:900;
-  font-size:11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
+  display:inline-block;padding:6px 10px;border-radius:999px;
+  color:var(--text);font-weight:900;font-size:12px;
 }
 .pill.soon{background:rgba(255,255,255,.05); color:var(--muted)}
+.pill[data-live="1"]{ border-color: rgba(34,211,238,.38); }
 
 .badge{
   display:inline-block;padding:4px 8px;border-radius:999px;
@@ -222,42 +248,54 @@ input,select{
 }
 .kbd{
   display:inline-block;padding:2px 8px;border-radius:999px;
-  color:var(--muted); font-weight:900; font-size:11px;
+  color:var(--muted); font-weight:900; font-size:12px;
 }
 
-/* ===== Hero alignment (Clean & Balanced) ===== */
+/* ===== Hero alignment (clean, centered) ===== */
 .hero{
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-}
-.heroCornerLeft{
-  flex: 0 0 auto;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
 }
 .heroMain{
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex:1;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+.heroCornerLeft{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  flex:0 0 auto;
+  min-width:140px;
 }
 .heroCornerRight{
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex:0 0 auto;
+  min-width:140px;
+  white-space:nowrap;
+}
+@media(max-width:420px){
+  .hero{gap:10px}
+  .heroCornerLeft,.heroCornerRight{min-width:96px} /* helps “Live” + corners not shove center */
 }
 
 .logoMark{
-  width:48px;height:48px;border-radius:14px;
+  width:44px;height:44px;border-radius:14px;
   background:
     radial-gradient(60% 60% at 30% 20%, rgba(34,211,238,.18), rgba(139,92,246,.16)),
     rgba(255,255,255,.05);
   border:1px solid rgba(255,255,255,.12);
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 10px 24px rgba(0,0,0,.25);
+  flex:0 0 auto;
 }
-.logoMark span{font-size:24px}
+.logoMark span{font-size:20px}
 
 /* ===== Game cards ===== */
 .gameGrid{display:grid;grid-template-columns:1fr;gap:12px}
@@ -265,20 +303,22 @@ input,select{
 .gameCard{
   background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   border:1px solid rgba(255,255,255,.10);
-  border-radius:18px;padding:16px;
+  border-radius:18px;padding:14px;
   box-shadow:0 10px 26px rgba(0,0,0,.28);
 }
 .gameHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.gameTitle{display:flex;align-items:center;gap:12px}
+.gameTitle{display:flex;align-items:center;gap:10px}
 .gameIcon{
-  width:40px;height:40px;border-radius:12px;
+  width:38px;height:38px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
+  background:
+    radial-gradient(60% 60% at 30% 20%, rgba(236,72,153,.16), rgba(34,211,238,.10)),
+    rgba(255,255,255,.04);
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;
+  font-size:18px;
 }
-.gameMeta{color:var(--muted);font-size:13px;margin-top:2px}
-.gameActions{display:flex;gap:10px;margin-top:14px}
+.gameMeta{color:var(--muted);font-size:13px;margin-top:4px}
+.gameActions{display:flex;gap:10px;margin-top:10px}
 .gameActions .btn{flex:1}
 
 /* ===== Roster ===== */
@@ -286,42 +326,55 @@ input,select{
 @media(min-width:860px){ .rosterGrid{grid-template-columns:1fr 1fr;} }
 .rosterCard{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:12px 14px;border-radius:16px;
+  padding:12px 12px;border-radius:16px;
   border:1px solid rgba(255,255,255,.10);
   background:rgba(255,255,255,.03);
 }
-.rosterLeft{display:flex;align-items:center;gap:12px}
+.rosterLeft{display:flex;align-items:center;gap:10px}
 .avatar{
-  width:36px;height:36px;border-radius:12px;
+  width:34px;height:34px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.04);
+  background:
+    radial-gradient(60% 60% at 30% 20%, rgba(34,197,94,.18), rgba(139,92,246,.10)),
+    rgba(255,255,255,.04);
   display:flex;align-items:center;justify-content:center;
   font-weight:1000;color:var(--c-cyan);
 }
-.rosterSub{color:var(--muted);font-size:11px;margin-top:1px}
+.rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
 
-/* ===== Indicators ===== */
+/* ===== Indicators kept ===== */
 @keyframes dangerPulse{0%{box-shadow:0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 24px rgba(239,68,68,.35)}100%{box-shadow:0 0 0 rgba(239,68,68,0)}}
 .dangerPulse{animation:dangerPulse 1.1s ease-in-out infinite;}
 @keyframes leaderGlow{0%{box-shadow:0 0 0 rgba(34,197,94,0)}50%{box-shadow:0 0 26px rgba(34,197,94,.25)}100%{box-shadow:0 0 0 rgba(34,197,94,0)}}
 .leaderGlow{animation:leaderGlow 1.25s ease-in-out infinite;}
 
-/* ===== Tables ===== */
+/* ===== Tables / active cell ===== */
 table{width:100%;border-collapse:collapse}
-th,td{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,.10);vertical-align:top}
-th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px); text-align: left;}
-.small{font-size:11px;color:var(--muted);margin-top:2px}
+th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.10);vertical-align:top}
+th{
+  position:sticky;top:0;
+  background:rgba(7,10,20,.88);
+  backdrop-filter:blur(10px);
+  color:var(--text); /* FIX: header text is real text again */
+}
+.small{font-size:12px;color:var(--muted);margin-top:4px}
 .activeCell{outline:2px solid rgba(34,211,238,.55); outline-offset:-2px; border-radius:10px}
 
+/* ===== Shanghai header cells (FIX: name above pts, stable layout) ===== */
+.playerTh{ text-align:center; vertical-align:bottom; }
+.thName{ font-weight:1000; font-size:13px; line-height:1.1; }
+.thPts{ margin-top:4px; }
+
 /* ===== Play UI ===== */
-.boardBox{display:flex;justify-content:center;align-items:center; padding: 10px 0;}
+.boardBox{display:flex;justify-content:center;align-items:center}
 .hitRow{display:flex;gap:10px;flex-wrap:wrap}
 .hitBtn{
-  flex:1; min-width:110px;
+  flex:1; min-width:120px;
   border-radius:14px;
+  border:1px solid rgba(255,255,255,.14);
   color:var(--text);
   font-weight:1000;
-  padding:14px;
+  padding:12px;
   cursor:pointer;
   position:relative;
 }
@@ -334,23 +387,25 @@ th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px)
 }
 .hitBtn.undo::after{display:none}
 
+/* ===== Active target pulse on the board ===== */
 @keyframes hotPulse{0%{opacity:.20;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.2)}100%{opacity:.20;filter:brightness(1)}}
 .hotWedge{animation:hotPulse .85s ease-in-out infinite;}
 
 /* ===== Killer typography ===== */
 .kTurnBig{
-  font-size:28px;
+  font-size:34px;
   font-weight:1000;
   letter-spacing:.4px;
   margin:0;
 }
-.kTurnSub{font-size:14px;color:var(--muted);margin-top:4px}
+.kTurnSub{font-size:15px;color:var(--muted);margin-top:6px}
 .kNumberBig{font-size:22px;font-weight:1000;}
 .kLivesBig{font-size:18px;font-weight:1000;letter-spacing:2px; display:flex; justify-content:flex-end; gap:6px; align-items:center;}
 .kAttackGrid{display:grid;grid-template-columns:1fr;gap:10px;}
 @media(min-width:860px){ .kAttackGrid{grid-template-columns:1fr 1fr;} }
 .kAttackBtn{
   border-radius:16px;
+  border:1px solid rgba(255,255,255,.14);
   color:var(--text);
   font-weight:1000;
   padding:14px;
@@ -359,8 +414,9 @@ th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px)
   position:relative;
 }
 .kAttackBtn:disabled{opacity:.45;cursor:not-allowed}
+.kAttackBtn::after{ border-radius:14px; }
 
-/* ===== Hearts ===== */
+/* ===== Hearts (FIXED: no HTML tags printing; always red) ===== */
 .heart{
   color:var(--danger);
   text-shadow:0 2px 10px rgba(0,0,0,.35);
@@ -371,10 +427,9 @@ th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px)
   color:rgba(159,176,208,.9);
   font-weight:1000;
   letter-spacing:.8px;
-  font-size: 11px;
 }
 
-/* ===== Multi-color glow ===== */
+/* ===== Multi-color glow (active) ===== */
 @keyframes glowCycle{
   0%   { box-shadow:0 0 0 rgba(0,0,0,0); }
   25%  { box-shadow:0 0 18px rgba(34,211,238,.55); }
@@ -389,11 +444,15 @@ th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px)
   0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 18px rgba(139,92,246,.55)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}
 }
 
+/* Live pills glow */
 .pill[data-live="1"]{ animation:glowCycle 2.4s ease-in-out infinite; }
+
+/* Primary actions glow */
 .btn.ok:not(:disabled){ animation:glowGreen 2.2s ease-in-out infinite; }
 .hitBtn:not(:disabled):not(.undo){ animation:glowCycle 2.4s ease-in-out infinite; }
 .kAttackBtn:not(:disabled){ animation:glowPurple 2.3s ease-in-out infinite; }
 
+/* Tiny readability boost */
 .sub,.small,.brand .s{ text-shadow:0 2px 10px rgba(0,0,0,.30); }
 </style>
 </head>
@@ -406,7 +465,7 @@ th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px)
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs</div>
   </div>
 
   <div class="topActions right">
@@ -418,6 +477,7 @@ th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px)
   <div class="card"><div class="h1">Loading…</div><div class="sub">Starting up…</div></div>
 </div>
 
+<!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
   <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs.</div>
 </div>
@@ -447,10 +507,8 @@ function showFatal(title,msg){
   appEl.innerHTML=`
     <div class="card">
       <div class="hero">
-        <div class="heroCornerLeft">
-          <div class="logoMark"><span>⚠</span></div>
-        </div>
-        <div class="heroMain">
+        <div class="logoMark"><span>⚠</span></div>
+        <div style="flex:1">
           <div class="h1">${esc(title)}</div>
           <div class="sub" style="white-space:pre-wrap">${esc(msg)}</div>
         </div>
@@ -460,6 +518,8 @@ function showFatal(title,msg){
         <button class="btn ok" id="retryBtn">Retry</button>
         <button class="btn ghost" id="reloadBtn">Hard Reload</button>
       </div>
+      <div class="divider"></div>
+      <div class="sub">If you’re on iPhone/Safari, make sure content blockers aren’t blocking Google scripts.</div>
     </div>
   `;
   document.getElementById("retryBtn").onclick=()=>boot();
@@ -726,8 +786,15 @@ function startApp(){
       const t=TARGETS[m.targetIndex];
       const activePlayer=m.players[m.turnIndex];
 
+      /* FIX: player name ALWAYS above pts in the header */
       let thead=`<tr><th>Target</th>`;
-      for(const p of m.players) thead+=`<th>${esc(p.name)}<div class="small">${p.total} pts</div></th>`;
+      for(const p of m.players){
+        thead+=`
+          <th class="playerTh">
+            <div class="thName">${esc(p.name)}</div>
+            <div class="small thPts">${p.total} pts</div>
+          </th>`;
+      }
       thead+=`</tr>`;
 
       let tbody="";
@@ -743,7 +810,7 @@ function startApp(){
         tbody+=`</tr>`;
       }
 
-      const finishedBanner = m.finished ? `<div class="divider"></div><div style="text-align:center"><span class="pill">Finished</span></div>` : "";
+      const finishedBanner=m.finished?`<div class="divider"></div><div class="pill">Finished</div>`:"";
 
       return `
         <div class="card">
@@ -757,10 +824,11 @@ function startApp(){
           <div class="hero">
             <div class="heroCornerLeft">
               <div class="logoMark"><span>🎯</span></div>
+              <span class="kbd">Shanghai</span>
             </div>
 
             <div class="heroMain">
-              <div class="h1">${esc(activePlayer.name)}</div>
+              <div class="h1" style="margin:0">${esc(activePlayer.name)}’s Turn</div>
               <div class="sub">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
@@ -785,9 +853,7 @@ function startApp(){
         </div>
 
         <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-             <span class="pill">Round Table</span>
-          </div>
+          <div class="pill">Round table</div>
           <div class="divider"></div>
           <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
             <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
@@ -824,7 +890,7 @@ function startApp(){
     return {initMatch, renderPlay, bindPlay};
   })();
 
-  /* Killer */
+  /* Killer (FIXED: no typing; per-opponent attack buttons; lives reliably drop) */
   const KillerGame = (() => {
     const MAX_LIVES = 3;
 
@@ -937,17 +1003,21 @@ function startApp(){
             <div class="hero">
               <div class="heroCornerLeft">
                 <div class="logoMark"><span>🔥</span></div>
+                <span class="kbd">Killer</span>
               </div>
 
               <div class="heroMain">
-                <div class="h1">${esc(p.name)}</div>
-                <div class="sub">Opposite-hand throw — pick your number.</div>
+                <div class="h1">Killer</div>
+                <div class="sub">Claim numbers (one at a time).</div>
               </div>
 
               <div class="heroCornerRight">
                 <span class="pill">Setup</span>
               </div>
             </div>
+            <div class="divider"></div>
+            <div class="kTurnBig" style="text-align:center">${esc(p.name)}</div>
+            <div class="kTurnSub" style="text-align:center">Opposite-hand throw — pick the number you hit.</div>
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
@@ -958,6 +1028,10 @@ function startApp(){
 
       const active=m.players[m.turnIndex];
       const isFinished = !!m.finished;
+
+      const statusLine = isFinished
+        ? `🏆 Winner: <b>${esc(m.winner?.name||"")}</b>`
+        : `${esc(active.name)} • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?"🔥 Killer":"Not killer yet"}`;
 
       const rows = m.players.map(p=>{
         const livesHtml = p.out ? `<span class="lifeOut">OUT</span>` : heartsHTML(p.lives);
@@ -984,9 +1058,10 @@ function startApp(){
       const attackTargets = m.players
         .filter(p=>!p.out && p.email!==active.email)
         .map(p=>{
+          const label = `${p.name} • ${p.number ?? "?"} • ${"❤️".repeat(Math.max(0,p.lives))}`;
           return `<button class="kAttackBtn" data-attack="${esc(p.email)}" ${canAttack?"":"disabled"}>
-            HIT ${esc(p.name)}’s DOUBLE
-            <div class="small">${esc(p.name)} • #${esc(p.number ?? "?")}</div>
+            HIT ${esc(p.name)}’s DOUBLE → remove 1 life
+            <div class="small">${esc(label)}</div>
           </button>`;
         }).join("");
 
@@ -1002,11 +1077,12 @@ function startApp(){
           <div class="hero">
             <div class="heroCornerLeft">
               <div class="logoMark"><span>🔥</span></div>
+              <span class="kbd">Killer</span>
             </div>
 
             <div class="heroMain">
-              <div class="h1">${isFinished ? "Game Over" : esc(active.name)}</div>
-              <div class="sub">Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?"🔥 Killer":"Not killer yet"}</div>
+              <h2 class="kTurnBig" style="margin:0">${isFinished ? "Finished" : `${esc(active.name)}’s Turn`}</h2>
+              <div class="kTurnSub">${statusLine}</div>
             </div>
 
             <div class="heroCornerRight">
@@ -1014,7 +1090,7 @@ function startApp(){
             </div>
           </div>
 
-          ${isFinished ? `<div class="divider"></div><div class="h1" style="text-align:center">🏆 ${esc(m.winner?.name)} Wins!</div>` : `
+          ${isFinished ? "" : `
             <div class="divider"></div>
             <div class="hitRow">
               <button class="hitBtn" id="myDouble">I HIT MY DOUBLE</button>
@@ -1022,7 +1098,9 @@ function startApp(){
               <button class="hitBtn undo" id="undoBtn">UNDO</button>
             </div>
             <div class="divider"></div>
-            <div style="text-align:center; margin-bottom: 10px;"><span class="kbd">Attack Buttons</span></div>
+            <div class="pill">Attack buttons</div>
+            <div class="small">Tap the opponent you hit (double). Removes 1 life.</div>
+            <div class="divider"></div>
             <div class="kAttackGrid">
               ${attackTargets || `<div class="sub">No opponents available.</div>`}
             </div>
@@ -1030,12 +1108,11 @@ function startApp(){
         </div>
 
         <div class="card">
-           <div style="display:flex; justify-content:space-between; align-items:center;">
-             <span class="pill">Player Roster</span>
-          </div>
+          <div class="pill">Players</div>
           <div class="divider"></div>
           <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
             <table>
+              <thead><tr><th>Roster</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
@@ -1046,16 +1123,25 @@ function startApp(){
     function bindPlay(ctx){
       const m=ctx.match;
 
+      // Back/Reset (claim + play)
       const backBtn=document.getElementById("backToSetup");
-      if(backBtn) backBtn.onclick=()=>{ match=null; screen="game.setup"; render(); };
-      
+      if(backBtn){
+        backBtn.onclick=()=>{
+          match=null;
+          screen="game.setup";
+          render();
+        };
+      }
       const resetBtn=document.getElementById("resetBtn");
-      if(resetBtn) resetBtn.onclick=()=>{
+      if(resetBtn){
+        resetBtn.onclick=()=>{
           const pls=m.players.map(p=>({name:p.name,email:p.email}));
           match=initMatch(pls);
           render();
-      };
+        };
+      }
 
+      // Claim screen
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
         claimBtn.onclick=()=>{
@@ -1063,16 +1149,19 @@ function startApp(){
           const raw=document.getElementById("claimNum").value;
           const n=parseInt(raw,10);
           if(!n){ alert("Pick a number."); return; }
+
           if(m.players.some(x=>x.email!==p.email && x.number===n)){
             alert("That number is taken. Pick another.");
             return;
           }
           p.number=n;
+
           const next = m.players.findIndex(x=>x.number==null);
           if(next===-1){
             m.phase="play";
             m.turnIndex=0;
             m.dartInTurn=0;
+            // ensure no one is "out" or killer from a prior session
             m.players.forEach(x=>{ x.out=false; x.killer=false; x.lives=MAX_LIVES; });
           } else {
             m.claimIndex=next;
@@ -1087,6 +1176,7 @@ function startApp(){
         return;
       }
 
+      // Simple undo snapshots for Killer too
       function pushK(m){ m.snaps=m.snaps||[]; m.snaps.push(JSON.stringify(m)); if(m.snaps.length>80) m.snaps.shift(); }
       function popK(m){
         if(!m?.snaps||m.snaps.length<2) return m;
@@ -1108,24 +1198,47 @@ function startApp(){
         }
       }
 
-      document.getElementById("undoBtn").onclick=()=>{ match=popK(ctx.match); render(); };
-      document.getElementById("miss").onclick=()=>{ pushK(m); endDart(); };
-      document.getElementById("myDouble").onclick=()=>{
+      const undoBtn=document.getElementById("undoBtn");
+      if(undoBtn){
+        undoBtn.onclick=()=>{
+          match=popK(ctx.match);
+          render();
+        };
+      }
+
+      document.getElementById("miss").onclick=()=>{
         pushK(m);
-        const me=m.players[m.turnIndex];
-        if(!me.killer) me.killer=true;
-        else me.lives = Math.min(MAX_LIVES, me.lives+1);
         endDart();
       };
 
+      document.getElementById("myDouble").onclick=()=>{
+        pushK(m);
+        const me=m.players[m.turnIndex];
+        if(me.number==null) return;
+
+        // First time: become killer; after: heal (+1 life, max 3)
+        if(!me.killer) me.killer=true;
+        else me.lives = Math.min(MAX_LIVES, me.lives+1);
+
+        endDart();
+      };
+
+      // Attack buttons: direct victim selection (no typing)
       appEl.querySelectorAll("button[data-attack]").forEach(btn=>{
         btn.onclick=()=>{
+          const me=m.players[m.turnIndex];
+          if(!me.killer) return; // disabled anyway
           const victimEmail=btn.getAttribute("data-attack");
           const victim=m.players.find(p=>p.email===victimEmail && !p.out);
           if(!victim) return;
+
           pushK(m);
+
           victim.lives -= 1;
-          if(victim.lives<=0){ victim.lives=0; victim.out=true; }
+          if(victim.lives<=0){
+            victim.lives=0;
+            victim.out=true;
+          }
           endDart();
         };
       });
@@ -1136,7 +1249,7 @@ function startApp(){
 
   /* App state */
   let toastMsg="";
-  let screen="auth"; 
+  let screen="auth"; // auth | signup | home | game.setup | game.play | stats | stats.game | history | rules | rules.game
   let meUser=null;
   let activeGameId=null;
   let match=null;
@@ -1153,6 +1266,7 @@ function startApp(){
     return (a+(b||"")).slice(0,2) || a || "?";
   }
 
+  /* Rules content */
   function rulesFor(gameId){
     if(gameId==="shanghai") return {
       title:"Shanghai",
@@ -1179,67 +1293,100 @@ function startApp(){
         "Last player alive wins."
       ]
     };
-    return { title:"Game", icon:"🎯", bullets:["Rules coming soon."] };
+    const g=getGame(gameId);
+    return {
+      title:g?.name||"Game",
+      icon:g?.icon||"🎯",
+      bullets:["Rules coming soon."]
+    };
   }
 
   /* Screens */
   async function renderAuth(){
     signOutBtn.style.display="none";
     brandTitle.textContent="Game Night";
+
     let html = `${toastMsg?`<div class="toast">${esc(toastMsg)}</div>`:""}`;
     toastMsg="";
+
     html += `
       <div class="card">
         <div class="hero">
           <div class="heroCornerLeft">
             <div class="logoMark"><span>🎯</span></div>
           </div>
-          <div class="heroMain">
+
+          <div class="heroMain" style="text-align:left;align-items:flex-start">
             <div class="h1">Game Night</div>
-            <div class="sub">The Dart Room Online Training Tool</div>
+            <div class="sub">Sign in with your email. Your stats and history stay with your account.</div>
           </div>
+
           <div class="heroCornerRight">
-            <span class="pill">Auth</span>
+            <span class="pill">Darts</span>
           </div>
         </div>
+        <div class="divider"></div>
+        <div class="sub">Tip: if you ever see a blank screen, hit <span class="kbd">Retry</span> on the error card.</div>
       </div>
+
       <div class="card">
-        <label>Email Address</label>
+        <label>Email</label>
         <div class="stack">
           <input id="inEmail" type="email" placeholder="you@email.com" autocomplete="email"/>
-          <button class="btn ok" id="goBtn">Sign In</button>
+          <button class="btn ok" id="goBtn">Enter</button>
         </div>
       </div>
     `;
     appEl.innerHTML=html;
+
     document.getElementById("goBtn").onclick=async()=>{
       const e=normEmail(document.getElementById("inEmail").value);
       if(!e){ toastMsg="Enter a valid email."; return render(); }
+
       const player=await signInEmail(e);
-      if(player){ meUser=player; statsViewerEmail=meUser.email; screen="home"; return render(); }
-      meUser={email:e}; screen="signup"; return render();
+      if(player){
+        meUser=player;
+        statsViewerEmail=meUser.email;
+        screen="home";
+        return render();
+      }
+      meUser={email:e};
+      screen="signup";
+      return render();
     };
   }
-
+  <!-- PART 2 / 2 -->
   async function renderSignup(){
     signOutBtn.style.display="none";
+    brandTitle.textContent="Game Night";
+
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>🧾</span></div></div>
-          <div class="heroMain"><div class="h1">New Profile</div><div class="sub">Enter your name to start.</div></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>🧾</span></div>
+          </div>
+
+          <div class="heroMain">
+            <div class="h1">Create Player</div>
+            <div class="sub">Just your name — you’re in.</div>
+          </div>
+
+          <div class="heroCornerRight"></div>
         </div>
       </div>
+
       <div class="card">
-        <label>Display Name</label>
+        <label>Name</label>
         <div class="stack">
           <input id="upName" type="text" placeholder="Your Name" autocomplete="name"/>
-          <button class="btn ok" id="createBtn">Create Account</button>
-          <button class="btn ghost" id="backBtn">Cancel</button>
+          <button class="btn ok" id="createBtn">Create</button>
+          <button class="btn ghost" id="backBtn">Back</button>
         </div>
       </div>
     `;
     document.getElementById("backBtn").onclick=()=>{ meUser=null; screen="auth"; render(); };
+
     document.getElementById("createBtn").onclick=async()=>{
       const n=String(document.getElementById("upName").value).trim();
       if(!n){ toastMsg="Enter your name."; return render(); }
@@ -1252,14 +1399,17 @@ function startApp(){
 
   async function renderHome(){
     signOutBtn.style.display="inline-block";
+    brandTitle.textContent="Game Night";
+
     const players=await getPlayers();
     const myStats=await getStatsDoc(meUser.email);
     const sh=(myStats.games||{}).shanghai||{};
+    const quickLine = `Shanghai • Played: ${sh.played||0} • Best: ${sh.best||0}`;
 
     const gameCards = Games.map(g=>{
       const soon=!g.active;
       return `
-        <div class="gameCard">
+        <div class="gameCard ${soon?"":"leaderGlow"}" style="${soon?"animation:none":""}">
           <div class="gameHead">
             <div class="gameTitle">
               <div class="gameIcon">${esc(g.icon||"🎯")}</div>
@@ -1268,7 +1418,7 @@ function startApp(){
                 <div class="gameMeta">${esc(g.tagline||"")}</div>
               </div>
             </div>
-            <div>${soon?`<span class="pill soon">Soon</span>`:`<span class="pill" data-live="1">Active</span>`}</div>
+            <div>${soon?`<span class="pill soon">Coming soon</span>`:`<span class="pill" data-live="1">Active</span>`}</div>
           </div>
           <div class="gameActions">
             <button class="btn ok" data-play="${esc(g.id)}" ${soon?"disabled":""}>Play</button>
@@ -1278,7 +1428,9 @@ function startApp(){
       `;
     }).join("");
 
-    const roster = players.filter(p=>p.email!==meUser.email).map(p=>`
+    const roster = players
+      .filter(p=>p.email!==meUser.email)
+      .map(p=>`
         <div class="rosterCard">
           <div class="rosterLeft">
             <div class="avatar">${esc(initials(p.name))}</div>
@@ -1287,83 +1439,155 @@ function startApp(){
               <div class="rosterSub">${esc(p.email)}</div>
             </div>
           </div>
-          <button class="btn ghost" data-view-player="${esc(p.email)}">View</button>
+          <button class="btn ghost" data-view-player="${esc(p.email)}">View stats</button>
         </div>
       `).join("");
 
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>👤</span></div></div>
-          <div class="heroMain">
-            <div class="h1">${esc(meUser.name)}</div>
-            <div class="sub">${esc(meUser.email)}</div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>👤</span></div>
           </div>
-          <div class="heroCornerRight"><span class="pill" data-live="1">Online</span></div>
+
+          <div class="heroMain" style="text-align:left;align-items:flex-start">
+            <div class="h1">${esc(meUser.name||"Player")}</div>
+            <div class="sub">${esc(meUser.email)} • <span class="kbd">${esc(quickLine)}</span></div>
+          </div>
+
+          <div class="heroCornerRight">
+            <span class="pill" data-live="1">Signed in</span>
+          </div>
         </div>
       </div>
+
       <div class="row">
-        <button class="btn ghost" id="rulesBtn">Rules</button>
+        <button class="btn ghost" id="rulesBtn">Game rules</button>
         <button class="btn ghost" id="statsBtn">Stats</button>
         <button class="btn ghost" id="historyBtn">History</button>
       </div>
+
       <div class="divider"></div>
+
       <div class="gameGrid">${gameCards}</div>
+
       <div class="divider"></div>
+
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>👥</span></div></div>
-          <div class="heroMain"><div class="h1">Player Roster</div><div class="sub">View other players’ performance.</div></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>👥</span></div>
+          </div>
+
+          <div class="heroMain" style="text-align:left;align-items:flex-start">
+            <div class="h1">Players</div>
+            <div class="sub">Tap “View stats” to see someone’s game stats.</div>
+          </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
-        <div class="rosterGrid">${roster || `<div class="sub">No other players found.</div>`}</div>
+        <div class="rosterGrid">${roster || `<div class="sub">No other players yet.</div>`}</div>
       </div>
     `;
 
     document.getElementById("rulesBtn").onclick=()=>{ screen="rules"; render(); };
     document.getElementById("statsBtn").onclick=()=>{ screen="stats"; render(); };
     document.getElementById("historyBtn").onclick=()=>{ screen="history"; render(); };
-    appEl.querySelectorAll("button[data-play]").forEach(btn=>btn.onclick=()=>{ activeGameId=btn.getAttribute("data-play"); screen="game.setup"; render(); });
-    appEl.querySelectorAll("button[data-stats]").forEach(btn=>btn.onclick=()=>{ activeGameId=btn.getAttribute("data-stats"); screen="stats.game"; render(); });
-    appEl.querySelectorAll("button[data-view-player]").forEach(btn=>btn.onclick=()=>{ statsViewerEmail=btn.getAttribute("data-view-player"); screen="stats"; render(); });
+
+    appEl.querySelectorAll("button[data-play]").forEach(btn=>{
+      btn.onclick=()=>{
+        activeGameId=btn.getAttribute("data-play");
+        match=null;
+        screen="game.setup";
+        render();
+      };
+    });
+
+    appEl.querySelectorAll("button[data-stats]").forEach(btn=>{
+      btn.onclick=()=>{
+        activeGameId=btn.getAttribute("data-stats");
+        screen="stats.game";
+        render();
+      };
+    });
+
+    appEl.querySelectorAll("button[data-view-player]").forEach(btn=>{
+      btn.onclick=()=>{
+        statsViewerEmail=btn.getAttribute("data-view-player");
+        screen="stats";
+        render();
+      };
+    });
   }
 
   async function renderRules(){
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent="Game rules";
+
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>📜</span></div></div>
-          <div class="heroMain"><div class="h1">Game Rules</div><div class="sub">Learn how to play.</div></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>📜</span></div>
+          </div>
+
+          <div class="heroMain">
+            <div class="h1">Game rules</div>
+            <div class="sub">Pick a game to see how to play.</div>
+          </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
         ${Games.map(g=>`
           <div class="rosterCard">
             <div class="rosterLeft">
-              <div class="avatar">${esc(g.icon)}</div>
-              <div><div class="rosterName">${esc(g.name)}</div></div>
+              <div class="avatar">${esc(g.icon||"🎯")}</div>
+              <div>
+                <div class="rosterName">${esc(g.name)}</div>
+                <div class="rosterSub">${esc(g.active?"Active":"Coming soon")}</div>
+              </div>
             </div>
-            <button class="btn" data-rule="${esc(g.id)}">Read Rules</button>
+            <button class="btn" data-rule="${esc(g.id)}">Open</button>
           </div>
         `).join("")}
         <div class="divider"></div>
-        <button class="btn ghost" id="rulesBack">Back Home</button>
+        <button class="btn ghost" id="rulesBack">Back</button>
       </div>
     `;
     document.getElementById("rulesBack").onclick=()=>{ screen="home"; render(); };
-    appEl.querySelectorAll("button[data-rule]").forEach(btn=>btn.onclick=()=>{ rulesGameId=btn.getAttribute("data-rule"); screen="rules.game"; render(); });
+    appEl.querySelectorAll("button[data-rule]").forEach(btn=>{
+      btn.onclick=()=>{
+        rulesGameId=btn.getAttribute("data-rule");
+        screen="rules.game";
+        render();
+      };
+    });
   }
 
   async function renderRulesGame(){
+    signOutBtn.style.display="inline-block";
     const r=rulesFor(rulesGameId);
+    brandTitle.textContent=`${r.title} • Rules`;
+
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>${esc(r.icon)}</span></div></div>
-          <div class="heroMain"><div class="h1">${esc(r.title)}</div><div class="sub">How to Play</div></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>${esc(r.icon)}</span></div>
+          </div>
+
+          <div class="heroMain">
+            <div class="h1">${esc(r.title)}</div>
+            <div class="sub">How to play</div>
+          </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
-        <ul style="margin:0;padding-left:18px;line-height:1.6">
-          ${r.bullets.map(b=>`<li style="margin:12px 0">${esc(b)}</li>`).join("")}
+        <ul style="margin:0;padding-left:18px;line-height:1.5">
+          ${r.bullets.map(b=>`<li style="margin:10px 0">${esc(b)}</li>`).join("")}
         </ul>
         <div class="divider"></div>
         <button class="btn ghost" id="rulesGameBack">Back</button>
@@ -1374,88 +1598,247 @@ function startApp(){
 
   async function renderGameSetup(){
     const g=getGame(activeGameId);
+    if(!g){ screen="home"; return render(); }
+
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent=g.name;
+
     const players=await getPlayers();
+    const meEmail=meUser.email;
+    const defaultCount=2;
+
     appEl.innerHTML=`
-      <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Cancel</button></div></div>
+      <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
+
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>${esc(g.icon)}</span></div></div>
-          <div class="heroMain"><div class="h1">${esc(g.name)}</div><div class="sub">Match Setup</div></div>
-          <div class="heroCornerRight"><span class="pill" data-live="1">Ready</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
+            <span class="kbd">${esc(g.name)}</span>
+          </div>
+
+          <div class="heroMain">
+            <div class="h1">${esc(g.name)}</div>
+            <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
+          </div>
+
+          <div class="heroCornerRight">
+            ${g.active?`<span class="pill" data-live="1">Ready</span>`:`<span class="pill soon">Coming soon</span>`}
+          </div>
         </div>
       </div>
+
       <div class="card">
         <div class="stack">
           <div class="row">
-            <div><label>Total Players</label><select id="playerCount"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></div>
-            <div><label>Ready</label><input id="selectedCount" type="text" disabled /></div>
+            <div>
+              <label>Number of players</label>
+              <select id="playerCount">
+                ${Array.from({length:MAX_PLAYERS},(_,i)=>i+1).map(n=>`<option value="${n}" ${n===defaultCount?"selected":""}>${n}</option>`).join("")}
+              </select>
+            </div>
+            <div>
+              <label>Selected</label>
+              <input id="selectedCount" type="text" value="0 / ${defaultCount}" disabled />
+            </div>
           </div>
-          <label>Select Participants</label>
-          <select id="matchPlayers" multiple size="6">${players.map(p=>`<option value="${esc(p.email)}" ${p.email===meUser.email?"selected":""}>${esc(p.name)}</option>`).join("")}</select>
+
+          <label>Pick players</label>
+          <select id="matchPlayers" multiple size="6">
+            ${players.map(p=>`<option value="${esc(p.email)}">${esc(p.name)}</option>`).join("")}
+          </select>
+
           <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
+          <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
         </div>
       </div>
     `;
-    const sel=document.getElementById("matchPlayers");
-    const update=()=>{
+
+    const selectEl=document.getElementById("matchPlayers");
+    Array.from(selectEl.options).forEach(o=>{ if(o.value===meEmail) o.selected=true; });
+
+    function updateStartState(){
       const n=parseInt(document.getElementById("playerCount").value,10);
-      const count=Array.from(sel.selectedOptions).length;
-      document.getElementById("selectedCount").value=`${count} / ${n}`;
-      document.getElementById("startMatchBtn").disabled=(count!==n);
-    };
-    document.getElementById("playerCount").onchange=update; sel.onchange=update; update();
-    document.getElementById("setupBack").onclick=()=>{ screen="home"; render(); };
+      const selectedEmails=Array.from(selectEl.selectedOptions).map(o=>o.value);
+      document.getElementById("selectedCount").value=`${selectedEmails.length} / ${n}`;
+      const ok=(selectedEmails.length===n) && !!g.active;
+      document.getElementById("startMatchBtn").disabled=!ok;
+      document.getElementById("hintLine").textContent=
+        !g.active ? "This game is coming soon." :
+        ok ? "Ready." : `Select exactly ${n} players to continue.`;
+    }
+    document.getElementById("playerCount").onchange=updateStartState;
+    selectEl.onchange=updateStartState;
+    updateStartState();
+
+    document.getElementById("setupBack").onclick=()=>{ activeGameId=null; match=null; screen="home"; render(); };
+
     document.getElementById("startMatchBtn").onclick=()=>{
-      const selected = Array.from(sel.selectedOptions).map(o=>players.find(p=>p.email===o.value));
-      if(activeGameId==="shanghai") match=ShanghaiGame.initMatch(selected);
-      else if(activeGameId==="killer") match=KillerGame.initMatch(selected);
-      screen="game.play"; render();
+      if(!g.active){ toastMsg="Coming soon."; return render(); }
+      const n=parseInt(document.getElementById("playerCount").value,10);
+      const selectedEmails=Array.from(selectEl.selectedOptions).map(o=>o.value);
+      if(selectedEmails.length!==n){ toastMsg=`You must select exactly ${n} players.`; return render(); }
+      const selectedPlayers=selectedEmails.map(e=>players.find(p=>p.email===e)).filter(Boolean);
+
+      if(activeGameId==="shanghai"){
+        match=ShanghaiGame.initMatch(selectedPlayers);
+        screen="game.play";
+        return render();
+      }
+      if(activeGameId==="killer"){
+        match=KillerGame.initMatch(selectedPlayers);
+        screen="game.play";
+        return render();
+      }
+      toastMsg="Coming soon.";
+      render();
     };
   }
 
   async function renderGamePlay(){
-    if(activeGameId==="shanghai") { appEl.innerHTML=ShanghaiGame.renderPlay({meUser, match}); ShanghaiGame.bindPlay({meUser, match}); }
-    else if(activeGameId==="killer") { appEl.innerHTML=KillerGame.renderPlay({meUser, match}); KillerGame.bindPlay({meUser, match}); }
+    const g=getGame(activeGameId);
+    if(!g || !match){ screen="home"; return render(); }
+
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent=g.name;
+
+    if(activeGameId==="shanghai"){
+      const ctx={meUser, match};
+      appEl.innerHTML=ShanghaiGame.renderPlay(ctx);
+      ShanghaiGame.bindPlay(ctx);
+      return;
+    }
+
+    if(activeGameId==="killer"){
+      const ctx={meUser, match};
+      appEl.innerHTML=KillerGame.renderPlay(ctx);
+      KillerGame.bindPlay(ctx);
+      return;
+    }
+
+    screen="home"; render();
   }
 
   async function renderStats(){
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent="Stats";
+
     const players=await getPlayers();
-    const statsDoc=await getStatsDoc(statsViewerEmail||meUser.email);
-    const viewer=players.find(p=>p.email===(statsViewerEmail||meUser.email))||meUser;
+    if(!statsViewerEmail) statsViewerEmail=meUser.email;
+
+    const statsDoc=await getStatsDoc(statsViewerEmail);
+    const games=statsDoc.games||{};
+    const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
+
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>📈</span></div></div>
-          <div class="heroMain"><div class="h1">Performance</div><div class="sub">Viewing: <b>${esc(viewer.name)}</b></div></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>📈</span></div>
+          </div>
+
+          <div class="heroMain">
+            <div class="h1">Stats</div>
+            <div class="sub">Pick a player, then pick a game.</div>
+          </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
-        <label>Switch Player</label>
-        <select id="statsPlayer">${players.map(p=>`<option value="${esc(p.email)}" ${p.email===viewer.email?"selected":""}>${esc(p.name)}</option>`).join("")}</select>
+        <label>Player</label>
+        <select id="statsPlayer">
+          ${players.map(p=>`<option value="${esc(p.email)}" ${p.email===statsViewerEmail?"selected":""}>${esc(p.name)}</option>`).join("")}
+        </select>
+        <div class="small">Viewing: <b>${esc(viewer.name||"Player")}</b></div>
       </div>
+
       ${Games.map(g=>{
-        const gs=(statsDoc.games||{})[g.id]||{};
-        return `<div class="gameCard"><div class="gameHead"><div class="gameTitle"><div class="gameIcon">${g.icon}</div><div><div class="h1" style="font-size:16px;margin:0">${g.name}</div><div class="gameMeta">Played: ${gs.played||0}</div></div></div><button class="btn ghost" data-open="${g.id}">Details</button></div></div>`;
+        const gs=games[g.id]||{};
+        const played=gs.played||0;
+        const line =
+          g.id==="shanghai"
+            ? `Played: <b>${played}</b> • Best: <b>${esc(gs.best||0)}</b> • Points: <b>${esc(gs.points||0)}</b>`
+          : g.id==="killer"
+            ? `Played: <b>${played}</b> • Wins: <b>${esc(gs.wins||0)}</b>`
+          : (g.active ? `Played: <b>${played}</b>` : `Coming soon`);
+        return `
+          <div class="gameCard">
+            <div class="gameHead">
+              <div class="gameTitle">
+                <div class="gameIcon">${esc(g.icon||"🎯")}</div>
+                <div>
+                  <div class="h1" style="font-size:18px;margin:0">${esc(g.name)}</div>
+                  <div class="gameMeta">${line}</div>
+                </div>
+              </div>
+              <button class="btn" data-open="${esc(g.id)}">Open</button>
+            </div>
+          </div>
+        `;
       }).join("")}
-      <button class="btn ghost" id="statsBack">Back Home</button>
+
+      <div class="row">
+        <button class="btn ghost" id="statsBack">Back</button>
+      </div>
     `;
+
     document.getElementById("statsBack").onclick=()=>{ screen="home"; render(); };
     document.getElementById("statsPlayer").onchange=(e)=>{ statsViewerEmail=e.target.value; render(); };
-    appEl.querySelectorAll("button[data-open]").forEach(btn=>btn.onclick=()=>{ activeGameId=btn.getAttribute("data-open"); screen="stats.game"; render(); });
+
+    appEl.querySelectorAll("button[data-open]").forEach(btn=>{
+      btn.onclick=()=>{ activeGameId=btn.getAttribute("data-open"); screen="stats.game"; render(); };
+    });
   }
 
   async function renderStatsGame(){
     const g=getGame(activeGameId);
-    const statsDoc=await getStatsDoc(statsViewerEmail||meUser.email);
+    if(!g){ screen="stats"; return render(); }
+
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent=`${g.name} • Stats`;
+
+    const players=await getPlayers();
+    if(!statsViewerEmail) statsViewerEmail=meUser.email;
+
+    const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
+    const statsDoc=await getStatsDoc(statsViewerEmail);
     const gs=(statsDoc.games||{})[g.id]||{};
+
+    let body="";
+    if(g.id==="shanghai"){
+      body=`
+        <div class="sub">Played: <b>${esc(gs.played||0)}</b></div>
+        <div class="sub">Points: <b>${esc(gs.points||0)}</b></div>
+        <div class="sub">Best game: <b>${esc(gs.best||0)}</b></div>
+        <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
+      `;
+    }else if(g.id==="killer"){
+      body=`
+        <div class="sub">Played: <b>${esc(gs.played||0)}</b></div>
+        <div class="sub">Wins: <b>${esc(gs.wins||0)}</b></div>
+        <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
+      `;
+    }else{
+      body=g.active?`<div class="sub">Played: <b>${esc(gs.played||0)}</b></div>`:`<div class="sub">Coming soon.</div>`;
+    }
+
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="heroCornerLeft"><div class="logoMark"><span>${g.icon}</span></div></div>
-          <div class="heroMain"><div class="h1">${g.name} Stats</div><div class="sub">${gs.played||0} Games Played</div></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
+            <span class="kbd">${esc(g.name)}</span>
+          </div>
+
+          <div class="heroMain">
+            <div class="h1">${esc(g.name)}</div>
+            <div class="sub">Player: <b>${esc(viewer.name||"Player")}</b></div>
+          </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
-        <div class="sub">Best Score: <b>${gs.best||0}</b></div>
-        <div class="sub">Total Wins: <b>${gs.wins||0}</b></div>
+        ${body}
         <div class="divider"></div>
         <button class="btn ghost" id="statsGameBack">Back</button>
       </div>
@@ -1464,31 +1847,53 @@ function startApp(){
   }
 
   async function renderHistory(){
+    signOutBtn.style.display="inline-block";
+    brandTitle.textContent="History";
+
     const history=await getHistory(meUser.email);
+    let items=history.map(h=>`
+      <div class="card">
+        <div class="h1" style="font-size:16px;margin:0">${esc(h.summary||"(no summary)")}</div>
+        <div class="sub">${esc(h.gameName||h.gameId||"Game")} • ${esc(h.endedAt?fmt(h.endedAt):"")}</div>
+      </div>
+    `).join("");
+    if(!items) items=`<div class="card"><div class="sub">No matches yet.</div></div>`;
+
     appEl.innerHTML=`
       <div class="row"><button class="btn ghost" id="historyBack">Back</button></div>
       <div class="divider"></div>
-      ${history.map(h=>`<div class="card"><div class="h1" style="font-size:15px;margin:0">${esc(h.summary)}</div><div class="sub">${esc(h.gameName)} • ${fmt(h.endedAt)}</div></div>`).join("") || `<div class="sub">No history yet.</div>`}
+      ${items}
     `;
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
   }
 
   async function render(){
-    homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
-    signOutBtn.onclick=()=>{ meUser=null; screen="auth"; render(); };
-    if(screen==="auth") renderAuth();
-    else if(screen==="signup") renderSignup();
-    else if(screen==="home") renderHome();
-    else if(screen==="rules") renderRules();
-    else if(screen==="rules.game") renderRulesGame();
-    else if(screen==="game.setup") renderGameSetup();
-    else if(screen==="game.play") renderGamePlay();
-    else if(screen==="stats") renderStats();
-    else if(screen==="stats.game") renderStatsGame();
-    else if(screen==="history") renderHistory();
+    try{
+      homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
+      signOutBtn.onclick=()=>{ meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
+
+      if(screen==="auth") return renderAuth();
+      if(screen==="signup") return renderSignup();
+      if(!meUser){ screen="auth"; return renderAuth(); }
+
+      if(screen==="home") return renderHome();
+      if(screen==="rules") return renderRules();
+      if(screen==="rules.game") return renderRulesGame();
+      if(screen==="game.setup") return renderGameSetup();
+      if(screen==="game.play") return renderGamePlay();
+      if(screen==="stats") return renderStats();
+      if(screen==="stats.game") return renderStatsGame();
+      if(screen==="history") return renderHistory();
+
+      screen="home"; return renderHome();
+    }catch(e){
+      showFatal("App error", e?.message || String(e));
+    }
   }
+
   render();
 }
+
 boot();
 </script>
 </body>
