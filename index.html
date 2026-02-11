@@ -1024,8 +1024,8 @@ function startApp(){
               </div>
 
               <div class="heroMain">
-                <div class="h1 turnTitle3d">Killer</div>
-                <div class="sub">Claim numbers (one at a time).</div>
+                <div class="h1 turnTitle3d">Killer Setup</div>
+                <div class="sub">Claim your number (one at a time)</div>
               </div>
 
               <div class="heroCornerRight">
@@ -1034,7 +1034,7 @@ function startApp(){
             </div>
             <div class="divider"></div>
             <div class="kTurnBig" style="text-align:center">${esc(p.name)}</div>
-            <div class="kTurnSub" style="text-align:center">Opposite-hand throw — pick the number you hit.</div>
+            <div class="kTurnSub" style="text-align:center">Pick the number you hit (opposite hand throw)</div>
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
@@ -1043,12 +1043,13 @@ function startApp(){
         `;
       }
 
+      // Play phase header — aligned like all other screens
       const active=m.players[m.turnIndex];
       const isFinished = !!m.finished;
 
       const statusLine = isFinished
-        ? `🏆 Winner: <b>${esc(m.winner?.name||"")}</b>`
-        : `${esc(active.name)} • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?"🔥 Killer":"Not killer yet"}`;
+        ? `Winner: <b>${esc(m.winner?.name||"")}</b>`
+        : `${esc(active.name)} • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer ? "🔥 Killer" : "Not killer yet"}`;
 
       const rows = m.players.map(p=>{
         const livesHtml = p.out ? `<span class="lifeOut">OUT</span>` : heartsHTML(p.lives);
@@ -1098,12 +1099,12 @@ function startApp(){
             </div>
 
             <div class="heroMain">
-              <h2 class="kTurnBig turnTitle3d" style="margin:0">${isFinished ? "Finished" : `${esc(active.name)}’s Turn`}</h2>
+              <h2 class="kTurnBig turnTitle3d" style="margin:0">${isFinished ? "Game Over" : `${esc(active.name)}’s Turn`}</h2>
               <div class="kTurnSub">${statusLine}</div>
             </div>
 
             <div class="heroCornerRight">
-              <span class="pill" ${isFinished?'':'data-live="1"'}>${isFinished?"Ended":"Live"}</span>
+              <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
             </div>
           </div>
 
@@ -1115,17 +1116,17 @@ function startApp(){
               <button class="hitBtn undo" id="undoBtn">UNDO</button>
             </div>
             <div class="divider"></div>
-            <div class="pill">Attack buttons</div>
-            <div class="small">Tap the opponent you hit (double). Removes 1 life.</div>
+            <div class="pill">Attack Opponents</div>
+            <div class="small">Hit their double → tap button to remove 1 life</div>
             <div class="divider"></div>
             <div class="kAttackGrid">
-              ${attackTargets || `<div class="sub">No opponents available.</div>`}
+              ${attackTargets || `<div class="sub">No valid targets left.</div>`}
             </div>
           `}
         </div>
 
         <div class="card">
-          <div class="pill">Players</div>
+          <div class="pill">Players & Lives</div>
           <div class="divider"></div>
           <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
             <table>
