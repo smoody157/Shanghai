@@ -7,87 +7,58 @@
 
 <style>
 :root{
-  --bg:#071021;
-  --bg2:#0b1a2e;
-  --panelA: rgba(255,255,255,.08);
-  --panelB: rgba(255,255,255,.035);
-  --stroke: rgba(255,255,255,.12);
+  --bg:#0b1a2e; --text:#eaf2ff; --muted:#b9cbe5; --accent:#4ea8ff;
+  --danger:#ff4d5a; --ok:#2bd576; --shadow: rgba(0,0,0,.25);
+  --glass: rgba(255,255,255,.06);
+  --glass2: rgba(255,255,255,.03);
 
-  --text:#eaf2ff;
-  --muted:#b9cbe5;
-
-  /* NEW THEME ACCENTS (more color, still consistent) */
-  --accent:#59b2ff;        /* cyan */
-  --accent2:#9b6bff;       /* purple */
-  --accent3:#ffcc55;       /* warm gold */
-  --accentGlow: rgba(89,178,255,.35);
-  --accentGlow2: rgba(155,107,255,.28);
-
-  --danger:#ff4d5a;
-  --ok:#2bd576;
-
-  --shadow: rgba(0,0,0,.28);
+  /* NEW: small “lipstick” accents */
+  --glowA: rgba(78,168,255,.38);
+  --glowB: rgba(255,110,214,.20);
+  --glowOK: rgba(43,213,118,.28);
 }
 
 *{box-sizing:border-box;}
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:radial-gradient(1200px 700px at 40% 0%, #10335f 0%, var(--bg) 55%);
   color:var(--text);
-
-  /* smoother background (no harsh “band” under board) */
-  background:
-    radial-gradient(1100px 700px at 30% -10%, rgba(89,178,255,.32) 0%, rgba(11,26,46,.0) 55%),
-    radial-gradient(900px 700px at 110% 35%, rgba(155,107,255,.22) 0%, rgba(11,26,46,.0) 55%),
-    radial-gradient(900px 700px at 0% 100%, rgba(255,204,85,.10) 0%, rgba(11,26,46,.0) 55%),
-    linear-gradient(180deg, var(--bg2), var(--bg));
-  background-attachment: fixed;
 }
 
 .topbar{
   position:sticky;top:0;z-index:10;
   display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:12px 14px;
-  background:rgba(8,14,26,.86);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--stroke);
+  padding:12px 14px;background:rgba(10,20,35,.78);backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
 .brand{display:flex;flex-direction:column;line-height:1.05}
-.brand .t{
-  font-weight:1000;font-size:16px;
-  letter-spacing:-.4px;
-}
-.brand .t .grad{
-  background:linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  filter: drop-shadow(0 6px 18px rgba(0,0,0,.35));
-}
+.brand .t{font-weight:900;font-size:16px}
 .brand .s{font-size:12px;color:var(--muted)}
 .btn{
-  border:1px solid rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.08);
   color:var(--text);border-radius:14px;padding:10px 12px;font-weight:900;
-  box-shadow:0 10px 22px var(--shadow);
+  box-shadow:0 6px 16px var(--shadow);
   cursor:pointer;
-  transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+  transition:transform .08s ease, box-shadow .18s ease, border-color .18s ease;
 }
 .btn:active{transform:translateY(1px)}
 .btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
 .btn.ok{
-  border:none;
-  background:linear-gradient(135deg, var(--accent), var(--accent2));
-  color:#08101d;
-  box-shadow:0 14px 34px rgba(89,178,255,.20), 0 14px 34px rgba(155,107,255,.18);
+  background:rgba(43,213,118,.20);
+  border-color:rgba(43,213,118,.35);
+  box-shadow:0 10px 22px rgba(0,0,0,.20), 0 0 0 rgba(0,0,0,0);
 }
-.btn.danger{background:rgba(255,77,90,.18);border-color:rgba(255,77,90,.35); color:#ffd6da;}
+.btn.ok:hover{ box-shadow:0 12px 26px rgba(0,0,0,.22), 0 0 18px var(--glowOK); }
+.btn.danger{background:rgba(255,77,90,.20);border-color:rgba(255,77,90,.35)}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-
 .wrap{max-width:980px;margin:0 auto;padding:14px}
 .card{
-  background:linear-gradient(180deg,var(--panelA),var(--panelB));
-  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg,var(--glass),var(--glass2));
+  border:1px solid rgba(255,255,255,.10);
   border-radius:18px;padding:14px;
-  box-shadow:0 14px 34px rgba(0,0,0,.30);
+  box-shadow:0 10px 28px rgba(0,0,0,.28);
   margin-bottom:12px;
 }
 .h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
@@ -96,7 +67,7 @@ label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
 input,select{
   width:100%;
   background:rgba(10,20,35,.65);
-  border:1px solid rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.14);
   color:var(--text);
   border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
 }
@@ -109,11 +80,13 @@ input,select{
   color:#ffd6da;
   border-radius:14px;padding:10px 12px;font-weight:900;margin-bottom:12px;
 }
+
 .pill{
-  display:inline-block;padding:6px 10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.16);
-  background:rgba(89,178,255,.10);
-  color:var(--accent);font-weight:1000;font-size:12px;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 10px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(78,168,255,.08);
+  color:var(--accent);font-weight:900;font-size:12px;
 }
 .pill.soon{background:rgba(255,255,255,.06); color:var(--muted)}
 .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
@@ -124,12 +97,10 @@ input,select{
 }
 .logoMark{
   width:44px;height:44px;border-radius:14px;
-  background:
-    radial-gradient(70% 70% at 30% 20%, rgba(89,178,255,.42), rgba(255,255,255,.06)),
-    radial-gradient(70% 70% at 70% 80%, rgba(155,107,255,.22), rgba(255,255,255,.0));
-  border:1px solid rgba(255,255,255,.16);
+  background:radial-gradient(60% 60% at 30% 20%, rgba(78,168,255,.35), rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.12);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 16px 28px rgba(0,0,0,.30);
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
   flex:0 0 auto;
 }
 .logoMark span{font-size:20px}
@@ -144,16 +115,16 @@ input,select{
 .gameGrid{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:860px){ .gameGrid{grid-template-columns:1fr 1fr;} }
 .gameCard{
-  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.10);
   border-radius:18px;padding:14px;
-  box-shadow:0 14px 32px rgba(0,0,0,.28);
+  box-shadow:0 10px 26px rgba(0,0,0,.25);
 }
 .gameHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .gameTitle{display:flex;align-items:center;gap:10px}
 .gameIcon{
   width:38px;height:38px;border-radius:14px;
-  border:1px solid rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.12);
   background:rgba(255,255,255,.06);
   display:flex;align-items:center;justify-content:center;
   font-size:18px;
@@ -168,22 +139,26 @@ input,select{
 .rosterCard{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:12px 12px;border-radius:16px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.04);
 }
 .rosterLeft{display:flex;align-items:center;gap:10px}
 .avatar{
   width:34px;height:34px;border-radius:14px;
-  border:1px solid rgba(255,255,255,.14);
-  background:rgba(89,178,255,.14);
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(78,168,255,.10);
   display:flex;align-items:center;justify-content:center;
   font-weight:1000;color:var(--accent);
 }
 .rosterName{font-weight:1000}
 .rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
 
-/* Active / leader indicators */
-@keyframes leaderGlow{0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 34px rgba(89,178,255,.22), 0 0 34px rgba(155,107,255,.16)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}}
+/* Danger / leader indicators */
+@keyframes leaderGlow{
+  0%{box-shadow:0 0 0 rgba(43,213,118,0)}
+  50%{box-shadow:0 0 30px rgba(43,213,118,.22)}
+  100%{box-shadow:0 0 0 rgba(43,213,118,0)}
+}
 .leaderGlow{animation:leaderGlow 1.25s ease-in-out infinite;}
 
 /* Play UI */
@@ -191,10 +166,15 @@ input,select{
 .hitRow{display:flex;gap:10px;flex-wrap:wrap}
 .hitBtn{
   flex:1; min-width:120px;
-  border-radius:14px;border:1px solid rgba(255,255,255,.16);
+  border-radius:14px;border:1px solid rgba(255,255,255,.14);
   background:rgba(255,255,255,.08);color:var(--text);
   font-weight:1000;padding:12px;
-  box-shadow:0 10px 20px rgba(0,0,0,.22);
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
+  transition:transform .08s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.hitBtn:hover{
+  border-color:rgba(78,168,255,.45);
+  box-shadow:0 10px 22px rgba(0,0,0,.20), 0 0 18px var(--glowA);
 }
 .hitBtn:active{transform:translateY(1px)}
 .hitBtn.miss{border-color:rgba(255,77,90,.35);background:rgba(255,77,90,.16)}
@@ -205,110 +185,133 @@ th{position:sticky;top:0;background:rgba(10,20,35,.85);backdrop-filter:blur(10px
 td.l{font-weight:900}
 .small{font-size:12px;color:var(--muted);margin-top:4px}
 .badge{
-  display:inline-block;padding:4px 10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.16);
-  background:rgba(255,255,255,.07);
+  display:inline-block;padding:4px 8px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
   font-size:12px;font-weight:1000;
 }
-.badge.big{font-size:16px;padding:6px 12px}
-.activeCell{outline:2px solid rgba(89,178,255,.55); outline-offset:-2px; border-radius:10px}
+
+/* NEW: “Live / Turn” cues */
+@keyframes livePulse{
+  0%,100%{ box-shadow: 0 0 0 rgba(0,0,0,0); filter:brightness(1); }
+  50%{ box-shadow: 0 0 18px var(--glowA), 0 0 34px var(--glowB); filter:brightness(1.15); }
+}
+.pill.live{
+  background:linear-gradient(90deg, rgba(78,168,255,.16), rgba(255,110,214,.10));
+  border-color:rgba(78,168,255,.28);
+  color:#dff0ff;
+  animation:livePulse 1.15s ease-in-out infinite;
+}
+.dot{
+  width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.35);
+}
+.pill.live .dot{
+  background:var(--ok);
+  box-shadow:0 0 14px rgba(43,213,118,.35);
+}
+
+/* NEW: Killer header layout (fixes overlap + spacing) */
+.playHeader{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.playHeader .left{
+  min-width:0;
+  flex:1;
+}
+.turnName{
+  font-size:30px;
+  font-weight:1000;
+  letter-spacing:-.6px;
+  margin:2px 0 6px;
+  line-height:1.05;
+  text-shadow: 0 0 18px rgba(78,168,255,.18), 0 0 24px rgba(255,110,214,.10);
+}
+.turnLine{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:10px;
+  color:var(--muted);
+  font-weight:900;
+}
+.turnChip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  font-size:12px;
+  white-space:nowrap;
+}
+.dartDots{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+.dartDots .d{
+  width:10px;height:10px;border-radius:999px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.16);
+}
+@keyframes dotGlow{
+  0%,100%{ transform:scale(1); box-shadow:none; filter:brightness(1); }
+  50%{ transform:scale(1.15); box-shadow:0 0 14px var(--glowA),0 0 26px var(--glowB); filter:brightness(1.3); }
+}
+.dartDots .d.on{
+  background:linear-gradient(180deg, rgba(255,110,214,.85), rgba(78,168,255,.85));
+  border-color:rgba(255,255,255,.22);
+  animation:dotGlow .95s ease-in-out infinite;
+}
+.kStatus{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  font-size:12px;
+  white-space:nowrap;
+}
+.kStatus.killer{
+  border-color:rgba(255,110,214,.35);
+  box-shadow:0 0 18px rgba(255,110,214,.18);
+  color:#ffe1f6;
+}
+.kStatus.not{
+  border-color:rgba(255,255,255,.14);
+  color:var(--muted);
+}
+
+/* NEW: bigger/clearer lives in Killer */
+.lifeBig{
+  font-size:18px;
+  letter-spacing:1px;
+  font-weight:1000;
+}
+.numBig{
+  font-size:14px;
+  padding:5px 10px;
+  border-color:rgba(78,168,255,.28);
+  box-shadow:0 0 16px rgba(78,168,255,.12);
+}
 
 /* Active target pulse on the board */
-@keyframes hotPulse{0%{opacity:.25;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.2)}100%{opacity:.25;filter:brightness(1)}}
+@keyframes hotPulse{0%{opacity:.20;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.4)}100%{opacity:.20;filter:brightness(1)}}
 .hotWedge{animation:hotPulse .85s ease-in-out infinite;}
-
-/* NEW: compact play layout (fits one screen better) */
-.playCard{padding:12px}
-.playTop{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-}
-.turnBig{
-  font-size:26px;font-weight:1000;line-height:1.05;margin:0;
-  background:linear-gradient(90deg, var(--accent), var(--accent2));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  text-shadow:0 0 18px rgba(89,178,255,.18);
-}
-.turnMeta{color:var(--muted);font-size:13px;font-weight:800}
-.turnMeta b{color:var(--text)}
-.targetBig{
-  display:inline-block;
-  padding:8px 12px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.16);
-  background:linear-gradient(135deg, rgba(89,178,255,.14), rgba(155,107,255,.10));
-  box-shadow:0 0 0 rgba(0,0,0,0), 0 16px 30px rgba(0,0,0,.22);
-  font-weight:1000;
-}
-.dartDots{display:flex;gap:6px;align-items:center;justify-content:flex-end}
-.dot{
-  width:10px;height:10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.20);
-  background:rgba(255,255,255,.10);
-  box-shadow:none;
-}
-.dot.on{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  border-color:rgba(255,255,255,.22);
-  box-shadow:0 0 18px rgba(89,178,255,.25), 0 0 18px rgba(155,107,255,.18);
-}
-
-.playGrid{display:grid;grid-template-columns:1fr;gap:12px;margin-top:10px}
-@media(min-width:860px){
-  .playGrid{grid-template-columns: 1.05fr .95fr; align-items:center}
-}
-.boardBox svg{max-width:320px;width:100%}
-
-/* Accordion for tables (reduces scroll) */
-details.accordion{
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.04);
-  border-radius:16px;
-  overflow:hidden;
-}
-details.accordion summary{
-  cursor:pointer;
-  list-style:none;
-  padding:12px 12px;
-  font-weight:1000;
-  color:var(--text);
-  display:flex;align-items:center;justify-content:space-between;
-}
-details.accordion summary::-webkit-details-marker{display:none}
-details.accordion .inner{padding:0 12px 12px}
-
-/* Killer: bigger lives + compact row */
-.kRow{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:10px 10px;border-radius:14px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.035);
-  margin-bottom:8px;
-}
-.kLeft{display:flex;align-items:center;gap:10px}
-.kName{font-weight:1000}
-.kNum{font-size:16px}
-.kLives{font-size:18px;font-weight:1000}
-.kOut{color:#ffd6da;font-weight:1000}
-.attackGrid{display:grid;grid-template-columns:1fr;gap:10px}
-@media(min-width:520px){ .attackGrid{grid-template-columns:1fr 1fr;} }
-.attackBtn{
-  width:100%;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.16);
-  background:linear-gradient(135deg, rgba(255,77,90,.18), rgba(155,107,255,.12));
-  color:#fff;
-  font-weight:1000;
-  padding:12px;
-  box-shadow:0 12px 24px rgba(0,0,0,.22);
-}
-.attackBtn:active{transform:translateY(1px)}
 </style>
 </head>
 
 <body>
 <div class="topbar">
   <div class="brand">
-    <div class="t" id="brandTitle"><span class="grad">Game Night</span></div>
-    <div class="s">The Dart Room • Designed & Developed by Steve’s Graphic Designs</div>
+    <div class="t" id="brandTitle">Game Night</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs</div>
   </div>
   <div>
     <button class="btn ghost" id="homeBtn" type="button">Home</button>
@@ -321,6 +324,7 @@ details.accordion .inner{padding:0 12px 12px}
 </div>
 
 <script>
+/* ========= Robust script loader (prevents “blue wallpaper only”) ========= */
 function loadScript(src){
   return new Promise((resolve,reject)=>{
     const s=document.createElement("script");
@@ -377,6 +381,7 @@ async function boot(){
 }
 
 function startApp(){
+  /* Firebase */
   const firebaseConfig = {
     apiKey: "AIzaSyCY3hTUNNlV6gAofPXY9BVGKb930WYz5RA",
     authDomain: "gamenightdarts-e7601.firebaseapp.com",
@@ -388,6 +393,7 @@ function startApp(){
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
+  /* Firestore helpers (history safe fallback) */
   async function getPlayers(){
     const snap = await db.collection("players").get();
     return snap.docs.map(d=>d.data());
@@ -433,7 +439,7 @@ function startApp(){
     return {name,email:e};
   }
 
-  /* Dartboard */
+  /* Dartboard (straight: 20 top) */
   const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 
   function polar(cx,cy,r,deg){
@@ -462,15 +468,15 @@ function startApp(){
         const halo=arcWedgePath(cx,cy,rTripleOuter+8,rDoubleInner-8,a0,a1);
         const core=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
         activeOverlay+=`
-          <path class="hotWedge" d="${halo}" fill="rgba(89,178,255,.40)" stroke="rgba(155,107,255,.80)" stroke-width="3.6" filter="url(#glow)"/>
-          <path class="hotWedge" d="${core}" fill="rgba(155,107,255,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+          <path class="hotWedge" d="${halo}" fill="rgba(78,168,255,.45)" stroke="rgba(78,168,255,.98)" stroke-width="3.8" filter="url(#glow)"/>
+          <path class="hotWedge" d="${core}" fill="rgba(78,168,255,.18)" stroke="rgba(255,255,255,.95)" stroke-width="2.8" filter="url(#glow)"/>
         `;
       }
     }
     if(activeTarget==="B"){
       activeOverlay+=`
-        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(89,178,255,.24)" stroke="rgba(155,107,255,.85)" stroke-width="3.0" filter="url(#glow)"/>
-        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(155,107,255,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(78,168,255,.28)" stroke="rgba(78,168,255,.98)" stroke-width="3.0" filter="url(#glow)"/>
+        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(78,168,255,.22)" stroke="rgba(255,255,255,.95)" stroke-width="2.6" filter="url(#glow)"/>
       `;
     }
 
@@ -491,17 +497,17 @@ function startApp(){
       numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
     }
 
-    return `<svg viewBox="0 0 200 200" width="100%">
+    return `<svg viewBox="0 0 200 200" width="70%">
       <defs>
         <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
-          <stop offset="0%" stop-color="#223b66"/>
+          <stop offset="0%" stop-color="#203a62"/>
           <stop offset="55%" stop-color="#0d1a2e"/>
           <stop offset="100%" stop-color="#060d18"/>
         </radialGradient>
         <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="4.2" result="b"/>
           <feColorMatrix in="b" type="matrix"
-            values="0 0 0 0 0.35  0 0 0 0 0.70  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
+            values="0 0 0 0 0.30  0 0 0 0 0.66  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
           <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
@@ -517,7 +523,7 @@ function startApp(){
     </svg>`;
   }
 
-  /* Undo snaps (Shanghai) */
+  /* Undo snaps (used by Shanghai) */
   function pushSnap(m){
     m.snaps=m.snaps||[];
     m.snaps.push(JSON.stringify(m));
@@ -530,6 +536,7 @@ function startApp(){
     try{return JSON.parse(prev);}catch{return m;}
   }
 
+  /* Games registry (Shanghai + Killer ACTIVE) */
   const Games=[
     {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
     {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles"},
@@ -620,10 +627,6 @@ function startApp(){
       const t=TARGETS[m.targetIndex];
       const activePlayer=m.players[m.turnIndex];
 
-      const d1 = (m.dartInTurn>=1);
-      const d2 = (m.dartInTurn>=2);
-      const d3 = (m.dartInTurn>=3);
-
       let thead=`<tr><th>Target</th>`;
       for(const p of m.players) thead+=`<th>${esc(p.name)}<div class="small">${p.total} pts</div></th>`;
       thead+=`</tr>`;
@@ -641,62 +644,51 @@ function startApp(){
         tbody+=`</tr>`;
       }
 
-      const targetLabel = (t==="B"?"BULL":t);
+      const finishedBanner=m.finished?`<div class="divider"></div><div class="pill">Finished</div>`:"";
 
       return `
-        <div class="card playCard">
+        <div class="card">
           <div class="row">
             <button class="btn ghost" id="backToSetup">Back</button>
             <button class="btn danger" id="resetBtn">Reset</button>
           </div>
-
-          <div class="divider"></div>
-
-          <div class="playTop">
-            <div style="min-width:0">
-              <div class="turnBig">${esc(activePlayer.name)}</div>
-              <div class="turnMeta">
-                Target: <span class="targetBig">${esc(targetLabel)}</span>
-                &nbsp;•&nbsp; Dart <b>${m.dartInTurn+1}</b>/3
-              </div>
-            </div>
-            <div style="text-align:right">
-              <span class="pill">Live</span><br/>
-              <span class="kbd">Shanghai</span>
-              <div class="dartDots" style="margin-top:8px">
-                <span class="dot ${!d1?'':'on'}"></span>
-                <span class="dot ${!d2?'':'on'}"></span>
-                <span class="dot ${!d3?'':'on'}"></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="playGrid">
-            <div class="boardBox">${dartboardSVG(t)}</div>
-
-            <div>
-              <div class="hitRow">
-                <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
-                <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
-                <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
-                <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-                <button class="hitBtn undo" id="undoBtn">UNDO</button>
-              </div>
-
-              ${m.finished?`<div class="divider"></div><div class="pill">Finished</div>`:""}
-            </div>
-          </div>
         </div>
 
-        <details class="accordion">
-          <summary>
-            <span>Round table</span>
-            <span class="pill">Tap</span>
-          </summary>
-          <div class="inner" style="overflow:auto">
+        <div class="card">
+          <div class="hero">
+            <div class="logoMark"><span>🎯</span></div>
+            <div style="flex:1">
+              <div class="h1" style="margin:0">${esc(activePlayer.name)}’s Turn</div>
+              <div class="sub">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+            </div>
+            <div style="text-align:right">
+              <span class="kbd">Shanghai</span><br/>
+              <span class="pill live"><span class="dot"></span> Live</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="boardBox">${dartboardSVG(t)}</div>
+          <div class="divider"></div>
+
+          <div class="hitRow">
+            <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
+            <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
+            <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
+            <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
+            <button class="hitBtn undo" id="undoBtn">UNDO</button>
+          </div>
+
+          ${finishedBanner}
+        </div>
+
+        <div class="card">
+          <div class="pill">Round table</div>
+          <div class="divider"></div>
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
             <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
           </div>
-        </details>
+        </div>
       `;
     }
 
@@ -728,7 +720,7 @@ function startApp(){
     return {initMatch, renderPlay, bindPlay};
   })();
 
-  /* Killer (UPDATED: no prompt, per-opponent attack buttons, bigger/cleaner UI) */
+  /* Killer (FULL: play + history + stats) */
   const KillerGame = (() => {
     const MAX_LIVES = 3;
 
@@ -812,19 +804,6 @@ function startApp(){
       });
     }
 
-    function dartDotsHTML(m){
-      const d1 = (m.dartInTurn>=1);
-      const d2 = (m.dartInTurn>=2);
-      const d3 = (m.dartInTurn>=3);
-      return `
-        <div class="dartDots">
-          <span class="dot ${!d1?'':'on'}"></span>
-          <span class="dot ${!d2?'':'on'}"></span>
-          <span class="dot ${!d3?'':'on'}"></span>
-        </div>
-      `;
-    }
-
     function renderPlay(ctx){
       const m=ctx.match;
 
@@ -837,124 +816,109 @@ function startApp(){
           opts += `<option value="${n}" ${dis?"disabled":""}>${n}${dis?" (taken)":""}</option>`;
         }
         return `
-          <div class="card playCard">
+          <div class="card">
             <div class="row">
               <button class="btn ghost" id="backToSetup">Back</button>
               <button class="btn danger" id="resetBtn">Reset</button>
             </div>
+          </div>
 
+          <div class="card">
+            <span class="pill live"><span class="dot"></span> Killer • Claim Numbers</span>
             <div class="divider"></div>
-
-            <div class="playTop">
-              <div style="min-width:0">
-                <div class="turnBig">${esc(p.name)}</div>
-                <div class="turnMeta">Opposite-hand throw — pick the number you hit.</div>
-              </div>
-              <div style="text-align:right">
-                <span class="pill">Claim</span><br/>
-                <span class="kbd">Killer</span>
-              </div>
-            </div>
-
+            <div class="h1" style="font-size:20px;margin:0">${esc(p.name)}</div>
+            <div class="sub">Opposite-hand throw — pick the number you hit.</div>
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
-            <button class="btn ok" id="saveClaim" style="width:100%">Save & Next</button>
+            <button class="btn ok" id="saveClaim">Save & Next</button>
           </div>
         `;
       }
 
       const active=m.players[m.turnIndex];
+      const dartN = m.dartInTurn; // 0..2
+      const d1 = dartN>=1 ? "on" : "";
+      const d2 = dartN>=2 ? "on" : "";
+      const d0 = dartN>=0 ? "on" : "on"; // always show first glowing while turn running
 
-      const status = m.finished
-        ? `🏆 Winner: <b>${esc(m.winner?.name||"")}</b>`
-        : `${esc(active.name)}’s turn • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer?`<span class="pill">Killer</span>`:`<span class="pill soon">Not killer yet</span>`}`;
+      const statusRight = m.finished
+        ? `<span class="pill">Finished</span>`
+        : `<span class="pill live"><span class="dot"></span> Live</span>`;
 
-      const playersList = m.players.map((p,idx)=>{
-        const livesTxt = p.out ? `<span class="kOut">OUT</span>` : `<span class="kLives">${"❤".repeat(p.lives)}</span>`;
-        const num = (p.number==null ? "?" : p.number);
+      const rows = m.players.map(p=>{
+        const lifeTxt = p.out ? "OUT" : "❤".repeat(p.lives);
         return `
-          <div class="kRow">
-            <div class="kLeft">
-              <div class="avatar">${esc((p.name||"?")[0]?.toUpperCase()||"?")}</div>
-              <div>
-                <div class="kName">${esc(p.name)} <span class="badge big">${esc(num)}</span> ${p.killer?"<span class='pill' style='margin-left:6px'>K</span>":""}</div>
-                <div class="small">${esc(p.email)}</div>
-              </div>
-            </div>
-            <div>${livesTxt}</div>
-          </div>
+          <tr>
+            <td class="l">${esc(p.name)} <span class="badge numBig">${esc(p.number??"?")}</span></td>
+            <td>${p.killer?"🔥":""}</td>
+            <td><span class="lifeBig">${esc(lifeTxt)}</span></td>
+          </tr>
         `;
       }).join("");
 
-      // Opponent attack buttons (no typing)
-      const oppButtons = m.players
-        .map((p,idx)=>({p,idx}))
-        .filter(x=>!x.p.out && x.p.email!==active.email)
-        .map(x=>{
-          const num = (x.p.number==null ? "?" : x.p.number);
-          return `<button class="attackBtn" data-attack="${x.idx}" ${m.finished?"disabled":""}>
-            Attack ${esc(x.p.name)} • Double <b>${esc(num)}</b>
-          </button>`;
-        }).join("");
-
       return `
-        <div class="card playCard">
+        <div class="card">
           <div class="row">
             <button class="btn ghost" id="backToSetup">Back</button>
             <button class="btn danger" id="resetBtn">Reset</button>
           </div>
+        </div>
 
-          <div class="divider"></div>
+        <div class="card">
+          <div class="playHeader">
+            <div class="left">
+              <div class="pill">${m.gameId==="killer"?"🔥 Killer":"Killer"}</div>
+              <div class="turnName">${m.finished ? `🏆 ${esc(m.winner?.name||"")}` : `${esc(active.name)}`}</div>
 
-          <div class="playTop">
-            <div style="min-width:0">
-              <div class="turnBig">${esc(active.name)}</div>
-              <div class="turnMeta">${status}</div>
+              <div class="turnLine">
+                ${m.finished ? `<span class="turnChip">Match complete</span>` : `
+                  <span class="turnChip">
+                    <span style="opacity:.9">Darts</span>
+                    <span class="dartDots" aria-label="Darts this turn">
+                      <span class="d ${d0}"></span>
+                      <span class="d ${d1}"></span>
+                      <span class="d ${d2}"></span>
+                    </span>
+                  </span>
+                  <span class="kStatus ${active.killer?"killer":"not"}">
+                    ${active.killer ? "🔥 Killer" : "— Not killer yet"}
+                  </span>
+                `}
+              </div>
             </div>
             <div style="text-align:right">
-              <span class="pill">Live</span><br/>
-              <span class="kbd">Killer</span>
-              <div style="margin-top:8px">${dartDotsHTML(m)}</div>
+              ${statusRight}
             </div>
           </div>
 
-          ${m.finished ? `<div class="divider"></div><div class="pill">Finished</div>` : `
-            <div class="playGrid">
-              <div>
-                <div class="sub" style="font-weight:900;margin-bottom:10px">Your throw</div>
-                <div class="hitRow">
-                  <button class="hitBtn" id="myDouble">MY DOUBLE</button>
-                  <button class="hitBtn miss" id="miss">MISS</button>
-                </div>
-                <div class="divider"></div>
-                <div class="sub" style="font-weight:900;margin-bottom:10px">Attack (hit opponent double)</div>
-                <div class="attackGrid">
-                  ${oppButtons || `<div class="sub">No opponents available.</div>`}
-                </div>
-                <div class="small" style="margin-top:10px">Tip: You must hit <b>MY DOUBLE</b> once to become a killer. After that, attack doubles remove hearts.</div>
-              </div>
-
-              <div>
-                <div class="sub" style="font-weight:900;margin-bottom:10px">Players</div>
-                ${playersList}
-              </div>
+          ${m.finished ? "" : `
+            <div class="divider"></div>
+            <div class="hitRow">
+              <button class="hitBtn" id="myDouble">MY DOUBLE</button>
+              <button class="hitBtn" id="attackDouble">ATTACK DOUBLE</button>
+              <button class="hitBtn miss" id="miss">MISS</button>
             </div>
           `}
         </div>
 
-        ${m.finished?`
-          <div class="card">
-            <div class="sub">This match has been saved to history + stats.</div>
+        <div class="card">
+          <div class="pill">Players</div>
+          <div class="divider"></div>
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+            <table>
+              <thead><tr><th>Player</th><th>K</th><th>Lives</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
           </div>
-        `:""}
+        </div>
       `;
     }
 
     function bindPlay(ctx){
       const m=ctx.match;
 
-      // Back/Reset
+      // Back/Reset (claim + play)
       const backBtn=document.getElementById("backToSetup");
       if(backBtn){
         backBtn.onclick=()=>{
@@ -1018,11 +982,11 @@ function startApp(){
         }
       }
 
-      const missBtn=document.getElementById("miss");
-      if(missBtn) missBtn.onclick=()=>endDart();
+      document.getElementById("miss").onclick=()=>{
+        endDart();
+      };
 
-      const myBtn=document.getElementById("myDouble");
-      if(myBtn) myBtn.onclick=()=>{
+      document.getElementById("myDouble").onclick=()=>{
         const me=m.players[m.turnIndex];
         if(me.number==null) return;
 
@@ -1031,23 +995,23 @@ function startApp(){
         endDart();
       };
 
-      // Attack buttons
-      appEl.querySelectorAll("button[data-attack]").forEach(btn=>{
-        btn.onclick=()=>{
-          const me=m.players[m.turnIndex];
-          if(!me.killer){
-            alert("You must become a killer first (hit MY DOUBLE).");
-            return;
-          }
-          const idx=parseInt(btn.getAttribute("data-attack"),10);
-          const victim=m.players[idx];
-          if(!victim || victim.out || victim.email===me.email) return;
+      document.getElementById("attackDouble").onclick=()=>{
+        const me=m.players[m.turnIndex];
+        if(!me.killer){
+          alert("You must become a killer first (hit your double).");
+          return;
+        }
+        const target = prompt("Enter opponent's number you hit (double):");
+        const n=parseInt(target,10);
+        if(!n) return;
 
+        const victim=m.players.find(p=>p.number===n && !p.out);
+        if(victim && victim.email!==me.email){
           victim.lives -= 1;
           if(victim.lives<=0) victim.out=true;
-          endDart();
-        };
-      });
+        }
+        endDart();
+      };
     }
 
     return { initMatch, renderPlay, bindPlay };
@@ -1071,9 +1035,10 @@ function startApp(){
     return (a+(b||"")).slice(0,2) || a || "?";
   }
 
+  /* Screens */
   async function renderAuth(){
     signOutBtn.style.display="none";
-    brandTitle.innerHTML=`<span class="grad">Game Night</span>`;
+    brandTitle.textContent="Game Night";
 
     let html = `${toastMsg?`<div class="toast">${esc(toastMsg)}</div>`:""}`;
     toastMsg="";
@@ -1083,15 +1048,15 @@ function startApp(){
         <div class="hero">
           <div class="logoMark"><span>🎯</span></div>
           <div style="flex:1">
-            <div class="h1">The Dart Room</div>
-            <div class="sub">Game Night app • Designed & Developed by Steve’s Graphic Designs</div>
+            <div class="h1">Game Night</div>
+            <div class="sub">Sign in with your email. Your stats and history stay with your account.</div>
           </div>
           <div style="text-align:right">
-            <span class="pill">Darts</span>
+            <span class="pill live"><span class="dot"></span> The Dart Room</span>
           </div>
         </div>
         <div class="divider"></div>
-        <div class="sub">Sign in with your email. Your stats and history stay with your account.</div>
+        <div class="sub">Tip: if you ever see a blank screen, hit <span class="kbd">Retry</span> on the error card.</div>
       </div>
 
       <div class="card">
@@ -1123,7 +1088,7 @@ function startApp(){
 
   async function renderSignup(){
     signOutBtn.style.display="none";
-    brandTitle.innerHTML=`<span class="grad">Game Night</span>`;
+    brandTitle.textContent="Game Night";
 
     appEl.innerHTML=`
       <div class="card">
@@ -1159,13 +1124,12 @@ function startApp(){
 
   async function renderHome(){
     signOutBtn.style.display="inline-block";
-    brandTitle.innerHTML=`<span class="grad">Game Night</span>`;
+    brandTitle.textContent="Game Night";
 
     const players=await getPlayers();
     const myStats=await getStatsDoc(meUser.email);
     const sh=(myStats.games||{}).shanghai||{};
-    const ki=(myStats.games||{}).killer||{};
-    const quickLine = `Shanghai • Played: ${sh.played||0} • Best: ${sh.best||0}  |  Killer • Played: ${ki.played||0} • Wins: ${ki.wins||0}`;
+    const quickLine = `Shanghai • Played: ${sh.played||0} • Best: ${sh.best||0}`;
 
     const gameCards = Games.map(g=>{
       const soon=!g.active;
@@ -1179,7 +1143,7 @@ function startApp(){
                 <div class="gameMeta">${esc(g.tagline||"")}</div>
               </div>
             </div>
-            <div>${soon?`<span class="pill soon">Coming soon</span>`:`<span class="pill">Active</span>`}</div>
+            <div>${soon?`<span class="pill soon">Coming soon</span>`:`<span class="pill live"><span class="dot"></span> Active</span>`}</div>
           </div>
           <div class="gameActions">
             <button class="btn ok" data-play="${esc(g.id)}" ${soon?"disabled":""}>Play</button>
@@ -1213,7 +1177,7 @@ function startApp(){
             <div class="sub">${esc(meUser.email)} • <span class="kbd">${esc(quickLine)}</span></div>
           </div>
           <div style="text-align:right">
-            <span class="pill">Signed in</span>
+            <span class="pill live"><span class="dot"></span> Signed in</span>
           </div>
         </div>
       </div>
@@ -1276,7 +1240,7 @@ function startApp(){
     if(!g){ screen="home"; return render(); }
 
     signOutBtn.style.display="inline-block";
-    brandTitle.innerHTML=`<span class="grad">${esc(g.name)}</span>`;
+    brandTitle.textContent=g.name;
 
     const players=await getPlayers();
     const meEmail=meUser.email;
@@ -1292,7 +1256,7 @@ function startApp(){
             <div class="h1">${esc(g.name)}</div>
             <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
           </div>
-          <div>${g.active?`<span class="pill">Ready</span>`:`<span class="pill soon">Coming soon</span>`}</div>
+          <div>${g.active?`<span class="pill live"><span class="dot"></span> Ready</span>`:`<span class="pill soon">Coming soon</span>`}</div>
         </div>
       </div>
 
@@ -1369,7 +1333,7 @@ function startApp(){
     if(!g || !match){ screen="home"; return render(); }
 
     signOutBtn.style.display="inline-block";
-    brandTitle.innerHTML=`<span class="grad">${esc(g.name)}</span>`;
+    brandTitle.textContent=g.name;
 
     if(activeGameId==="shanghai"){
       const ctx={meUser, match};
@@ -1390,7 +1354,7 @@ function startApp(){
 
   async function renderStats(){
     signOutBtn.style.display="inline-block";
-    brandTitle.innerHTML=`<span class="grad">Stats</span>`;
+    brandTitle.textContent="Stats";
 
     const players=await getPlayers();
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
@@ -1461,7 +1425,7 @@ function startApp(){
     if(!g){ screen="stats"; return render(); }
 
     signOutBtn.style.display="inline-block";
-    brandTitle.innerHTML=`<span class="grad">${esc(g.name)} • Stats</span>`;
+    brandTitle.textContent=`${g.name} • Stats`;
 
     const players=await getPlayers();
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
@@ -1508,7 +1472,7 @@ function startApp(){
 
   async function renderHistory(){
     signOutBtn.style.display="inline-block";
-    brandTitle.innerHTML=`<span class="grad">History</span>`;
+    brandTitle.textContent="History";
 
     const history=await getHistory(meUser.email);
     let items=history.map(h=>`
