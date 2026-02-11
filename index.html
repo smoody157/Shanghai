@@ -73,7 +73,18 @@ body{
   padding:12px 14px;background:rgba(7,10,20,.84);backdrop-filter:blur(12px);
   border-bottom:1px solid rgba(255,255,255,.08);
 }
-.brand{display:flex;flex-direction:column;line-height:1.05}
+.topActions{display:flex;align-items:center;gap:10px;flex:0 0 auto;min-width:92px}
+.topActions.left{justify-content:flex-start}
+.topActions.right{justify-content:flex-end}
+
+.brand{
+  display:flex;
+  flex-direction:column;
+  line-height:1.05;
+  flex:1;
+  align-items:center;
+  text-align:center;
+}
 .brand .t{font-weight:900;font-size:16px}
 .brand .s{font-size:12px;color:var(--muted)}
 
@@ -191,7 +202,7 @@ input,select{
   color:var(--muted); font-weight:900; font-size:12px;
 }
 
-/* ===== Hero alignment (clean, centered, not “thrown on”) ===== */
+/* ===== Hero alignment (clean, centered) ===== */
 .hero{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
 }
@@ -203,14 +214,22 @@ input,select{
   align-items:center;
   justify-content:center;
 }
-.heroBadges{
+.heroCornerLeft{
   display:flex;
-  gap:8px;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  flex:0 0 auto;
+  min-width:140px;
+}
+.heroCornerRight{
+  display:flex;
   align-items:center;
   justify-content:flex-end;
-  flex-wrap:nowrap;
-  white-space:nowrap;
+  gap:10px;
   flex:0 0 auto;
+  min-width:140px;
+  white-space:nowrap;
 }
 
 .logoMark{
@@ -364,13 +383,17 @@ th{position:sticky;top:0;background:rgba(7,10,20,.88);backdrop-filter:blur(10px)
 
 <body>
 <div class="topbar">
+  <div class="topActions left">
+    <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
+  </div>
+
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
     <div class="s">The Dart Room • Designed by Steve’s Graphic Designs</div>
   </div>
-  <div>
+
+  <div class="topActions right">
     <button class="btn ghost" id="homeBtn" type="button">Home</button>
-    <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
   </div>
 </div>
 
@@ -711,15 +734,17 @@ function startApp(){
 
         <div class="card">
           <div class="hero">
-            <div class="logoMark"><span>🎯</span></div>
+            <div class="heroCornerLeft">
+              <div class="logoMark"><span>🎯</span></div>
+              <span class="kbd">Shanghai</span>
+            </div>
 
             <div class="heroMain">
               <div class="h1" style="margin:0">${esc(activePlayer.name)}’s Turn</div>
               <div class="sub">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
-            <div class="heroBadges">
-              <span class="kbd">Shanghai</span>
+            <div class="heroCornerRight">
               <span class="pill" data-live="1">Live</span>
             </div>
           </div>
@@ -882,14 +907,17 @@ function startApp(){
 
           <div class="card">
             <div class="hero">
-              <div class="logoMark"><span>🔥</span></div>
+              <div class="heroCornerLeft">
+                <div class="logoMark"><span>🔥</span></div>
+                <span class="kbd">Killer</span>
+              </div>
 
               <div class="heroMain">
                 <div class="h1">Killer</div>
                 <div class="sub">Claim numbers (one at a time).</div>
               </div>
 
-              <div class="heroBadges">
+              <div class="heroCornerRight">
                 <span class="pill">Setup</span>
               </div>
             </div>
@@ -936,7 +964,7 @@ function startApp(){
       const attackTargets = m.players
         .filter(p=>!p.out && p.email!==active.email)
         .map(p=>{
-          const label = `${p.name} • ${p.number ?? "?"} • ${"❤".repeat(Math.max(0,p.lives))}`;
+          const label = `${p.name} • ${p.number ?? "?"} • ${"❤️".repeat(Math.max(0,p.lives))}`;
           return `<button class="kAttackBtn" data-attack="${esc(p.email)}" ${canAttack?"":"disabled"}>
             HIT ${esc(p.name)}’s DOUBLE → remove 1 life
             <div class="small">${esc(label)}</div>
@@ -953,15 +981,17 @@ function startApp(){
 
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
           <div class="hero">
-            <div class="logoMark"><span>🔥</span></div>
+            <div class="heroCornerLeft">
+              <div class="logoMark"><span>🔥</span></div>
+              <span class="kbd">Killer</span>
+            </div>
 
             <div class="heroMain">
               <h2 class="kTurnBig" style="margin:0">${isFinished ? "Finished" : `${esc(active.name)}’s Turn`}</h2>
               <div class="kTurnSub">${statusLine}</div>
             </div>
 
-            <div class="heroBadges">
-              <span class="kbd">Killer</span>
+            <div class="heroCornerRight">
               <span class="pill" ${isFinished?'':'data-live="1"'}>${isFinished?"Ended":"Live"}</span>
             </div>
           </div>
@@ -1160,7 +1190,7 @@ function startApp(){
       icon:"🔥",
       bullets:[
         "Setup: each player claims a unique number (1–20).",
-        "Start with 3 lives (❤❤❤).",
+        "Start with 3 lives (❤️❤️❤️).",
         "On your turn you throw 3 darts.",
         "Hit YOUR number as a DOUBLE to become a KILLER (🔥).",
         "Once you’re a killer: you can ‘attack’ by hitting an opponent’s number as a DOUBLE.",
@@ -1188,14 +1218,16 @@ function startApp(){
     html += `
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>🎯</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>🎯</span></div>
+          </div>
 
           <div class="heroMain" style="text-align:left;align-items:flex-start">
             <div class="h1">Game Night</div>
             <div class="sub">Sign in with your email. Your stats and history stay with your account.</div>
           </div>
 
-          <div class="heroBadges">
+          <div class="heroCornerRight">
             <span class="pill">Darts</span>
           </div>
         </div>
@@ -1237,12 +1269,16 @@ function startApp(){
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>🧾</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>🧾</span></div>
+          </div>
 
           <div class="heroMain">
             <div class="h1">Create Player</div>
             <div class="sub">Just your name — you’re in.</div>
           </div>
+
+          <div class="heroCornerRight"></div>
         </div>
       </div>
 
@@ -1316,14 +1352,16 @@ function startApp(){
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>👤</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>👤</span></div>
+          </div>
 
           <div class="heroMain" style="text-align:left;align-items:flex-start">
             <div class="h1">${esc(meUser.name||"Player")}</div>
             <div class="sub">${esc(meUser.email)} • <span class="kbd">${esc(quickLine)}</span></div>
           </div>
 
-          <div class="heroBadges">
+          <div class="heroCornerRight">
             <span class="pill" data-live="1">Signed in</span>
           </div>
         </div>
@@ -1343,12 +1381,16 @@ function startApp(){
 
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>👥</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>👥</span></div>
+          </div>
 
           <div class="heroMain" style="text-align:left;align-items:flex-start">
             <div class="h1">Players</div>
             <div class="sub">Tap “View stats” to see someone’s game stats.</div>
           </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
         <div class="rosterGrid">${roster || `<div class="sub">No other players yet.</div>`}</div>
@@ -1392,12 +1434,16 @@ function startApp(){
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>📜</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>📜</span></div>
+          </div>
 
           <div class="heroMain">
             <div class="h1">Game rules</div>
             <div class="sub">Pick a game to see how to play.</div>
           </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
         ${Games.map(g=>`
@@ -1434,12 +1480,16 @@ function startApp(){
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>${esc(r.icon)}</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>${esc(r.icon)}</span></div>
+          </div>
 
           <div class="heroMain">
             <div class="h1">${esc(r.title)}</div>
             <div class="sub">How to play</div>
           </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
         <ul style="margin:0;padding-left:18px;line-height:1.5">
@@ -1468,14 +1518,17 @@ function startApp(){
 
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
+            <span class="kbd">${esc(g.name)}</span>
+          </div>
 
           <div class="heroMain">
             <div class="h1">${esc(g.name)}</div>
             <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
           </div>
 
-          <div class="heroBadges">
+          <div class="heroCornerRight">
             ${g.active?`<span class="pill" data-live="1">Ready</span>`:`<span class="pill soon">Coming soon</span>`}
           </div>
         </div>
@@ -1586,12 +1639,16 @@ function startApp(){
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>📈</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>📈</span></div>
+          </div>
 
           <div class="heroMain">
             <div class="h1">Stats</div>
             <div class="sub">Pick a player, then pick a game.</div>
           </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
         <label>Player</label>
@@ -1674,12 +1731,17 @@ function startApp(){
     appEl.innerHTML=`
       <div class="card">
         <div class="hero">
-          <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
+          <div class="heroCornerLeft">
+            <div class="logoMark"><span>${esc(g.icon||"🎯")}</span></div>
+            <span class="kbd">${esc(g.name)}</span>
+          </div>
 
           <div class="heroMain">
             <div class="h1">${esc(g.name)}</div>
             <div class="sub">Player: <b>${esc(viewer.name||"Player")}</b></div>
           </div>
+
+          <div class="heroCornerRight"></div>
         </div>
         <div class="divider"></div>
         ${body}
