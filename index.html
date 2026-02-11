@@ -579,6 +579,48 @@ th{
   text-overflow:ellipsis;
 }
 
+
+/* ===== Turn swipe (FIX: visible + animated) ===== */
+.turnSwipe{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+.turnNames{position:relative;height:42px;width:100%;overflow:hidden}
+.turnName{
+  position:absolute; left:50%; top:0;
+  transform:translateX(-50%);
+  padding:4px 10px;
+  border-radius:14px;
+  text-align:center;
+  white-space:nowrap;
+}
+.turnName.flash{
+  animation:namePulse 1.25s ease-in-out infinite;
+}
+@keyframes namePulse{
+  0%{ box-shadow:0 0 0 rgba(239,68,68,0); }
+  50%{ box-shadow:0 0 22px rgba(239,68,68,.42); }
+  100%{ box-shadow:0 0 0 rgba(239,68,68,0); }
+}
+@keyframes turnIn{
+  from{ opacity:0; transform:translateX(calc(-50% + 56px)); }
+  to{ opacity:1; transform:translateX(-50%); }
+}
+@keyframes turnOut{
+  from{ opacity:1; transform:translateX(-50%); }
+  to{ opacity:0; transform:translateX(calc(-50% - 56px)); }
+}
+.turnIn{ animation:turnIn .32s ease-out both; }
+.turnOut{ animation:turnOut .32s ease-in both; }
+
+/* ===== Corner stack (pill above icon) ===== */
+.cornerStack{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.cornerIcon{
+  width:34px;height:34px;border-radius:14px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
+  font-size:16px;
+}
+
 </style>
 </head>
 
@@ -626,15 +668,24 @@ function fmt(ts){ try{return new Date(ts).toLocaleString();}catch{return "";} }
 function turnSwipe(gameId, name){
   window.__turnMem = window.__turnMem || {};
   const prev = window.__turnMem[gameId];
+  const changed = !!(prev && prev !== name);
   window.__turnMem[gameId] = name;
-  if(prev && prev !== name){
+
+  if(changed){
     return `<div class="turnSwipe">
-      <div class="turnName turnOut">${esc(prev)}</div>
-      <div class="turnName turnIn dangerPulse">${esc(name)}</div>
+      <div class="turnNames">
+        <div class="turnName turnOut">${esc(prev)}</div>
+        <div class="turnName turnIn flash">${esc(name)}</div>
+      </div>
     </div>`;
   }
-  return `<div class="turnSwipe"><div class="turnName turnIn dangerPulse">${esc(name)}</div></div>`;
+  return `<div class="turnSwipe">
+    <div class="turnNames">
+      <div class="turnName flash">${esc(name)}</div>
+    </div>
+  </div>`;
 }
+
 
 const appEl=document.getElementById("app");
 const homeBtn=document.getElementById("homeBtn");
@@ -1013,17 +1064,17 @@ function startApp(){
         <div class="card">
           <div class="hero">
             <div class="heroCornerLeft">
-              <span class="kbd">Shanghai</span>
+              <div class="cornerStack">
+                <span class="pill">Shanghai</span>
+                <div class="cornerIcon">🎯</div>
+              </div>
             </div>
 
             <div class="heroMain">
-              <div class="titleRow">
-                <div class="logoMini" aria-hidden="true">🎯</div>
-                <div class="gameTitleBig">Shanghai</div>
-              </div>
+              <div class="gameTitleBig">Shanghai</div>
               ${turnSwipe("shanghai", activePlayer.name)}
-              <div class="small"><span class="badge">NOW THROWING</span></div>
-              <div class="sub statusLine">Target: <b><span class="targetGlow">${esc(t==="B"?"BULL":t)}</span></b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+              ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="sub statusLine">Target: <b>${esc(t==="B"?"BULL":t)}</b> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
             <div class="heroCornerRight">
@@ -1057,6 +1108,7 @@ function startApp(){
     }
 
     function bindPlay(ctx){
+      const $=(id)=>document.getElementById(id);
       function onHit(h){
         const m=ctx.match;
         if(m.finished) return;
@@ -1278,18 +1330,17 @@ function startApp(){
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
           <div class="hero">
             <div class="heroCornerLeft">
-              <span class="kbd">Killer</span>
+              <div class="cornerStack">
+                <span class="pill">Killer</span>
+                <div class="cornerIcon">🔥</div>
+              </div>
             </div>
 
             <div class="heroMain">
-              <div class="titleRow">
-                <div class="logoMini" aria-hidden="true">🔥</div>
-                <div class="gameTitleBig">Killer</div>
-              </div>
-
-              ${isFinished ? `<div class="turnSwipe"><div class="turnName turnIn">${esc("Game Over")}</div></div>` : turnSwipe("killer", active.name)}
-              ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="kTurnSub statusLine">${statusLine}</div>
+              <div class="gameTitleBig">Killer</div>
+              ${isFinished ? "" : turnSwipe("killer", active.name)}
+              ${isFinished ? "" : `<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="sub statusLine">${statusLine}</div>
             </div>
 
             <div class="heroCornerRight">
@@ -1625,16 +1676,15 @@ function startApp(){
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
           <div class="hero">
             <div class="heroCornerLeft">
-              <span class="kbd">Around the World</span>
+              <div class="cornerStack">
+                <span class="pill">Around the World</span>
+                <div class="cornerIcon">🌍</div>
+              </div>
             </div>
 
             <div class="heroMain">
-              <div class="titleRow">
-                <div class="logoMini" aria-hidden="true">🌍</div>
-                <div class="gameTitleBig">Around the World</div>
-              </div>
-
-              ${isFinished ? `<div class="turnSwipe"><div class="turnName turnIn">${esc("Game Over")}</div></div>` : turnSwipe("around", active.name)}
+              <div class="gameTitleBig">Around the World</div>
+              ${turnSwipe("around", active.name)}
               ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
               <div class="sub statusLine">${statusLine}</div>
             </div>
