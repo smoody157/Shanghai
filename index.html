@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <title>Game Night • v8-2026-02-11</title>
-<!-- BUILD: v9-20260211 -->
+<!-- BUILD: v10-20260211 -->
 
 <style>
 :root{
@@ -569,7 +569,7 @@ th{
 .turnHeader{display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
 .turnTopRow{width:100%;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .turnTopRow .pill{max-width:46vw;overflow:hidden;text-overflow:ellipsis}
-.turnTitleRow{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%}
+.turnTitleRow{position:relative;display:block;width:fit-content;margin:0 auto;text-align:center;padding-bottom:44px}
 .turnIconMini{
   width:38px;height:38px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
@@ -582,7 +582,7 @@ th{
 .turnNameRow{margin-top:2px}
 .turnNowRow{margin-top:2px}
 .turnNowRow .pill{letter-spacing:.6px}
-.turnMetaLine{margin-top:2px}
+.turnMetaLine{margin-top:8px}
 .targetPulse{
   display:inline-block;
   color:var(--c-cyan);
@@ -660,6 +660,15 @@ th{
   font-size:16px;
 }
 
+
+.turnSwipeWrap{position:relative;display:inline-block;min-height:42px}
+.turnSwipeText{font-size:34px;font-weight:1000;letter-spacing:.4px;line-height:1.05}
+.turnSwipeGlow{animation:glowCycle 2.4s ease-in-out infinite;text-shadow:0 2px 16px rgba(0,0,0,.55)}
+.turnSwipeIn{animation:swipeIn .28s ease-out both}
+.turnSwipeOut{animation:swipeOut .28s ease-in both}
+@keyframes swipeIn{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:translateX(0)}}
+@keyframes swipeOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-26px)}}
+
 </style>
 </head>
 
@@ -671,7 +680,7 @@ th{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v9-20260211</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v10-20260211</div>
   </div>
 
   <div class="topActions right">
@@ -1109,8 +1118,8 @@ function startApp(){
             </div>
 
             <div class="turnTitleRow">
-              <div class="turnIconMini"><span>🎯</span></div>
               <div class="gameTitleBig">Shanghai</div>
+              <div class="turnIconUnder"><span>🎯</span></div>
             </div>
 
             <div class="turnNameRow">
@@ -1308,7 +1317,7 @@ function startApp(){
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
-            <button class="btn ok" id="saveClaim">Save & Next</button>
+            <button class="btn ok" id="saveClaim" type="button">Save & Next</button>
           </div>
         `;
       }
@@ -1729,8 +1738,8 @@ function startApp(){
             </div>
 
             <div class="turnTitleRow">
-              <div class="turnIconMini"><span>🌍</span></div>
               <div class="gameTitleBig">Around the World</div>
+              <div class="turnIconUnder"><span>🌍</span></div>
             </div>
 
             <div class="turnNameRow">
