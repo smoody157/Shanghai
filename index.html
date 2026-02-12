@@ -737,32 +737,29 @@ input,select{
 }
 \.turnNameBox{
   position:relative;
-  overflow:hidden;
-  height:64px;
   display:flex;
   align-items:center;
   justify-content:center;
   width:100%;
-  align-self:stretch;
-  padding:0;
-
-  z-index:3;
+  min-height:56px;
+  padding:8px 0 2px;
+  overflow:visible;
 }
-
-
 .turnNameText{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-70%);
-  font-size:26px;
+  position:relative;
+  left:auto;
+  top:auto;
+  transform:none;
+  font-size:28px;
   font-weight:1000;
   white-space:nowrap;
   width:max-content;
   max-width:100%;
   text-align:center;
-
-  z-index:4;
+  padding:0 10px;
+}
+@media(max-width:520px){
+  .turnNameText{ font-size:24px; }
 }
 
 
@@ -1090,48 +1087,59 @@ function turnNameHTML(name){
   </div>`;
 }
 function animateTurnName(gameId, name){
-  const repaint = ()=>{
-    const box=document.getElementById("turnNameBox");
-    if(!box) return;
-    const prev=_turnNameCache[gameId] ?? null;
+  const box=document.getElementById("turnNameBox");
+  if(!box) return;
 
-    if(prev===name){
-      box.innerHTML = turnNameHTML(name);
-      return;
-    }
-    _turnNameCache[gameId]=name;
+  const nm = String(name||"").trim();
+  if(!nm){
+    box.innerHTML = "";
+    _turnNameCache[gameId] = nm;
+    return;
+  }
 
-    if(!prev){
-      box.innerHTML = turnNameHTML(name);
-      return;
-    }
+  const prev = _turnNameCache[gameId];
+  const turnNameHTML = (n)=>(
+    `<div class="turnNameText turnTitle3d turnNameGlow">`+
+      `<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>`+
+      `${esc(n)}`+
+      `<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>`+
+    `</div>`
+  );
 
-    box.innerHTML = `
-      <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-70%,0)">
-        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(prev)}
-        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
-      </div>
-      <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-70%,0)">
-        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(name)}
-        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
-      </div>
-    `;
-    const oldEl=document.getElementById("turnOld");
-    const newEl=document.getElementById("turnNew");
-    if(!oldEl || !newEl){
-      box.innerHTML = turnNameHTML(name);
-      return;
-    }
-    try{
-      oldEl.animate([{transform:"translate3d(-50%,-70%,0)"},{transform:"translate3d(-170%,-70%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
-      newEl.animate([{transform:"translate3d(120%,-70%,0)"},{transform:"translate3d(-50%,-70%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
-        box.innerHTML = turnNameHTML(name);
-      };
-    }catch(_){
-      box.innerHTML = turnNameHTML(name);
-    }
-  };
-  requestAnimationFrame(repaint);
+  // Always paint at least once per render (prevents “missing name” after DOM swaps)
+  if(prev === nm){
+    box.innerHTML = turnNameHTML(nm);
+    return;
+  }
+  _turnNameCache[gameId] = nm;
+
+  // First paint: no animation
+  if(!prev){
+    box.innerHTML = turnNameHTML(nm);
+    return;
+  }
+
+  // Slide old out, new in
+  box.innerHTML = `
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translateX(0);opacity:1">
+      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(prev)}
+      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
+    </div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translateX(140%);opacity:1">
+      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(nm)}
+      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
+    </div>
+  `;
+  const oldEl=document.getElementById("turnOld");
+  const newEl=document.getElementById("turnNew");
+  try{
+    oldEl.animate([{transform:"translateX(0)",opacity:1},{transform:"translateX(-160%)",opacity:0.2}],{duration:300,easing:"cubic-bezier(.2,.8,.2,1)"});
+    newEl.animate([{transform:"translateX(140%)",opacity:1},{transform:"translateX(0)",opacity:1}],{duration:300,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
+      box.innerHTML = turnNameHTML(nm);
+    };
+  }catch(_){
+    box.innerHTML = turnNameHTML(nm);
+  }
 }
 
 const appEl=document.getElementById("app");
