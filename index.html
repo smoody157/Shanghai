@@ -1456,41 +1456,6 @@ function startApp(){
       ${numText}
     </svg>`;
   }
-      return out;
-    }
-
-    let numText="";
-    for(let i=0;i<20;i++){
-      const ang=i*seg+rot+seg/2;
-      const p=polar(cx,cy,90,ang);
-      numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
-    }
-
-    return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
-          <stop offset="0%" stop-color="#1a2a4a"/>
-          <stop offset="55%" stop-color="#0b1325"/>
-          <stop offset="100%" stop-color="#040814"/>
-        </radialGradient>
-        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="6.2" result="b"/>
-          <feColorMatrix in="b" type="matrix"
-            values="0 0 0 0 0.18  0 0 0 0 0.92  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
-          <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
-      ${activeOverlay}
-      ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
-      ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
-      ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
-      ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
-      <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
-      <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
-      ${numText}
-    </svg>`;
-  }
 
   function pushSnap(m){
     m.snaps=m.snaps||[];
