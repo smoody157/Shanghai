@@ -516,6 +516,57 @@ input,select{
 }
 .rosterSub{ color:var(--muted); font-size:12px; overflow-wrap:anywhere; }
 
+
+/* ===== Player strip under dartboard (shows names + active) ===== */
+.playerStrip{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:stretch;
+  flex-wrap:wrap;
+  padding:4px 0 2px;
+}
+.playerChip{
+  min-width:140px;
+  max-width:min(320px, 90vw);
+  flex:1;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.03);
+  padding:10px 12px;
+  text-align:center;
+  position:relative;
+}
+.playerChip .nm{
+  font-weight:1000;
+  font-size:15px;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.playerChip .sub{
+  margin-top:2px;
+  font-size:12px;
+  color:var(--muted);
+  text-shadow:none;
+}
+.playerChip.active{
+  border-color: rgba(34,197,94,.38);
+  box-shadow: 0 0 22px rgba(34,197,94,.22);
+}
+.playerChip.active::before{
+  content:"";
+  position:absolute;
+  inset:-12px;
+  border-radius:inherit;
+  pointer-events:none;
+  filter: blur(18px);
+  background: radial-gradient(120% 140% at 50% 50%, rgba(34,197,94,.55) 0%, rgba(34,197,94,.22) 52%, rgba(34,197,94,0) 78%);
+  opacity:.9;
+  animation:auraPulseSoft 2.0s ease-in-out infinite;
+  z-index:-1;
+}
 /* ===== Presence (online indicator) ===== */
 .avatar.online{
   border-color:rgba(34,197,94,.55);
@@ -684,10 +735,10 @@ input,select{
   box-shadow:0 10px 22px rgba(0,0,0,.28);
   pointer-events:none;
 }
-.turnNameBox{
+\.turnNameBox{
   position:relative;
   overflow:hidden;
-  height:52px;
+  height:64px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -703,7 +754,7 @@ input,select{
   position:absolute;
   left:50%;
   top:50%;
-  transform:translate3d(-50%,-50%,0);
+  transform:translate(-50%,-70%);
   font-size:26px;
   font-weight:1000;
   white-space:nowrap;
@@ -888,7 +939,7 @@ try{
 }catch{}
 
 let __audioCtx = null;
-const MASTER_GAIN = 2.2; // boosted for phone speakers
+const MASTER_GAIN = 3.2; // boosted for phone speakers
 
 function ensureAudio(){
   if(__audioCtx) return __audioCtx;
@@ -1029,33 +1080,58 @@ document.addEventListener("click", (ev)=>{
 }, {capture:true});
 
 // ===== Turn name swipe helper (keeps state across renders) =====
-let _turnNameCache = {shanghai:null, around:null, killer:null};
+let _turnNameCache = {};
+
+function turnNameHTML(name){
+  const nm = esc(name||"");
+  return `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-70%,0)">
+    <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${nm}
+    <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
+  </div>`;
+}
 function animateTurnName(gameId, name){
-  const box=document.getElementById("turnNameBox");
-  if(!box) return;
-  const prev=_turnNameCache[gameId];
-  if(prev===name){
-    return;
-  }
-  _turnNameCache[gameId]=name;
+  const repaint = ()=>{
+    const box=document.getElementById("turnNameBox");
+    if(!box) return;
+    const prev=_turnNameCache[gameId] ?? null;
 
-  // First render: just place it
-  if(!prev){
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
-    return;
-  }
+    if(prev===name){
+      box.innerHTML = turnNameHTML(name);
+      return;
+    }
+    _turnNameCache[gameId]=name;
 
-  // Build outgoing + incoming nodes
-  box.innerHTML = `
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(prev)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
-  `;
-  const oldEl=document.getElementById("turnOld");
-  const newEl=document.getElementById("turnNew");
-  oldEl.animate([{transform:"translate3d(-50%,-50%,0)"},{transform:"translate3d(-170%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
-  newEl.animate([{transform:"translate3d(120%,-50%,0)"},{transform:"translate3d(-50%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
+    if(!prev){
+      box.innerHTML = turnNameHTML(name);
+      return;
+    }
+
+    box.innerHTML = `
+      <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-70%,0)">
+        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(prev)}
+        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
+      </div>
+      <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-70%,0)">
+        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(name)}
+        <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
+      </div>
+    `;
+    const oldEl=document.getElementById("turnOld");
+    const newEl=document.getElementById("turnNew");
+    if(!oldEl || !newEl){
+      box.innerHTML = turnNameHTML(name);
+      return;
+    }
+    try{
+      oldEl.animate([{transform:"translate3d(-50%,-70%,0)"},{transform:"translate3d(-170%,-70%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
+      newEl.animate([{transform:"translate3d(120%,-70%,0)"},{transform:"translate3d(-50%,-70%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
+        box.innerHTML = turnNameHTML(name);
+      };
+    }catch(_){
+      box.innerHTML = turnNameHTML(name);
+    }
   };
+  requestAnimationFrame(repaint);
 }
 
 const appEl=document.getElementById("app");
@@ -1461,13 +1537,14 @@ function startApp(){
             </div>
             <div class="headerIcon">🎯</div>
             <div class="headerTitle turnTitle3d">Shanghai</div>
-            ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
+            ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML(m.players[m.turnIndex]?.name||"")}</div>`}
             ${m.finished?"":`<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
             <div class="sub" style="text-align:center;margin-top:6px">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
           </div>
 
           <div class="divider"></div>
           <div class="boardBox">${dartboardSVG(t)}</div>
+          ${playerStripHTML(m.players, m.turnIndex, (p)=>"Score: <b>"+esc(p.total)+"</b>")}
           <div class="divider"></div>
 
           <div class="hitRow">
@@ -1715,7 +1792,7 @@ function startApp(){
             </div>
             <div class="headerIcon">🔥</div>
             <div class="headerTitle turnTitle3d">Killer</div>
-            ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
+            ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML(m.players[m.turnIndex]?.name||"")}</div>`}
             ${isFinished ? "" : `<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
             <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
@@ -2058,13 +2135,14 @@ function startApp(){
             </div>
             <div class="headerIcon">🌍</div>
             <div class="headerTitle turnTitle3d">Around the World</div>
-            <div class="turnNameBox" id="turnNameBox"></div>
+            <div class="turnNameBox" id="turnNameBox">${turnNameHTML(m.players[m.turnIndex]?.name||"")}</div>
             ${isFinished?'':'<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>'}
             <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
 
           <div class="divider"></div>
           <div class="boardBox">${dartboardSVG(t==="B"?"B":t)}</div>
+          ${playerStripHTML(m.players, m.turnIndex, (p)=>"Target: <b>"+esc((currentTarget(m,p)==="B")?"BULL":currentTarget(m,p))+"</b>")}
           <div class="divider"></div>
 
           ${isFinished ? "" : `
@@ -3006,6 +3084,13 @@ function startApp(){
     `);
 
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
+    const ch=document.getElementById("clearHistoryBtn");
+    if(ch){ ch.onclick=async()=>{
+      if(!confirm("Clear your match history? This will NOT delete your player or stats.")) return;
+      try{ await deleteHistoryForPlayer(meUser.email); toastMsg="History cleared."; render(); }
+      catch(e){ showFatal("Clear history error", e?.message||String(e)); }
+    }; }
+
 
     const clearBtn=document.getElementById("clearHistoryBtn");
     if(clearBtn){
@@ -3077,6 +3162,21 @@ function startApp(){
 
   render();
 }
+
+function playerStripHTML(players, activeIndex, extraLineFn){
+  try{
+    return `<div class="playerStrip">` + (players||[]).map((p,i)=>{
+      const act = (i===activeIndex);
+      const extra = extraLineFn ? (extraLineFn(p,i) || "") : "";
+      return `<div class="playerChip ${act?'active':''}">
+        <div class="nm">${esc(p.name||"")}</div>
+        <div class="sub">${act ? "NOW THROWING" : "&nbsp;"}</div>
+        ${extra?`<div class="small" style="margin-top:4px">${extra}</div>`:""}
+      </div>`;
+    }).join("") + `</div>`;
+  }catch(_){ return ""; }
+}
+
 
 boot();
 </script>
