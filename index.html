@@ -22,6 +22,7 @@
   /* MULTI-COLOR ACCENTS (NOT “ALL BLUE”) */
   --c-cyan:#22d3ee;
   --c-purple:#8b5cf6;
+  --c-blue:#3b82f6;
   --c-pink:#ec4899;
   --c-green:#22c55e;
   --c-orange:#f97316;
@@ -741,6 +742,31 @@ input,select{
   50%{ opacity:.92; filter:blur(20px); }
   100%{ opacity:.40; filter:blur(16px); }
 }
+
+
+/* Players/Stats page game segments: soft BLUE halo (status/section, NOT action green) */
+.gameCard.segmentGlow::before{
+  content:"";
+  position:absolute;
+  inset:-14px;
+  border-radius:22px;
+  background:
+    radial-gradient(90% 140% at 50% 40%,
+      rgba(59,130,246,.52) 0%,
+      rgba(139,92,246,.24) 46%,
+      rgba(59,130,246,0) 80%);
+  filter:blur(18px);
+  opacity:.72;
+  z-index:-1;
+  pointer-events:none;
+  animation:haloSegment 3.1s ease-in-out infinite;
+}
+@keyframes haloSegment{
+  0%{ opacity:.28; filter:blur(16px); }
+  50%{ opacity:.86; filter:blur(21px); }
+  100%{ opacity:.28; filter:blur(16px); }
+}
+
 
 /* HIT buttons: use the existing multi-color cycle but as a true halo */
 .hitBtn:not(.undo):not(:disabled)::before{
@@ -2852,7 +2878,7 @@ screen="home"; render();
             ? aroundLine(gs)
           : (g.active ? `Played: <b>${played}</b>` : `Coming soon`);
         return `
-          <div class="gameCard">
+          <div class="gameCard segmentGlow">
             <div class="gameHead">
               <div class="gameTitle">
                 <div class="gameIcon">${esc(g.icon||"🎯")}</div>
