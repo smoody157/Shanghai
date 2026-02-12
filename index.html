@@ -245,13 +245,6 @@ input,select{
 .btn.ok{
   background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.12)) !important;
   border-color:rgba(34,197,94,.40) !important;
-
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.32),
-    0 0 26px rgba(34,197,94,.28),
-    inset 0 0 26px rgba(34,197,94,.22),
-    inset 0 1px 0 rgba(255,255,255,.20),
-    inset 0 -12px 18px rgba(0,0,0,.38);
 }
 .btn.danger{
   background:linear-gradient(135deg, rgba(239,68,68,.22), rgba(249,115,22,.12)) !important;
@@ -289,7 +282,7 @@ input,select{
 .pill,.badge,.kbd{ position:relative; }
 
 /* ===== Chrome text (HEADERS ONLY) ===== */
-.h1, .kTurnBig, .brand .t, td.l, .rosterName{
+.h1, .kTurnBig, .brand .t, .rosterName{
   background:var(--chrome-text);
   -webkit-background-clip:text;
   background-clip:text;
@@ -592,16 +585,15 @@ input,select{
 
 /* GREEN = primary action */
 .btn.ok::before{
-  /* Full-button halo (soft fill + edge) */
-  inset:-14px;
+  /* Full-surface halo (covers the whole button, not just edges) */
   background:
-    radial-gradient(140% 160% at 50% 50%,
-      rgba(34,197,94,.65) 0%,
-      rgba(34,197,94,.38) 42%,
-      rgba(34,197,94,.18) 60%,
-      rgba(34,197,94,0) 78%);
-  opacity:.95;
-  animation: auraPulseSoft 2.0s ease-in-out infinite;
+    radial-gradient(circle at 50% 50%,
+      rgba(34,197,94,.16) 0%,
+      rgba(34,197,94,.32) 46%,
+      rgba(34,197,94,.58) 72%,
+      rgba(34,197,94,0) 92%);
+  opacity:.72;
+  animation: auraPulseSoft 2.05s ease-in-out infinite;
 }
 /* RED/ORANGE = destructive */
 .btn.danger::before{
@@ -702,6 +694,8 @@ input,select{
   width:100%;
   align-self:stretch;
   padding:0;
+
+  z-index:3;
 }
 
 
@@ -709,13 +703,15 @@ input,select{
   position:absolute;
   left:50%;
   top:46%;
-  transform:translate(-50%,-64%);
+  transform:translate(-50%,-50%);
   font-size:26px;
   font-weight:1000;
   white-space:nowrap;
   width:max-content;
   max-width:100%;
   text-align:center;
+
+  z-index:4;
 }
 
 
@@ -747,8 +743,7 @@ input,select{
 
 
 /* Dartboard active target highlight */
-.hotWedge{ opacity:.92; animation:hotPulse 1.25s ease-in-out infinite; }
-@keyframes hotPulse{ 0%,100%{opacity:.55; filter:brightness(1);} 50%{opacity:1; filter:brightness(1.85);} }
+.hotWedge{ opacity:1; }
 /* ===== Win animation overlay ===== */
 .winOverlay{
   position:fixed;
@@ -835,14 +830,9 @@ input,select{
 }
 .btn.ghost:active{ transform:translateY(1px); }
 
-/* ===== Dartboard active slice pulse ===== */
-@keyframes wedgePulse{
-  0%{ opacity:.35; filter:brightness(1); }
-  50%{ opacity:1;  filter:brightness(1.35); }
-  100%{ opacity:.35; filter:brightness(1); }
-}
-/* SVG wedge highlight */
-.hotWedgePulse{ animation:wedgePulse 1.35s ease-in-out infinite; }
+/* ===== Safety: never hide table body text ===== */
+.tableWrap tbody td{ color: var(--text); background: transparent; }
+.tableWrap tbody td *{ color: inherit; -webkit-text-fill-color: currentColor; }
 
 </style>
 </head>
@@ -898,27 +888,12 @@ try{
 }catch{}
 
 let __audioCtx = null;
-let __masterGain = null;
-let __compressor = null;
 const MASTER_GAIN = 2.2; // boosted for phone speakers
 
 function ensureAudio(){
   if(__audioCtx) return __audioCtx;
   try{
     __audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // Master output chain (louder + protected from clipping)
-    __masterGain = __audioCtx.createGain();
-    __masterGain.gain.value = 0.92;
-
-    __compressor = __audioCtx.createDynamicsCompressor();
-    __compressor.threshold.value = -18;
-    __compressor.knee.value = 24;
-    __compressor.ratio.value = 10;
-    __compressor.attack.value = 0.003;
-    __compressor.release.value = 0.22;
-
-    __masterGain.connect(__compressor);
-    __compressor.connect(__audioCtx.destination);
   }catch(_){}
   return __audioCtx;
 }
@@ -936,7 +911,7 @@ function unlockAudio(){
     const g = ctx.createGain();
     g.gain.value = 0.0002;
     o.frequency.value = 440;
-    o.connect(g); g.connect(__masterGain || ctx.destination);
+    o.connect(g); g.connect(ctx.destination);
     o.start(); o.stop(ctx.currentTime + 0.02);
   }catch(_){}
   __audioUnlocked = true;
@@ -967,16 +942,16 @@ function playBeep(kind){
   // click (neutral), toggle (tick), win (celebration).
   const preset = (() => {
     switch(kind){
-      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.60}; // C5
-      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.55}; // A3
-      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.60}; // E5
-      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.50}; // G3
-      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.45}; // E4
-      case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.45}; // G4
-      case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.45}; // G5
-      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.65}; // C major
+      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.85}; // C5
+      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.85}; // A3
+      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.84}; // E5
+      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.85}; // G3
+      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.85}; // E4
+      case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.85}; // G4
+      case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.85}; // G5
+      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.85}; // C major
       case "click":
-      default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.45}; // A4
+      default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.85}; // A4
     }
   })();
 
@@ -992,7 +967,7 @@ function playBeep(kind){
     g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
 
     o.connect(g);
-    g.connect(__masterGain || ctx.destination);
+    g.connect(ctx.destination);
     o.start(start);
     o.stop(start + dur + 0.02);
   }
@@ -1059,17 +1034,14 @@ function animateTurnName(gameId, name){
   const box=document.getElementById("turnNameBox");
   if(!box) return;
   const prev=_turnNameCache[gameId];
-  // On re-render the DOM is replaced; if the name is unchanged we still need to repaint.
   if(prev===name){
-    if(box.firstElementChild) return;
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
     return;
   }
   _turnNameCache[gameId]=name;
 
   // First render: just place it
   if(!prev){
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
     return;
   }
 
@@ -1082,7 +1054,7 @@ function animateTurnName(gameId, name){
   const newEl=document.getElementById("turnNew");
   oldEl.animate([{transform:"translate3d(-50%,-62%,0)"},{transform:"translate3d(-170%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
   newEl.animate([{transform:"translate3d(120%,-62%,0)"},{transform:"translate3d(-50%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
   };
 }
 
@@ -1309,34 +1281,6 @@ function startApp(){
 
     let activeOverlay="";
 
-    // Active target highlight (glows & pulses the full slice across rings)
-    if(typeof activeTarget === "number"){
-      const idx = BOARD_NUMS.indexOf(activeTarget);
-      if(idx >= 0){
-        const a0 = idx*seg + rot + 0.6;
-        const a1 = (idx+1)*seg + rot - 0.6;
-
-        // Cover all 4 ring segments for the number: outer single, triple, inner single, double
-        const slices = [
-          {r0:rDoubleInner, r1:rDoubleOuter, fill:"rgba(239,68,68,.22)", stroke:"rgba(255,255,255,.88)", sw:2.6},
-          {r0:rTripleInner, r1:rTripleOuter, fill:"rgba(239,68,68,.18)", stroke:"rgba(255,255,255,.84)", sw:2.2},
-          {r0:rTripleOuter, r1:rDoubleInner, fill:"rgba(34,211,238,.14)", stroke:"rgba(34,211,238,.92)", sw:2.6},
-          {r0:rSingleInner, r1:rTripleInner, fill:"rgba(34,211,238,.12)", stroke:"rgba(34,211,238,.86)", sw:2.3},
-        ];
-
-        for(const s of slices){
-          activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,s.r0,s.r1,a0,a1)}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
-        }
-      }
-    }
-
-    if(activeTarget === "B"){
-      activeOverlay += `
-        <circle class="hotWedgePulse" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.20)" stroke="rgba(34,211,238,.95)" stroke-width="3.0" filter="url(#glow)"/>
-        <circle class="hotWedgePulse" cx="100" cy="100" r="7.6"  fill="rgba(239,68,68,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
-      `;
-    }
-
     function ringWedges(r0,r1,fillA,fillB){
       let out="";
       for(let i=0;i<20;i++){
@@ -1351,17 +1295,7 @@ function startApp(){
     for(let i=0;i<20;i++){
       const ang=i*seg+rot+seg/2;
       const p=polar(cx,cy,90,ang);
-      const n=BOARD_NUMS[i];
-      const isActive = (typeof activeTarget==="number" && n===activeTarget);
-      if(isActive){
-        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
-          font-size="10.2" fill="#22d3ee" font-weight="1000"
-          style="paint-order:stroke;stroke:#ffffff;stroke-width:2.6px;filter:url(#glow)">${n}</text>`;
-      }else{
-        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
-          font-size="8.5" fill="#dfe9ff" font-weight="900"
-          style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${n}</text>`;
-      }
+      numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
     }
 
     return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
@@ -1379,14 +1313,13 @@ function startApp(){
         </filter>
       </defs>
       <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
+      ${activeOverlay}
       ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
       ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
-      ${activeOverlay}
       <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
       <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
-      ${activeOverlay}
       ${numText}
     </svg>`;
   }
@@ -1787,13 +1720,9 @@ function startApp(){
             <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
 
-          
           ${isFinished ? "" : `
             <div class="divider"></div>
-            <div class="boardBox">${dartboardSVG(active.number!=null?active.number:null)}</div>
-            <div class="divider"></div>
             <div class="hitRow">
-
               <button class="hitBtn" id="myDouble">I HIT MY DOUBLE</button>
               <button class="hitBtn miss" id="miss">MISS</button>
               <button class="hitBtn undo" id="undoBtn">UNDO</button>
@@ -2637,7 +2566,7 @@ function startApp(){
                 <div class="rosterSub">${esc(g.active?"Active":"Coming soon")}</div>
               </div>
             </div>
-            <button class="btn ok" data-rule="${esc(g.id)}">Open</button>
+            <button class="btn" data-rule="${esc(g.id)}">Open</button>
           </div>
         `).join("")}
         <div class="divider"></div>
@@ -2906,7 +2835,7 @@ function startApp(){
                   <div class="gameMeta">${line}</div>
                 </div>
               </div>
-              <button class="btn ok" data-open="${esc(g.id)}">Open</button>
+              <button class="btn" data-open="${esc(g.id)}">Open</button>
             </div>
           </div>
         `;
