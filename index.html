@@ -588,26 +588,32 @@ input,select{
 
 /* GREEN = primary action */
 .btn.ok::before{
-/* Ring-style halo (fills around edges, not center) */
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(34,197,94,0) 38%,
-      rgba(34,197,94,.28) 52%,
-      rgba(34,197,94,.55) 66%,
-      rgba(34,197,94,0) 82%);
-  opacity:.78;
-  animation: auraPulseSoft 2.05s ease-in-out infinite;
+
+/* Full-surface halo (even across the whole button) */
+inset:-10px;
+background:
+  radial-gradient(140% 180% at 50% 50%,
+    rgba(34,197,94,.42) 0%,
+    rgba(34,197,94,.26) 46%,
+    rgba(34,197,94,.10) 62%,
+    rgba(34,197,94,0) 78%);
+opacity:.70;
+filter: blur(22px);
+animation: auraPulseSoft 2.05s ease-in-out infinite;
 }
 /* RED/ORANGE = destructive */
 .btn.danger::before{
+
+inset:-10px;
 background:
-    radial-gradient(circle at 50% 50%,
-      rgba(239,68,68,0) 36%,
-      rgba(239,68,68,.22) 50%,
-      rgba(249,115,22,.55) 66%,
-      rgba(239,68,68,0) 82%);
-  opacity:.82;
-  animation: auraPulseSoft 2.0s ease-in-out infinite;
+  radial-gradient(140% 180% at 50% 50%,
+    rgba(239,68,68,.38) 0%,
+    rgba(249,115,22,.22) 46%,
+    rgba(239,68,68,.12) 62%,
+    rgba(239,68,68,0) 80%);
+opacity:.72;
+filter: blur(22px);
+animation: auraPulseSoft 2.0s ease-in-out infinite;
 }
 /* LIVE pill */
 .pill[data-live="1"]::before{
@@ -715,11 +721,12 @@ inset:-12px;
   padding:0;
 }
 
+
 .turnNameText{
   position:absolute;
   left:50%;
-  top:50%;
-  transform:translate(-50%,-56%);
+  top:48%;
+  transform:translate(-50%,-50%);
   font-size:26px;
   font-weight:1000;
   white-space:nowrap;
@@ -909,7 +916,7 @@ function unlockAudio(){
   try{
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    g.gain.value = 0.00001;
+    g.gain.value = 0.0002;
     o.frequency.value = 440;
     o.connect(g); g.connect(ctx.destination);
     o.start(); o.stop(ctx.currentTime + 0.02);
@@ -939,16 +946,16 @@ function playBeep(kind){
   // click (neutral), toggle (tick), win (celebration).
   const preset = (() => {
     switch(kind){
-      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.22}; // C5
-      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.20}; // A3
-      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.22}; // E5
-      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.20}; // G3
-      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.18}; // E4
-      case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.16}; // G4
-      case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.16}; // G5
-      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.24}; // C major
+      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.30}; // C5
+      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.28}; // A3
+      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.30}; // E5
+      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.28}; // G3
+      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.32}; // E4
+      case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.22}; // G4
+      case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.22}; // G5
+      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.32}; // C major
       case "click":
-      default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.16}; // A4
+      default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.22}; // A4
     }
   })();
 
@@ -1273,25 +1280,6 @@ function startApp(){
     const rot=-seg/2;
 
     let activeOverlay="";
-    if(typeof activeTarget==="number"){
-      const idx=BOARD_NUMS.indexOf(activeTarget);
-      if(idx>=0){
-        const a0=idx*seg+rot+1.0;
-        const a1=(idx+1)*seg+rot-1.0;
-        const halo=arcWedgePath(cx,cy,rTripleOuter+8,rDoubleInner-8,a0,a1);
-        const core=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
-        activeOverlay+=`
-          <path class="hotWedge" d="${halo}" fill="rgba(34,211,238,.42)" stroke="rgba(34,211,238,.95)" stroke-width="3.8" filter="url(#glow)"/>
-          <path class="hotWedge" d="${core}" fill="rgba(59,130,246,.14)" stroke="rgba(255,255,255,.92)" stroke-width="2.8" filter="url(#glow)"/>
-        `;
-      }
-    }
-    if(activeTarget==="B"){
-      activeOverlay+=`
-        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.22)" stroke="rgba(34,211,238,.95)" stroke-width="3.0" filter="url(#glow)"/>
-        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(59,130,246,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
-      `;
-    }
 
     function ringWedges(r0,r1,fillA,fillB){
       let out="";
@@ -3026,9 +3014,12 @@ function startApp(){
 
       if(soundBtn){
         soundBtn.onclick=()=>{
-          // make toggle always audible (if currently enabled)
-          if(soundEnabled) playBeep("toggle");
+          // Always unlock + make toggle audible (even when currently OFF)
+          try{ unlockAudio(); }catch(_){}
+          const wasOn = !!soundEnabled;
+          if(wasOn) playBeep("toggle");
           setSoundEnabled(!soundEnabled);
+          if(!wasOn) playBeep("toggle");
         };
         setSoundEnabled(soundEnabled);
       }
