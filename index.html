@@ -245,6 +245,13 @@ input,select{
 .btn.ok{
   background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.12)) !important;
   border-color:rgba(34,197,94,.40) !important;
+
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.32),
+    0 0 26px rgba(34,197,94,.28),
+    inset 0 0 26px rgba(34,197,94,.22),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -12px 18px rgba(0,0,0,.38);
 }
 .btn.danger{
   background:linear-gradient(135deg, rgba(239,68,68,.22), rgba(249,115,22,.12)) !important;
@@ -933,16 +940,16 @@ function playBeep(kind){
   // click (neutral), toggle (tick), win (celebration).
   const preset = (() => {
     switch(kind){
-      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.85}; // C5
-      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.85}; // A3
-      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.84}; // E5
-      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.85}; // G3
-      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.85}; // E4
-      case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.85}; // G4
-      case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.85}; // G5
-      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.85}; // C major
+      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.60}; // C5
+      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.55}; // A3
+      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.60}; // E5
+      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.50}; // G3
+      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.45}; // E4
+      case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.45}; // G4
+      case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.45}; // G5
+      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.65}; // C major
       case "click":
-      default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.85}; // A4
+      default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.45}; // A4
     }
   })();
 
@@ -1032,7 +1039,7 @@ function animateTurnName(gameId, name){
 
   // First render: just place it
   if(!prev){
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
     return;
   }
 
@@ -1045,7 +1052,7 @@ function animateTurnName(gameId, name){
   const newEl=document.getElementById("turnNew");
   oldEl.animate([{transform:"translate3d(-50%,-62%,0)"},{transform:"translate3d(-170%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
   newEl.animate([{transform:"translate3d(120%,-62%,0)"},{transform:"translate3d(-50%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
   };
 }
 
@@ -1286,7 +1293,17 @@ function startApp(){
     for(let i=0;i<20;i++){
       const ang=i*seg+rot+seg/2;
       const p=polar(cx,cy,90,ang);
-      numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
+      const n=BOARD_NUMS[i];
+      const isActive = (typeof activeTarget==="number" && n===activeTarget);
+      if(isActive){
+        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
+          font-size="10.2" fill="#22d3ee" font-weight="1000"
+          style="paint-order:stroke;stroke:#ffffff;stroke-width:2.6px;filter:url(#glow)">${n}</text>`;
+      }else{
+        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
+          font-size="8.5" fill="#dfe9ff" font-weight="900"
+          style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${n}</text>`;
+      }
     }
 
     return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
