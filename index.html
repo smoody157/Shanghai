@@ -381,7 +381,7 @@ input,select{
   display:inline-block;
   padding:2px 8px;
   border-radius:999px;
-  box-shadow:0 0 18px rgba(34,211,238,.40), 0 0 0 rgba(139,92,246,0);
+  box-shadow:0 0 18px rgba(34,211,238,.40), 0 0 0 rgba(59,130,246,0);
 }
 
 /* ===== Shanghai table header name styling (prevents split) ===== */
@@ -403,7 +403,7 @@ input,select{
 .logoMark{
   width:44px;height:44px;border-radius:14px;
   background:
-    radial-gradient(60% 60% at 30% 20%, rgba(34,211,238,.18), rgba(139,92,246,.16)),
+    radial-gradient(60% 60% at 30% 20%, rgba(34,211,238,.18), rgba(59,130,246,.16)),
     rgba(255,255,255,.05);
   border:1px solid rgba(255,255,255,.12);
   display:flex;align-items:center;justify-content:center;
@@ -512,7 +512,7 @@ input,select{
   width:34px;height:34px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
   background:
-    radial-gradient(60% 60% at 30% 20%, rgba(34,197,94,.18), rgba(139,92,246,.10)),
+    radial-gradient(60% 60% at 30% 20%, rgba(34,197,94,.18), rgba(59,130,246,.10)),
     rgba(255,255,255,.04);
   display:flex;align-items:center;justify-content:center;
   font-weight:1000;color:var(--c-cyan);
@@ -588,59 +588,62 @@ input,select{
 
 /* GREEN = primary action */
 .btn.ok::before{
+/* Ring-style halo (fills around edges, not center) */
   background:
-    radial-gradient(circle at 18% 22%, rgba(34,197,94,.92) 0%, rgba(34,197,94,0) 62%),
-    radial-gradient(circle at 82% 22%, rgba(34,197,94,.72) 0%, rgba(34,197,94,0) 60%),
-    radial-gradient(circle at 22% 82%, rgba(34,211,238,.40) 0%, rgba(34,211,238,0) 62%),
-    radial-gradient(circle at 82% 82%, rgba(34,197,94,.72) 0%, rgba(34,197,94,0) 60%),
-    radial-gradient(circle at 50% 50%, rgba(34,197,94,.22) 0%, rgba(34,197,94,0) 72%);
-  opacity:.96;
-  animation: auraPulse 2.05s ease-in-out infinite;
+    radial-gradient(circle at 50% 50%,
+      rgba(34,197,94,0) 38%,
+      rgba(34,197,94,.28) 52%,
+      rgba(34,197,94,.55) 66%,
+      rgba(34,197,94,0) 82%);
+  opacity:.78;
+  animation: auraPulseSoft 2.05s ease-in-out infinite;
 }
 /* RED/ORANGE = destructive */
 .btn.danger::before{
-  background:
-    radial-gradient(circle at 18% 22%, rgba(239,68,68,.92) 0%, rgba(239,68,68,0) 62%),
-    radial-gradient(circle at 82% 22%, rgba(249,115,22,.72) 0%, rgba(249,115,22,0) 60%),
-    radial-gradient(circle at 22% 82%, rgba(239,68,68,.55) 0%, rgba(239,68,68,0) 62%),
-    radial-gradient(circle at 82% 82%, rgba(249,115,22,.62) 0%, rgba(249,115,22,0) 60%),
-    radial-gradient(circle at 50% 50%, rgba(239,68,68,.18) 0%, rgba(239,68,68,0) 72%);
-  opacity:.96;
-  animation: auraPulse 2.0s ease-in-out infinite;
+background:
+    radial-gradient(circle at 50% 50%,
+      rgba(239,68,68,0) 36%,
+      rgba(239,68,68,.22) 50%,
+      rgba(249,115,22,.55) 66%,
+      rgba(239,68,68,0) 82%);
+  opacity:.82;
+  animation: auraPulseSoft 2.0s ease-in-out infinite;
 }
 /* LIVE pill */
 .pill[data-live="1"]::before{
-  inset:-16px;
+inset:-10px;
   background:
-    radial-gradient(circle at 20% 25%, rgba(34,211,238,.88) 0%, rgba(34,211,238,0) 60%),
-    radial-gradient(circle at 80% 25%, rgba(139,92,246,.70) 0%, rgba(139,92,246,0) 58%),
-    radial-gradient(circle at 25% 80%, rgba(236,72,153,.38) 0%, rgba(236,72,153,0) 62%),
-    radial-gradient(circle at 80% 80%, rgba(34,211,238,.62) 0%, rgba(34,211,238,0) 62%);
-  opacity:.98;
-  animation: auraPulseSoft 2.35s ease-in-out infinite;
+    radial-gradient(circle at 50% 50%,
+      rgba(34,211,238,0) 34%,
+      rgba(34,211,238,.28) 50%,
+      rgba(34,211,238,.72) 66%,
+      rgba(34,211,238,0) 84%);
+  opacity:.92;
+  animation: auraPulse 2.2s ease-in-out infinite;
 }
 /* HIT buttons + attack buttons */
 .hitBtn:not(.undo):not(:disabled)::before{
-  inset:-18px;
+inset:-12px;
   background:
-    radial-gradient(circle at 18% 22%, rgba(34,211,238,.78) 0%, rgba(34,211,238,0) 62%),
-    radial-gradient(circle at 82% 22%, rgba(139,92,246,.60) 0%, rgba(139,92,246,0) 60%),
-    radial-gradient(circle at 22% 82%, rgba(236,72,153,.34) 0%, rgba(236,72,153,0) 62%),
-    radial-gradient(circle at 82% 82%, rgba(34,211,238,.62) 0%, rgba(34,211,238,0) 62%),
-    radial-gradient(circle at 50% 50%, rgba(34,211,238,.18) 0%, rgba(34,211,238,0) 74%);
-  opacity:.96;
-  animation: auraPulse 2.4s ease-in-out infinite;
+    radial-gradient(circle at 50% 50%,
+      rgba(34,211,238,0) 34%,
+      rgba(34,211,238,.22) 48%,
+      rgba(34,211,238,.60) 64%,
+      rgba(236,72,153,.22) 72%,
+      rgba(34,211,238,0) 86%);
+  opacity:.95;
+  animation: auraPulse 2.25s ease-in-out infinite;
 }
 .kAttackBtn:not(:disabled)::before{
-  inset:-18px;
+inset:-12px;
   background:
-    radial-gradient(circle at 18% 22%, rgba(139,92,246,.78) 0%, rgba(139,92,246,0) 62%),
-    radial-gradient(circle at 82% 22%, rgba(34,211,238,.52) 0%, rgba(34,211,238,0) 60%),
-    radial-gradient(circle at 22% 82%, rgba(139,92,246,.52) 0%, rgba(139,92,246,0) 62%),
-    radial-gradient(circle at 82% 82%, rgba(34,211,238,.44) 0%, rgba(34,211,238,0) 62%),
-    radial-gradient(circle at 50% 50%, rgba(139,92,246,.16) 0%, rgba(139,92,246,0) 74%);
-  opacity:.92;
-  animation: auraPulse 2.4s ease-in-out infinite;
+    radial-gradient(circle at 50% 50%,
+      rgba(59,130,246,0) 36%,
+      rgba(59,130,246,.22) 52%,
+      rgba(59,130,246,.55) 66%,
+      rgba(59,130,246,0) 84%);
+  opacity:.88;
+  animation: auraPulseSoft 2.25s ease-in-out infinite;
 }
 /* No glow on UNDO */
 .hitBtn.undo::before{ opacity:0 !important; }
@@ -711,18 +714,17 @@ input,select{
   align-self:stretch;
   padding:0;
 }
+
 .turnNameText{
   position:absolute;
   left:50%;
   top:50%;
-  transform:translate3d(-50%,-50%,0);
-  font-size:28px;
+  transform:translate(-50%,-56%);
+  font-size:26px;
   font-weight:1000;
-  line-height:1.05;
   white-space:nowrap;
-  width:max-content;
-  text-align:center;
 }
+
 .turnNameGlow{
   animation:auraPulse 2.4s ease-in-out infinite;
   padding:0;
@@ -895,6 +897,28 @@ function ensureAudio(){
   }catch(_){}
   return __audioCtx;
 }
+
+// ===== Audio unlock (iOS/Safari) =====
+let __audioUnlocked = false;
+function unlockAudio(){
+  if(__audioUnlocked) return;
+  const ctx = ensureAudio();
+  if(!ctx) return;
+  try{ if(ctx.state === "suspended") ctx.resume(); }catch(_){}
+  // tiny silent tick to fully unlock
+  try{
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    g.gain.value = 0.00001;
+    o.frequency.value = 440;
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + 0.02);
+  }catch(_){}
+  __audioUnlocked = true;
+}
+window.addEventListener("pointerdown", unlockAudio, {passive:true});
+window.addEventListener("touchstart", unlockAudio, {passive:true});
+
 function playBeep(kind){
   if(!soundEnabled) return;
   const ctx = ensureAudio();
@@ -1010,20 +1034,20 @@ function animateTurnName(gameId, name){
 
   // First render: just place it
   if(!prev){
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟧</span></div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
     return;
   }
 
   // Build outgoing + incoming nodes
   box.innerHTML = `
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟦</span>${esc(prev)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟧</span></div>
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟧</span></div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(prev)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
   `;
   const oldEl=document.getElementById("turnOld");
   const newEl=document.getElementById("turnNew");
   oldEl.animate([{transform:"translate3d(-50%,-50%,0)"},{transform:"translate3d(-170%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
   newEl.animate([{transform:"translate3d(120%,-50%,0)"},{transform:"translate3d(-50%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(139,92,246,0);font-weight:1000;">⟧</span></div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
   };
 }
 
@@ -1071,7 +1095,7 @@ function showWinOverlay(title, subtitle){
     const conf = document.createElement("div");
     conf.className = "confetti";
 
-    const colors = ["rgba(34,211,238,.95)","rgba(139,92,246,.95)","rgba(236,72,153,.90)","rgba(34,197,94,.90)","rgba(249,115,22,.90)"];
+    const colors = ["rgba(34,211,238,.95)","rgba(59,130,246,.95)","rgba(236,72,153,.90)","rgba(34,197,94,.90)","rgba(249,115,22,.90)"];
     const pieces = 26;
     for(let i=0;i<pieces;i++){
       const s=document.createElement("span");
@@ -1258,14 +1282,14 @@ function startApp(){
         const core=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
         activeOverlay+=`
           <path class="hotWedge" d="${halo}" fill="rgba(34,211,238,.42)" stroke="rgba(34,211,238,.95)" stroke-width="3.8" filter="url(#glow)"/>
-          <path class="hotWedge" d="${core}" fill="rgba(139,92,246,.14)" stroke="rgba(255,255,255,.92)" stroke-width="2.8" filter="url(#glow)"/>
+          <path class="hotWedge" d="${core}" fill="rgba(59,130,246,.14)" stroke="rgba(255,255,255,.92)" stroke-width="2.8" filter="url(#glow)"/>
         `;
       }
     }
     if(activeTarget==="B"){
       activeOverlay+=`
         <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.22)" stroke="rgba(34,211,238,.95)" stroke-width="3.0" filter="url(#glow)"/>
-        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(139,92,246,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(59,130,246,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
       `;
     }
 
