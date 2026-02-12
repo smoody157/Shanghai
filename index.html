@@ -245,6 +245,15 @@ input,select{
 .btn.ok{
   background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.12)) !important;
   border-color:rgba(34,197,94,.40) !important;
+
+  /* Strong full-button glow (not just edges) */
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.32),
+    0 0 34px rgba(34,197,94,.55),
+    0 0 70px rgba(34,197,94,.28),
+    inset 0 0 26px rgba(34,197,94,.22),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -12px 18px rgba(0,0,0,.38);
 }
 .btn.danger{
   background:linear-gradient(135deg, rgba(239,68,68,.22), rgba(249,115,22,.12)) !important;
@@ -636,15 +645,17 @@ input,select{
 
 /* GREEN = primary action */
 .btn.ok::before{
-  /* Full-surface halo (covers the whole button, not just edges) */
+  /* Full-button halo (behind the entire button) */
+  inset:-18px;
   background:
     radial-gradient(circle at 50% 50%,
-      rgba(34,197,94,.16) 0%,
-      rgba(34,197,94,.32) 46%,
-      rgba(34,197,94,.58) 72%,
-      rgba(34,197,94,0) 92%);
-  opacity:.72;
-  animation: auraPulseSoft 2.05s ease-in-out infinite;
+      rgba(34,197,94,.85) 0%,
+      rgba(34,197,94,.55) 34%,
+      rgba(34,197,94,.28) 60%,
+      rgba(34,197,94,0) 80%);
+  opacity:.98;
+  filter: blur(20px);
+  animation: auraPulseSoft 1.9s ease-in-out infinite;
 }
 /* RED/ORANGE = destructive */
 .btn.danger::before{
@@ -735,29 +746,8 @@ input,select{
   box-shadow:0 10px 22px rgba(0,0,0,.28);
   pointer-events:none;
 }
-\.turnNameBox{
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:100%;
-  min-height:56px;
-  padding:8px 0 2px;
-  overflow:visible;
-}
-.turnNameText{
-  position:relative;
-  left:auto;
-  top:auto;
-  transform:none;
-  font-size:28px;
-  font-weight:1000;
-  white-space:nowrap;
-  width:max-content;
-  max-width:100%;
-  text-align:center;
-  padding:0 10px;
-}
+\.turnNameBox{ position:relative; overflow:hidden; height:56px; display:flex; align-items:center; justify-content:center; width:100%; align-self:stretch; }
+.turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
 @media(max-width:520px){
   .turnNameText{ font-size:24px; }
 }
@@ -769,6 +759,16 @@ input,select{
   border-radius:999px;
   background:transparent;
 }
+
+.turnBracket{
+  margin:0 8px;
+  color:var(--c-cyan);
+  text-shadow:0 0 12px rgba(34,211,238,.65);
+  font-weight:1000;
+}
+.turnNameSlide{ position:absolute; left:0; right:0; top:0; display:flex; justify-content:center; }
+.turnNameBox{ position:relative; height:56px; }
+.turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
 
 /* Target highlight */
 @keyframes targetFlash{0%{filter:brightness(1)}50%{filter:brightness(2.2)}100%{filter:brightness(1)}}
@@ -1081,66 +1081,47 @@ let _turnNameCache = {};
 
 function turnNameHTML(name){
   const nm = esc(name||"");
-  return `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-70%,0)">
-    <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${nm}
-    <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
+  return `<div class="turnNameText turnTitle3d turnNameGlow">
+    <span class="turnBracket">⟦</span>${nm}<span class="turnBracket">⟧</span>
   </div>`;
 }
+
 function animateTurnName(gameId, name){
   const box=document.getElementById("turnNameBox");
   if(!box) return;
 
-  const nm = String(name||"").trim();
-  if(!nm){
-    box.innerHTML = "";
-    _turnNameCache[gameId] = nm;
-    return;
-  }
+  const prev=_turnNameCache[gameId];
+  _turnNameCache[gameId]=name;
 
-  const prev = _turnNameCache[gameId];
-  const turnNameHTML = (n)=>(
-    `<div class="turnNameText turnTitle3d turnNameGlow">`+
-      `<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>`+
-      `${esc(n)}`+
-      `<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>`+
-    `</div>`
-  );
-
-  // Always paint at least once per render (prevents “missing name” after DOM swaps)
-  if(prev === nm){
-    box.innerHTML = turnNameHTML(nm);
-    return;
-  }
-  _turnNameCache[gameId] = nm;
-
-  // First paint: no animation
-  if(!prev){
-    box.innerHTML = turnNameHTML(nm);
+  // Always render something (DOM is replaced on every render)
+  if(!prev || prev===name){
+    box.innerHTML = turnNameHTML(name);
     return;
   }
 
   // Slide old out, new in
   box.innerHTML = `
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translateX(0);opacity:1">
-      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(prev)}
-      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
-    </div>
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translateX(140%);opacity:1">
-      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟦</span>${esc(nm)}
-      <span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65);font-weight:1000;">⟧</span>
-    </div>
+    <div class="turnNameSlide turnOld">${turnNameHTML(prev)}</div>
+    <div class="turnNameSlide turnNew">${turnNameHTML(name)}</div>
   `;
-  const oldEl=document.getElementById("turnOld");
-  const newEl=document.getElementById("turnNew");
+
+  const oldWrap = box.querySelector(".turnOld");
+  const newWrap = box.querySelector(".turnNew");
+
   try{
-    oldEl.animate([{transform:"translateX(0)",opacity:1},{transform:"translateX(-160%)",opacity:0.2}],{duration:300,easing:"cubic-bezier(.2,.8,.2,1)"});
-    newEl.animate([{transform:"translateX(140%)",opacity:1},{transform:"translateX(0)",opacity:1}],{duration:300,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
-      box.innerHTML = turnNameHTML(nm);
-    };
+    oldWrap.animate(
+      [{transform:"translateX(0%)", opacity:1},{transform:"translateX(-140%)", opacity:0.2}],
+      {duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}
+    );
+    newWrap.animate(
+      [{transform:"translateX(140%)", opacity:0.2},{transform:"translateX(0%)", opacity:1}],
+      {duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}
+    ).onfinish=()=>{ box.innerHTML = turnNameHTML(name); };
   }catch(_){
-    box.innerHTML = turnNameHTML(nm);
+    box.innerHTML = turnNameHTML(name);
   }
 }
+
 
 const appEl=document.getElementById("app");
 const homeBtn=document.getElementById("homeBtn");
@@ -1363,8 +1344,17 @@ function startApp(){
     const seg=360/20;
     const rot=-seg/2;
 
-    let activeOverlay="";
-
+    function polar(cx,cy,r,deg){
+      const rad=(deg-90)*Math.PI/180;
+      return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
+    }
+    function arcWedgePath(cx,cy,r0,r1,a0,a1){
+      const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1);
+      const p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
+      const large=(a1-a0)>180?1:0;
+      const f=n=>(Math.round(n*1000)/1000).toFixed(3);
+      return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
+    }
     function ringWedges(r0,r1,fillA,fillB){
       let out="";
       for(let i=0;i<20;i++){
@@ -1372,6 +1362,83 @@ function startApp(){
         const a1=(i+1)*seg+rot-0.8;
         out+=`<path d="${arcWedgePath(cx,cy,r0,r1,a0,a1)}" fill="${i%2===0?fillA:fillB}" opacity="0.95"/>`;
       }
+      return out;
+    }
+
+    // ===== Active target overlay (full slice across the 4 segments) =====
+    let activeOverlay="";
+    if(typeof activeTarget === "number"){
+      const idx = BOARD_NUMS.indexOf(activeTarget);
+      if(idx >= 0){
+        const a0 = idx*seg + rot + 0.6;
+        const a1 = (idx+1)*seg + rot - 0.6;
+
+        const slices = [
+          {r0:rDoubleInner, r1:rDoubleOuter, fill:"rgba(34,211,238,.22)", stroke:"rgba(34,211,238,.98)", sw:3.0},
+          {r0:rTripleInner, r1:rTripleOuter, fill:"rgba(34,211,238,.18)", stroke:"rgba(34,211,238,.92)", sw:2.6},
+          {r0:rTripleOuter, r1:rDoubleInner, fill:"rgba(34,211,238,.14)", stroke:"rgba(34,211,238,.86)", sw:2.6},
+          {r0:rSingleInner, r1:rTripleInner, fill:"rgba(34,211,238,.12)", stroke:"rgba(34,211,238,.82)", sw:2.4},
+        ];
+
+        // Big soft glow behind
+        activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,rSingleInner,rDoubleOuter,a0,a1)}"
+          fill="rgba(34,197,94,.10)" stroke="rgba(34,211,238,.55)" stroke-width="7.5" filter="url(#glow)" />`;
+
+        for(const s of slices){
+          activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,s.r0,s.r1,a0,a1)}"
+            fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
+        }
+      }
+    }else if(activeTarget === "B"){
+      activeOverlay += `
+        <circle class="hotWedgePulse" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.22)" stroke="rgba(34,211,238,.98)" stroke-width="3.0" filter="url(#glow)"/>
+        <circle class="hotWedgePulse" cx="100" cy="100" r="7.6"  fill="rgba(34,197,94,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+      `;
+    }
+
+    // Numbers (with active number emphasized too)
+    let numText="";
+    for(let i=0;i<20;i++){
+      const ang=i*seg+rot+seg/2;
+      const p=polar(cx,cy,90,ang);
+      const n=BOARD_NUMS[i];
+      const isActive = (typeof activeTarget==="number" && n===activeTarget);
+      if(isActive){
+        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
+          font-size="10.2" fill="#22d3ee" font-weight="1000"
+          style="paint-order:stroke;stroke:#ffffff;stroke-width:2.6px;filter:url(#glow)">${n}</text>`;
+      }else{
+        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
+          font-size="8.5" fill="#dfe9ff" font-weight="900"
+          style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${n}</text>`;
+      }
+    }
+
+    return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
+          <stop offset="0%" stop-color="#1a2a4a"/>
+          <stop offset="55%" stop-color="#0b1325"/>
+          <stop offset="100%" stop-color="#040814"/>
+        </radialGradient>
+        <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="4.8" result="b"/>
+          <feColorMatrix in="b" type="matrix"
+            values="0 0 0 0 0.20  0 0 0 0 0.80  0 0 0 0 0.95  0 0 0 1.0 0" result="c"/>
+          <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
+      ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
+      ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
+      ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
+      ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
+      ${activeOverlay}
+      <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
+      <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
+      ${numText}
+    </svg>`;
+  }
       return out;
     }
 
