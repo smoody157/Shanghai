@@ -1018,6 +1018,100 @@ input,select{
   50%    { opacity:.98; filter:blur(26px); transform:scale(1.02); }
 }
 
+
+/* ===== Segment glow (Players/Home game segments) — toned and classy =====
+   Purpose: subtle depth behind each game segment without screaming neon.
+   Color: deep indigo + cyan edge (NOT action-green).
+*/
+.gameCard.leaderGlow::before{
+  content:"";
+  position:absolute;
+  inset:-10px;
+  border-radius:22px;
+  background:
+    radial-gradient(120% 160% at 50% 40%,
+      rgba(20,26,60,.55) 0%,
+      rgba(34,211,238,.18) 32%,
+      rgba(139,92,246,.16) 55%,
+      rgba(0,0,0,0) 75%);
+  filter:blur(18px);
+  opacity:.55;
+  z-index:-1;
+  pointer-events:none;
+  animation:auraPulseSoft 3.1s ease-in-out infinite;
+}
+
+
+/* ===== Win animation overlay ===== */
+.winOverlay{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:radial-gradient(900px 520px at 50% 40%, rgba(34,211,238,.12), rgba(6,8,20,.72) 62%, rgba(6,8,20,.88));
+  backdrop-filter: blur(6px);
+  animation: winFade 2.8s ease-out forwards;
+}
+@keyframes winFade{
+  0%{opacity:0}
+  12%{opacity:1}
+  80%{opacity:1}
+  100%{opacity:0}
+}
+.winCard{
+  position:relative;
+  padding:18px 18px 14px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  text-align:center;
+  min-width:min(360px, 86vw);
+  transform:translateZ(0);
+  animation: winPop 900ms cubic-bezier(.2,.9,.2,1) both;
+}
+@keyframes winPop{
+  0%{ transform:scale(.92); opacity:.0; }
+  55%{ transform:scale(1.03); opacity:1; }
+  100%{ transform:scale(1); opacity:1; }
+}
+.winTitle{
+  font-weight:1000;
+  font-size:22px;
+  margin:0 0 6px;
+  background:var(--chrome-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 2px 12px rgba(0,0,0,.55);
+}
+.winSub{ color:rgba(238,244,255,.92); font-weight:900; letter-spacing:.3px; }
+.confetti{
+  position:absolute;
+  inset:-16px;
+  overflow:hidden;
+  border-radius:22px;
+  pointer-events:none;
+}
+.confetti span{
+  position:absolute;
+  top:-18px;
+  width:10px;
+  height:16px;
+  border-radius:4px;
+  opacity:.92;
+  transform:translateY(0) rotate(0deg);
+  animation: confettiFall 1.9s linear infinite;
+}
+@keyframes confettiFall{
+  0%{ transform:translateY(-10px) rotate(0deg); opacity:.0; }
+  10%{ opacity:1; }
+  100%{ transform:translateY(420px) rotate(320deg); opacity:0; }
+}
+
 </style>
 </head>
 
@@ -1034,6 +1128,7 @@ input,select{
   </div>
 
   <div class="topActions right">
+    <button class="btn ghost" id="soundBtn" type="button" aria-label="Sound toggle">🔊</button>
     <button class="btn ghost" id="homeBtn" type="button">Home</button>
   </div>
 </div>
@@ -1062,6 +1157,62 @@ function esc(s){ return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
 function normEmail(e){ return String(e??"").trim().toLowerCase(); }
 function now(){ return Date.now(); }
 function fmt(ts){ try{return new Date(ts).toLocaleString();}catch{return "";} }
+
+// ===== Sound (toggle + tiny synth beeps; no external files) =====
+let soundEnabled = true;
+try{
+  const v = localStorage.getItem("gn_sound");
+  if(v === "0") soundEnabled = false;
+}catch{}
+
+let __audioCtx = null;
+function ensureAudio(){
+  if(__audioCtx) return __audioCtx;
+  try{
+    __audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }catch(_){}
+  return __audioCtx;
+}
+function playBeep(kind){
+  if(!soundEnabled) return;
+  const ctx = ensureAudio();
+  if(!ctx) return;
+
+  // If suspended (iOS), try to resume on user gesture calls.
+  try{ if(ctx.state === "suspended") ctx.resume(); }catch(_){}
+
+  const t0 = ctx.currentTime;
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+
+  const freq =
+    kind==="win" ? 880 :
+    kind==="hit" ? 660 :
+    kind==="click" ? 520 :
+    220; // miss/low
+
+  o.type = "sine";
+  o.frequency.setValueAtTime(freq, t0);
+
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(0.22, t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + (kind==="win" ? 0.38 : 0.14));
+
+  o.connect(g);
+  g.connect(ctx.destination);
+
+  o.start(t0);
+  o.stop(t0 + (kind==="win" ? 0.42 : 0.18));
+}
+
+function setSoundEnabled(on){
+  soundEnabled = !!on;
+  try{ localStorage.setItem("gn_sound", soundEnabled ? "1" : "0"); }catch(_){}
+  if(soundBtn){
+    soundBtn.textContent = soundEnabled ? "🔊" : "🔈";
+    soundBtn.setAttribute("aria-label", soundEnabled ? "Sound on" : "Sound off");
+  }
+}
 
 // ===== Turn name swipe helper (keeps state across renders) =====
 let _turnNameCache = {shanghai:null, around:null};
@@ -1118,6 +1269,7 @@ function turnSwipe(gameId, name){
 
 const appEl=document.getElementById("app");
 const homeBtn=document.getElementById("homeBtn");
+const soundBtn=document.getElementById("soundBtn");
 const signOutBtn=document.getElementById("signOutBtn");
 const brandTitle=document.getElementById("brandTitle");
 
@@ -1154,6 +1306,43 @@ function setHTML(html){
 }
 
 
+
+// ===== Win overlay (end of match) =====
+function showWinOverlay(title, subtitle){
+  try{
+    // Build overlay
+    const wrap = document.createElement("div");
+    wrap.className = "winOverlay";
+    const card = document.createElement("div");
+    card.className = "winCard";
+    const conf = document.createElement("div");
+    conf.className = "confetti";
+
+    // Create a small set of confetti pieces (colors follow existing palette)
+    const colors = ["rgba(34,211,238,.95)","rgba(139,92,246,.95)","rgba(236,72,153,.90)","rgba(34,197,94,.90)","rgba(249,115,22,.90)"];
+    const pieces = 26;
+    for(let i=0;i<pieces;i++){
+      const s=document.createElement("span");
+      s.style.left = (Math.random()*100).toFixed(2) + "%";
+      s.style.animationDelay = (Math.random()*0.35).toFixed(2) + "s";
+      s.style.animationDuration = (1.35 + Math.random()*0.9).toFixed(2) + "s";
+      s.style.background = colors[i % colors.length];
+      s.style.transform = `translateY(-10px) rotate(${Math.floor(Math.random()*180)}deg)`;
+      conf.appendChild(s);
+    }
+
+    card.innerHTML = `
+      <div class="winTitle">${esc(title||"Match complete")}</div>
+      <div class="winSub">${esc(subtitle||"")}</div>
+    `;
+    card.appendChild(conf);
+    wrap.appendChild(card);
+    document.body.appendChild(wrap);
+
+    // Auto-remove
+    setTimeout(()=>{ try{ wrap.remove(); }catch{} }, 2850);
+  }catch(_){}
+}
 function showFatal(title,msg){
   setHTML(`
     <div class="card">
@@ -1557,10 +1746,12 @@ function startApp(){
       try{ animateTurnName("shanghai", ctx.match.players[ctx.match.turnIndex].name); }catch{}
       const $=(id)=>document.getElementById(id);
       function onHit(h){
+        playBeep(h==="M" ? "miss" : "hit");
         const m=ctx.match;
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,h);
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.players.slice().sort((a,b)=>b.total-a.total)[0]?.name||"")); }
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
       }
@@ -1903,6 +2094,7 @@ function startApp(){
           m.turnIndex = nextAliveIndex(m, m.turnIndex);
         }
         checkWinner(m);
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.winner?.name||"")); }
         render();
         if(m.finished){
           saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
@@ -1917,12 +2109,12 @@ function startApp(){
         };
       }
 
-      document.getElementById("miss").onclick=()=>{
+      document.getElementById("miss").onclick=()=>{ playBeep("miss");
         pushK(m);
         endDart();
       };
 
-      document.getElementById("myDouble").onclick=()=>{
+      document.getElementById("myDouble").onclick=()=>{ playBeep("hit");
         pushK(m);
         const me=m.players[m.turnIndex];
         if(me.number==null) return;
@@ -1934,7 +2126,7 @@ function startApp(){
       };
 
       appEl.querySelectorAll("button[data-attack]").forEach(btn=>{
-        btn.onclick=()=>{
+        btn.onclick=()=>{ playBeep("hit");
           const me=m.players[m.turnIndex];
           if(!me.killer) return;
           const victimEmail=btn.getAttribute("data-attack");
@@ -2197,17 +2389,19 @@ function startApp(){
         undoBtn.onclick=()=>{ match=popSnap(ctx.match); render(); };
       }
 
-      const hitBtn=$("hitBtn"); if(hitBtn) hitBtn.onclick=()=>{
+      const hitBtn=$("hitBtn"); if(hitBtn) hitBtn.onclick=()=>{ playBeep("hit");
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,true);
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.winner?.name||m.players[m.turnIndex]?.name||"")); }
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
       };
-      const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{
+      const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{ playBeep("miss");
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,false);
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.winner?.name||m.players[m.turnIndex]?.name||"")); }
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
       };
@@ -2430,7 +2624,7 @@ function startApp(){
     `;
     setHTML(html);
 
-    document.getElementById("goBtn").onclick=async()=>{
+    document.getElementById("goBtn").onclick=async()=>{ playBeep("click");
       const e=normEmail(document.getElementById("inEmail").value);
       if(!e){ toastMsg="Enter a valid email."; return render(); }
 
@@ -2478,7 +2672,7 @@ function startApp(){
     `);
     document.getElementById("backBtn").onclick=()=>{ meUser=null; screen="auth"; render(); };
 
-    document.getElementById("createBtn").onclick=async()=>{
+    document.getElementById("createBtn").onclick=async()=>{ playBeep("click");
       const n=String(document.getElementById("upName").value).trim();
       if(!n){ toastMsg="Enter your name."; return render(); }
       meUser=await signUpEmail(n, meUser.email);
@@ -2804,7 +2998,7 @@ function startApp(){
 
     document.getElementById("setupBack").onclick=()=>{ activeGameId=null; match=null; screen="home"; render(); };
 
-    document.getElementById("startMatchBtn").onclick=()=>{
+    document.getElementById("startMatchBtn").onclick=()=>{ playBeep("click");
       if(!g.active){ toastMsg="Coming soon."; return render(); }
       const n=parseInt(document.getElementById("playerCount").value,10);
       const selectedEmails=Array.from(selectEl.selectedOptions).map(o=>o.value);
@@ -3117,7 +3311,8 @@ else{
       window.__lastScreen = screen;
 
       homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
-      signOutBtn.onclick=()=>{ stopPresence(); meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
+      if(soundBtn){ soundBtn.onclick=()=>{ setSoundEnabled(!soundEnabled); playBeep("click"); }; setSoundEnabled(soundEnabled); }
+      signOutBtn.onclick=()=>{ playBeep("click"); stopPresence(); meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
 
       if(screen==="auth") return renderAuth();
       if(screen==="signup") return renderSignup();
