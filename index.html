@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v14-2026-02-11</title>
-<!-- BUILD: v14_20260211T120000Z -->
+<title>Game Night • v17-2026-02-12</title>
+<!-- BUILD: v17_20260212T120000Z -->
 
 <style>
 :root{
@@ -749,7 +749,7 @@ th{
 </head>
 
 <body>
-<!-- BUILD: v11_20260211T120000Z -->
+<!-- BUILD: v17_20260212T120000Z -->
 <div class="topbar">
   <div class="topActions left">
     <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
@@ -757,7 +757,7 @@ th{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v14-20260211</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v17-20260212</div>
   </div>
 
   <div class="topActions right">
@@ -771,7 +771,7 @@ th{
 
 <!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
-  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v14-2026-02-11</div>
+  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v17-2026-02-12</div>
 </div>
 
 <script>
@@ -907,7 +907,7 @@ async function boot(){
 function startApp(){
   console.log('GameNight build v14-2026-02-11 loaded');
   const firebaseConfig = {
-    apiKey: "AIzaSyCY3hTUNNlV6gAofPXY9BVGKb930WYz5RA",
+    apiKey: "__REPLACE_WITH_NEW_API_KEY__",
     authDomain: "gamenightdarts-e7601.firebaseapp.com",
     projectId: "gamenightdarts-e7601",
     storageBucket: "gamenightdarts-e7601.firebasestorage.app",
@@ -2203,19 +2203,20 @@ function startApp(){
     }).join("");
 
     const roster = players
-      .filter(p=>p.email!==meUser.email)
+      .slice()
+      .sort((a,b)=> (a.email===meUser.email?-1:0) - (b.email===meUser.email?-1:0))
       .map(p=>`
         <div class="rosterCard">
           <div class="rosterLeft">
             <div class="avatar ${isOnline(p.email)?"online":""}">${esc(initials(p.name))}</div>
             <div>
-              <div class="rosterName">${esc(p.name)}</div>
+              <div class="rosterName">${esc(p.name)}${p.email===meUser.email?` <span class="badge">YOU</span>`:""}</div>
               <div class="rosterSub">${esc(p.email)}</div>
             </div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
             <button class="btn ghost" data-view-player="${esc(p.email)}">View stats</button>
-            <button class="btn danger" data-del-player="${esc(p.email)}">Remove</button>
+            <button class="btn danger" data-del-player="${esc(p.email)}" ${p.email===meUser.email?"disabled":""}>Remove</button>
           </div>
         </div>
       `).join("");
