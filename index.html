@@ -848,22 +848,34 @@ const homeBtn=document.getElementById("homeBtn");
 const signOutBtn=document.getElementById("signOutBtn");
 const brandTitle=document.getElementById("brandTitle");
 
-function setHTML(html){
-  appEl.innerHTML = html;
-  // Light "swipe" / fade-in on every screen render (no delays, bindings still work)
-  try{
-    appEl.animate(
-      [
-        { opacity: 0, transform: "translateY(10px)" },
-        { opacity: 1, transform: "translateY(0px)" }
-      ],
-      { duration: 180, easing: "cubic-bezier(.2,.8,.2,1)" }
-    );
-  }catch(e){}
-  // keep view at top for new screens
-  try{ window.scrollTo({top:0, left:0, behavior:"instant"}); }catch(e){ window.scrollTo(0,0); }
+// ===== Render hygiene (prevents “bouncing” on presence updates) =====
+let __lastScreen = null;
+window.__renderReason = "nav";
+function requestRender(reason){
+  window.__renderReason = reason || "nav";
+  render();
 }
 
+function setHTML(html){
+  appEl.innerHTML = html;
+
+  const reason = window.__renderReason || "nav";
+  const curScreen = (typeof screen !== "undefined") ? screen : null;
+  const screenChanged = (curScreen !== __lastScreen);
+
+  // Only animate + scroll-to-top on real navigation, not on live presence refreshes.
+  if(reason !== "presence" && screenChanged){
+    try{
+      appEl.animate(
+        [{ opacity: 0.0 }, { opacity: 1.0 }],
+        { duration: 140, easing: "cubic-bezier(.2,.8,.2,1)" }
+      );
+    }catch(e){}
+    try{ window.scrollTo({top:0, left:0, behavior:"instant"}); }catch(e){ window.scrollTo(0,0); }
+  }
+
+  if(screenChanged) __lastScreen = curScreen;
+}
 
 function showFatal(title,msg){
   setHTML(`
@@ -1976,8 +1988,8 @@ function startApp(){
           const next = {...presenceMap};
           snap.forEach(doc=>{ next[doc.id] = doc.data() || {}; });
           presenceMap = next;
-          // re-render so avatars can light up/down
-          render();
+          // re-render so avatars can light up/down (without bouncing the page)
+          requestRender("presence");
         }, ()=>{ /* ignore presence errors */ });
       presenceUnsubs.push(unsub);
     });
@@ -2822,6 +2834,7 @@ else{
     }
     finally{
       window.__rendering=false;
+      window.__renderReason="nav";
       if(window.__renderAgain){ window.__renderAgain=false; render(); }
     }
   }
