@@ -702,8 +702,8 @@ input,select{
 .turnNameText{
   position:absolute;
   left:50%;
-  top:46%;
-  transform:translate(-50%,-50%);
+  top:50%;
+  transform:translate3d(-50%,-50%,0);
   font-size:26px;
   font-weight:1000;
   white-space:nowrap;
@@ -1029,7 +1029,7 @@ document.addEventListener("click", (ev)=>{
 }, {capture:true});
 
 // ===== Turn name swipe helper (keeps state across renders) =====
-let _turnNameCache = {shanghai:null, around:null};
+let _turnNameCache = {shanghai:null, around:null, killer:null};
 function animateTurnName(gameId, name){
   const box=document.getElementById("turnNameBox");
   if(!box) return;
@@ -1047,13 +1047,13 @@ function animateTurnName(gameId, name){
 
   // Build outgoing + incoming nodes
   box.innerHTML = `
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(prev)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(prev)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
   `;
   const oldEl=document.getElementById("turnOld");
   const newEl=document.getElementById("turnNew");
-  oldEl.animate([{transform:"translate3d(-50%,-62%,0)"},{transform:"translate3d(-170%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
-  newEl.animate([{transform:"translate3d(120%,-62%,0)"},{transform:"translate3d(-50%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
+  oldEl.animate([{transform:"translate3d(-50%,-50%,0)"},{transform:"translate3d(-170%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
+  newEl.animate([{transform:"translate3d(120%,-50%,0)"},{transform:"translate3d(-50%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
     box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
   };
 }
@@ -2996,11 +2996,30 @@ function startApp(){
     if(!items) items=`<div class="card"><div class="sub">No matches yet.</div></div>`;
 
     setHTML(`
-      <div class="row"><button class="btn ghost" id="historyBack">Back</button></div>
+      <div class="row">
+        <button class="btn ghost" id="historyBack">Back</button>
+        <button class="btn danger" id="clearHistoryBtn">Clear history</button>
+      </div>
+      <div class="small">Clearing history removes match history entries for <b>${esc(meUser.email)}</b>. This does not delete players or stats.</div>
       <div class="divider"></div>
       ${items}
     `);
+
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
+
+    const clearBtn=document.getElementById("clearHistoryBtn");
+    if(clearBtn){
+      clearBtn.onclick=async()=>{
+        if(!confirm("Clear your match history? This cannot be undone.")) return;
+        try{
+          await deleteHistoryForPlayer(meUser.email);
+          toastMsg="History cleared.";
+          render();
+        }catch(e){
+          showFatal("Clear history error", e?.message||String(e));
+        }
+      };
+    }
   }
 
   async function render(){
