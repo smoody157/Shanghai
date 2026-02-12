@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v11-2026-02-11</title>
-<!-- BUILD: v11-20260211 -->
+<title>Game Night • v13-2026-02-11</title>
+<!-- BUILD: v13-20260211 -->
 
 <style>
 :root{
@@ -650,7 +650,7 @@ th{
   display:grid;
   grid-template-rows:auto auto auto auto;
   gap:6px;
-  padding:10px 10px 6px;
+  padding:8px 10px 6px;
 }
 .headerTopRow{
   display:grid;
@@ -1193,9 +1193,9 @@ function startApp(){
 
             <div class="heroMain">
               <div class="gameTitleBig">Shanghai</div>
-              ${turnSwipe("shanghai", activePlayer.name)}
+              <div class="turnNameBox" id="turnNameBox" aria-live="polite"></div>
               ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="sub statusLine">Target: <span class="targetNum">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+              <div class="sub statusLine">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
             <div class="heroCornerRight">
@@ -1537,14 +1537,21 @@ function startApp(){
           }
           p.number=n;
 
-          const next = m.players.findIndex(x=>x.number==null);
-          if(next===-1){
+          // Find the next player who still needs a number (after the current one)
+          let nextIdx=-1;
+          for(let step=1; step<=m.players.length; step++){
+            const i=(m.claimIndex+step)%m.players.length;
+            if(m.players[i].number==null){ nextIdx=i; break; }
+          }
+
+          if(nextIdx===-1){
+            // Everyone claimed → start the game
             m.phase="play";
             m.turnIndex=0;
             m.dartInTurn=0;
             m.players.forEach(x=>{ x.out=false; x.killer=false; x.lives=MAX_LIVES; });
-          } else {
-            m.claimIndex=next;
+          }else{
+            m.claimIndex=nextIdx;
           }
           render();
         };
@@ -1763,7 +1770,7 @@ function startApp(){
 
       const statusLine = isFinished
         ? `Winner: <b>${esc(m.winner?.name||"")}</b> • Format: <b>${esc(modeName(m))}</b>`
-        : `Target: <span class="targetNum">${esc(tLabel)}</span> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
+        : `Target: <span class="targetFlash">${esc(tLabel)}</span> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
 
       const rows = m.players.map(p=>{
         const ct=currentTarget(m,p);
