@@ -1332,6 +1332,30 @@ body{
 /* Prevent any glow layer from looking like a “purple slab” behind grouped controls */
 .hitRow .hitBtn::before{ opacity:.72; }
 
+
+/* ===== Final mobile polish (v17.6) ===== */
+/* Center the dartboard reliably on iOS */
+.boardBox{ display:flex; justify-content:center; align-items:center; width:100%; }
+.boardBox svg{ display:block; margin:0 auto; width:min(420px, 92vw) !important; max-width:92vw; height:auto; }
+
+/* Hit buttons: keep them centered and stop halos from blending into a purple "band" */
+.hitRow{ justify-content:center; }
+.btn, .hitBtn, .kAttackBtn, .pill, .gameCard{ isolation:isolate; }
+.hitBtn::before{ inset:-6px !important; filter:blur(10px) !important; opacity:.55 !important; }
+.hitBtn.miss::before{
+  background: radial-gradient(circle at 50% 50%,
+    rgba(239,68,68,.60) 0%,
+    rgba(249,115,22,.30) 46%,
+    rgba(239,68,68,0) 78%) !important;
+  opacity:.70 !important;
+}
+.hitBtn.undo::before{ opacity:0 !important; } /* no glow on UNDO */
+
+/* Tables: remove forced min-width that causes left-squish; keep columns readable */
+table{ min-width:0 !important; width:100% !important; table-layout:fixed !important; }
+th,td{ overflow:hidden; text-overflow:ellipsis; }
+thead th:first-child, tbody td:first-child{ width:92px; }
+
 </style>
 </head>
 
