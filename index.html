@@ -834,6 +834,16 @@ input,select{
   border-color:rgba(255,255,255,.12);
 }
 .btn.ghost:active{ transform:translateY(1px); }
+
+/* ===== Dartboard active slice pulse ===== */
+@keyframes wedgePulse{
+  0%{ opacity:.35; filter:brightness(1); }
+  50%{ opacity:1;  filter:brightness(1.35); }
+  100%{ opacity:.35; filter:brightness(1); }
+}
+/* SVG wedge highlight */
+.hotWedgePulse{ animation:wedgePulse 1.35s ease-in-out infinite; }
+
 </style>
 </head>
 
@@ -1049,7 +1059,10 @@ function animateTurnName(gameId, name){
   const box=document.getElementById("turnNameBox");
   if(!box) return;
   const prev=_turnNameCache[gameId];
+  // On re-render the DOM is replaced; if the name is unchanged we still need to repaint.
   if(prev===name){
+    if(box.firstElementChild) return;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
     return;
   }
   _turnNameCache[gameId]=name;
@@ -1312,15 +1325,15 @@ function startApp(){
         ];
 
         for(const s of slices){
-          activeOverlay += `<path class="hotWedge" d="${arcWedgePath(cx,cy,s.r0,s.r1,a0,a1)}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
+          activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,s.r0,s.r1,a0,a1)}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
         }
       }
     }
 
     if(activeTarget === "B"){
       activeOverlay += `
-        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.20)" stroke="rgba(34,211,238,.95)" stroke-width="3.0" filter="url(#glow)"/>
-        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(239,68,68,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+        <circle class="hotWedgePulse" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.20)" stroke="rgba(34,211,238,.95)" stroke-width="3.0" filter="url(#glow)"/>
+        <circle class="hotWedgePulse" cx="100" cy="100" r="7.6"  fill="rgba(239,68,68,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
       `;
     }
 
@@ -1366,11 +1379,11 @@ function startApp(){
         </filter>
       </defs>
       <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
-      ${activeOverlay}
-            ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
+      ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
       ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
+      ${activeOverlay}
       <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
       <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
       ${activeOverlay}
