@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <title>Game Night • v17-2026-02-12</title>
-<!-- BUILD: v17_20260212T120000Z -->
+<!-- BUILD: v17_20260212T174000Z -->
 
 <style>
 :root{
@@ -179,6 +179,48 @@ input,select{
 }
 
 .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+
+/* ===== Tables (Round table / rosters) ===== */
+.small{font-size:12px;color:var(--muted);}
+.tableWrap{
+  overflow:auto;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(6,8,20,.14);
+}
+.tableWrap table{
+  width:100%;
+  min-width:560px; /* keeps columns from squishing into the left */
+  border-collapse:separate;
+  border-spacing:0;
+}
+.tableWrap th,
+.tableWrap td{
+  padding:10px 10px;
+  text-align:center;
+  vertical-align:top;
+  font-size:14px;
+}
+.tableWrap th:first-child,
+.tableWrap td:first-child{
+  text-align:left;
+  width:96px;
+}
+.tableWrap thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:rgba(7,10,20,.82);
+  backdrop-filter:blur(10px);
+}
+.tableWrap tbody tr:nth-child(odd) td{
+  background:rgba(255,255,255,.02);
+}
+.tableWrap td.activeCell{
+  outline:2px solid rgba(34,211,238,.22);
+  background:rgba(34,211,238,.06);
+  border-radius:10px;
+}
 
 /* ===== Chrome UI (buttons/badges) ===== */
 .btn{
@@ -1219,11 +1261,38 @@ body{
 .gameActions{justify-content:center;}
 .gameActions .btn{min-height:48px;}
 
+
+/* ===== Topbar button sizing (touch friendly) ===== */
+.topActions .btn.ghost{
+  padding:10px 14px;
+  min-height:42px;
+  min-width:88px;
+  border-radius:14px;
+}
+.topActions .btn.ghost#soundBtn{
+  min-width:52px;
+  width:52px;
+  padding:10px 0;
+  font-size:18px;
+}
+/* Make ghost buttons visually tappable without looking "filled" */
+.btn.ghost{
+  border-color:rgba(255,255,255,.12);
+}
+.btn.ghost:active{ transform:translateY(1px); }
+
+/* Ensure primary action rows don't squash left on narrow screens */
+.row{ flex-wrap:wrap; }
+.row > *{ min-width:140px; }
+@media(max-width:420px){
+  .row > *{ min-width:120px; }
+}
+
 </style>
 </head>
 
 <body>
-<!-- BUILD: v17_20260212T120000Z -->
+<!-- BUILD: v17_20260212T174000Z -->
 <div class="topbar">
   <div class="topActions left">
     <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
@@ -1231,7 +1300,7 @@ body{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v17-20260212</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v17-20260212-174</div>
   </div>
 
   <div class="topActions right">
@@ -1281,6 +1350,9 @@ function ensureAudio(){
   return __audioCtx;
 }
 function playBeep(kind){
+  // Prevent double-beeps when both a button handler and the global click delegator fire.
+  window.__gnJustBeepedAt = Date.now();
+
   if(!soundEnabled) return;
   const ctx = ensureAudio();
   if(!ctx) return;
@@ -1288,51 +1360,47 @@ function playBeep(kind){
   // If suspended (iOS), try to resume on user gesture calls.
   try{ if(ctx.state === "suspended") ctx.resume(); }catch(_){}
 
-  // Prevent double "click" beeps when handlers + global listener both fire.
-  if(kind==="click" || kind==="nav" || kind==="back" || kind==="danger"){
-    const t = Date.now();
-    if(window.__lastUiBeepAt && (t - window.__lastUiBeepAt) < 110) return;
-    window.__lastUiBeepAt = t;
-  }
-
   const t0 = ctx.currentTime;
 
-  // Small "theme" palette
-  const presets = {
-    click:  {f:[520],  dur:0.12, type:"sine",   gain:0.20},
-    nav:    {f:[560],  dur:0.11, type:"sine",   gain:0.18},
-    back:   {f:[420],  dur:0.12, type:"sine",   gain:0.18},
-    danger: {f:[260,210], dur:0.16, type:"triangle", gain:0.22},
-    hit:    {f:[660],  dur:0.14, type:"sine",   gain:0.22},
-    miss:   {f:[220],  dur:0.14, type:"sine",   gain:0.20},
-    win:    {f:[880,990,1180], dur:0.42, type:"sine", gain:0.24}
+  // Theme mapping:
+  // ok (green) / danger (red) / nav (ghost) / back (undo/back) / click (neutral) / hit / miss / win
+  const preset = (()=>{
+    switch(kind){
+      case "ok":     return {type:"triangle", notes:[523], dur:0.14, vol:0.22};      // C5
+      case "danger": return {type:"sawtooth", notes:[233], dur:0.16, vol:0.20};      // A#3-ish
+      case "nav":    return {type:"sine",     notes:[440], dur:0.10, vol:0.16};      // A4
+      case "back":   return {type:"sine",     notes:[330], dur:0.11, vol:0.16};      // E4
+      case "hit":    return {type:"triangle", notes:[659], dur:0.11, vol:0.20};      // E5
+      case "miss":   return {type:"sine",     notes:[196], dur:0.14, vol:0.18};      // G3
+      case "win":    return {type:"triangle", notes:[659, 784, 988], dur:0.42, vol:0.22}; // E5 G5 B5
+      default:       return {type:"sine",     notes:[520], dur:0.10, vol:0.16};
+    }
+  })();
+
+  const makeVoice = (freq, start, dur, vol, type)=>{
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type || "sine";
+    o.frequency.setValueAtTime(freq, start);
+
+    g.gain.setValueAtTime(0.0001, start);
+    g.gain.exponentialRampToValueAtTime(vol, start + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+
+    o.connect(g);
+    g.connect(ctx.destination);
+
+    o.start(start);
+    o.stop(start + dur + 0.02);
   };
-  const p = presets[kind] || presets.click;
 
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
-  o.type = p.type || "sine";
-
-  // Simple chirp (frequency ramp) for multi-step sounds
-  if(p.f && p.f.length>1){
-    o.frequency.setValueAtTime(p.f[0], t0);
-    const step = (p.dur || 0.16) / (p.f.length-1);
-    p.f.slice(1).forEach((fq,i)=>{
-      o.frequency.linearRampToValueAtTime(fq, t0 + step*(i+1));
-    });
-  }else{
-    o.frequency.setValueAtTime((p.f && p.f[0]) ? p.f[0] : 520, t0);
+  if(kind === "win"){
+    // small "celebration" chord: 3 quick notes
+    preset.notes.forEach((f,i)=> makeVoice(f, t0 + i*0.06, preset.dur, preset.vol, preset.type));
+    return;
   }
 
-  g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(Math.max(0.0002, p.gain||0.2), t0 + 0.02);
-  g.gain.exponentialRampToValueAtTime(0.0001, t0 + (p.dur || 0.14));
-
-  o.connect(g);
-  g.connect(ctx.destination);
-
-  o.start(t0);
-  o.stop(t0 + (p.dur || 0.14) + 0.02);
+  makeVoice(preset.notes[0], t0, preset.dur, preset.vol, preset.type);
 }
 
 
@@ -1345,21 +1413,50 @@ function setSoundEnabled(on){
   }
 }
 
+// Global sound delegator: gives the whole app a consistent "sound theme".
+// - Green glow (btn ok) => ok sound
+// - Red glow   (btn danger) => danger sound
+// - Ghost/nav  => nav sound
+// - Undo/back  => back sound
+// - HIT/MISS   => hit/miss sound
+document.addEventListener("click", (ev)=>{
+  try{
+    if(!soundEnabled) return;
+    if((Date.now() - (window.__gnJustBeepedAt||0)) < 120) return; // avoid double-beeps
+    const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
+    if(!btn || btn.disabled) return;
+
+    // Sound toggle has its own handler (and also changes icon)
+    if(btn.id === "soundBtn") return;
+
+    let kind = "click";
+
+    if(btn.classList && btn.classList.contains("hitBtn")){
+      if(btn.classList.contains("miss")) kind = "miss";
+      else if(btn.classList.contains("undo") || /back/i.test(btn.id||"") || /back/i.test(btn.textContent||"")) kind = "back";
+      else kind = "hit";
+    }else if(btn.classList && btn.classList.contains("btn")){
+      const txt = (btn.textContent||"").trim().toLowerCase();
+      const id = (btn.id||"").toLowerCase();
+      if(btn.classList.contains("ok")) kind = "ok";
+      else if(btn.classList.contains("danger")) kind = "danger";
+      else if(btn.classList.contains("ghost") && (id.includes("back") || txt==="back" || txt==="undo")) kind = "back";
+      else if(btn.classList.contains("ghost")) kind = "nav";
+      else kind = "click";
+    }else{
+      // non-standard buttons (rare)
+      kind = "click";
+    }
+
+    playBeep(kind);
+  }catch(_){}
+}, true);
+
+
 // ===== Global sound: every tap gets a consistent click "theme" =====
 // Exclusions: hit/attack buttons already play hit/miss/win sounds.
-(function bindGlobalClickSound(){
-  let bound=false;
-  if(bound) return;
-  bound=true;
-  document.addEventListener("click", (ev)=>{
-    const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
-    if(!btn) return;
-    if(btn.disabled) return;
-    // Avoid double-sounds on gameplay hit buttons / attack buttons
-    if(btn.classList.contains("hitBtn") || btn.classList.contains("kAttackBtn")) return;
-    playBeep("click");
-  }, true);
-})();
+
+;
 
 
 // ===== Global UI sounds (theme everywhere) =====
@@ -1553,7 +1650,7 @@ async function boot(){
 }
 
 function startApp(){
-  console.log('GameNight build v14-2026-02-11 loaded');
+  console.log('GameNight build v17_4_2026-02-12 loaded');
   const firebaseConfig = {
     apiKey: "__REPLACE_WITH_NEW_API_KEY__",
     authDomain: "gamenightdarts-e7601.firebaseapp.com",
@@ -1897,7 +1994,7 @@ function startApp(){
         <div class="card">
           <div class="pill">Round table</div>
           <div class="divider"></div>
-          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+          <div class="tableWrap">
             <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
           </div>
         </div>
@@ -2162,7 +2259,7 @@ function startApp(){
         <div class="card">
           <div class="pill">Players & Lives</div>
           <div class="divider"></div>
-          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+          <div class="tableWrap">
             <table>
               <thead><tr><th>Roster</th></tr></thead>
               <tbody>${rows}</tbody>
@@ -2507,7 +2604,7 @@ function startApp(){
         <div class="card">
           <div class="pill">Players</div>
           <div class="divider"></div>
-          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
+          <div class="tableWrap">
             <table>
               <thead><tr><th>Progress</th></tr></thead>
               <tbody>${rows}</tbody>
