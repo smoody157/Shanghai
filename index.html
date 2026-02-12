@@ -924,6 +924,7 @@ input,select{
 </div>
 
 <script>
+
 /* ========= Robust script loader ========= */
 function loadScript(src){
   return new Promise((resolve,reject)=>{
@@ -934,8 +935,8 @@ function loadScript(src){
     document.head.appendChild(s);
   });
 }
-function esc(s){ return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function normEmail(e){ return String(e??"").trim().toLowerCase(); }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function normEmail(e){ return String(e==null?"":e).trim().toLowerCase(); }
 function now(){ return Date.now(); }
 function fmt(ts){ try{return new Date(ts).toLocaleString();}catch{return "";} }
 
@@ -1068,20 +1069,20 @@ document.addEventListener("click", (ev)=>{
   if(btn.id === "soundBtn") return;
 
   // Gameplay buttons already trigger precise sounds inside game logic
-  if(btn.classList?.contains("hitBtn") || btn.classList?.contains("kAttackBtn")) return;
+  if((btn.classList && btn.classList.contains("hitBtn")) || (btn.classList && btn.classList.contains("kAttackBtn"))) return;
 
   const id = String(btn.id||"").toLowerCase();
   const txt = String(btn.textContent||"").trim().toLowerCase();
 
   // Delete / destructive
-  if(btn.classList?.contains("danger")) return playBeep("danger");
+  if((btn.classList && btn.classList.contains("danger"))) return playBeep("danger");
 
   // Confirm / primary action
-  if(btn.classList?.contains("ok")) return playBeep("ok");
+  if((btn.classList && btn.classList.contains("ok"))) return playBeep("ok");
 
   // Back/undo/nav (ghosts and any button that reads "back")
   if(id.includes("back") || txt === "back" || txt === "undo") return playBeep("back");
-  if(btn.classList?.contains("ghost")) return playBeep("nav");
+  if((btn.classList && btn.classList.contains("ghost"))) return playBeep("nav");
 
   // Default
   return playBeep("click");
@@ -1236,7 +1237,7 @@ async function boot(){
     if(!window.firebase) throw new Error("Firebase loaded but window.firebase is missing.");
     startApp();
   }catch(err){
-    showFatal("Can’t start app", err?.message || String(err));
+    showFatal("Can’t start app", (err && err.message) || String(err));
   }
 }
 
@@ -1463,7 +1464,7 @@ function startApp(){
     if(m.snaps.length>80) m.snaps.shift();
   }
   function popSnap(m){
-    if(!m?.snaps||m.snaps.length<2) return m;
+    if(!m || !m.snaps || m.snaps.length<2) return m;
     m.snaps.pop();
     const prev=m.snaps.pop();
     try{return JSON.parse(prev);}catch{return m;}
@@ -1594,7 +1595,7 @@ function startApp(){
             </div>
             <div class="headerIcon">🎯</div>
             <div class="headerTitle turnTitle3d">Shanghai</div>
-            ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML(m.players[m.turnIndex]?.name||"")}</div>`}
+            ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>`}
             ${m.finished?"":`<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
             <div class="sub" style="text-align:center;margin-top:6px">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
           </div>
@@ -1634,9 +1635,9 @@ function startApp(){
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,h);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.players.slice().sort((a,b)=>b.total-a.total)[0]?.name||"")); }
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.players.slice().sort((a,b)=>b.total-a.total)[0] && m.players.slice().sort((a,b)=>b.total-a.total)[0].name)||"")); }
         render();
-        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
       }
       document.getElementById("hitT").onclick=()=>onHit("T");
       document.getElementById("hitS").onclick=()=>onHit("S");
@@ -1705,7 +1706,7 @@ function startApp(){
       if(!m.finished || m._saved) return;
       m._saved=true;
 
-      const winnerName = m.winner?.name || "Unknown";
+      const winnerName = (m.winner && m.winner.name) || "Unknown";
       const summary = `🏆 ${winnerName} wins • ` + m.players
         .map(p=>`${p.name}${p.out?" (OUT)":""}`)
         .join(" | ");
@@ -1718,7 +1719,7 @@ function startApp(){
         players:m.players.map(p=>p.email),
         summary,
         meta:{
-          winnerEmail: m.winner?.email || null,
+          winnerEmail: (m.winner && m.winner.email) || null,
           numbers: m.players.map(p=>({email:p.email, number:p.number}))
         }
       });
@@ -1728,7 +1729,7 @@ function startApp(){
       const g=games.killer||{};
       const played=(g.played||0)+1;
 
-      const iWon = (m.winner?.email === ctx.meUser.email);
+      const iWon = (((m.winner && m.winner.email) === ctx.meUser.email));
       const wins = (g.wins||0) + (iWon?1:0);
 
       await saveStatsDoc(ctx.meUser.email,{
@@ -1796,7 +1797,7 @@ function startApp(){
       const isFinished = !!m.finished;
 
       const statusLine = isFinished
-        ? `Winner: <b>${esc(m.winner?.name||"")}</b>`
+        ? `Winner: <b>${esc((m.winner && m.winner.name) || "")}</b>`
         : `${esc(active.name)} • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer ? "🔥 Killer" : "Not killer yet"}`;
 
       const rows = m.players.map(p=>{
@@ -1807,7 +1808,7 @@ function startApp(){
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
                 <div>
                   <div style="font-size:16px;font-weight:1000">${esc(p.name)}</div>
-                  <div class="small kNumberBig">Number: <b>${esc(p.number??"?")}</b></div>
+                  <div class="small kNumberBig">Number: <b>${esc((p.number!=null?p.number:"?"))}</b></div>
                 </div>
                 <div style="text-align:right">
                   <div class="kLivesBig">${livesHtml}</div>
@@ -1824,7 +1825,7 @@ function startApp(){
       const attackTargets = m.players
         .filter(p=>!p.out && p.email!==active.email)
         .map(p=>{
-          const label = `${p.name} • ${p.number ?? "?"} • ${"❤️".repeat(Math.max(0,p.lives))}`;
+          const label = `${p.name} • ${(p.number!=null?p.number:"?")} • ${"❤️".repeat(Math.max(0,p.lives))}`;
           return `<button class="kAttackBtn" data-attack="${esc(p.email)}" ${canAttack?"":"disabled"}>
             HIT ${esc(p.name)}’s DOUBLE → remove 1 life
             <div class="small">${esc(label)}</div>
@@ -1849,7 +1850,7 @@ function startApp(){
             </div>
             <div class="headerIcon">🔥</div>
             <div class="headerTitle turnTitle3d">Killer</div>
-            ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML(m.players[m.turnIndex]?.name||"")}</div>`}
+            ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>`}
             ${isFinished ? "" : `<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
             <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
@@ -1908,7 +1909,7 @@ function startApp(){
 
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
-        claimBtn.onclick=(ev)=>{ ev?.preventDefault?.(); ev?.stopPropagation?.();
+        claimBtn.onclick=(ev)=>{ if(ev && ev.preventDefault) ev.preventDefault(); if(ev && ev.stopPropagation) ev.stopPropagation();
           const p=m.players[m.claimIndex];
           const raw=document.getElementById("claimNum").value;
           const n=parseInt(raw,10);
@@ -1940,13 +1941,13 @@ function startApp(){
       }
 
       if(m.finished){
-        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
         return;
       }
 
       function pushK(m){ m.snaps=m.snaps||[]; m.snaps.push(JSON.stringify(m)); if(m.snaps.length>80) m.snaps.shift(); }
       function popK(m){
-        if(!m?.snaps||m.snaps.length<2) return m;
+        if(!m || !m.snaps || m.snaps.length<2) return m;
         m.snaps.pop();
         const prev=m.snaps.pop();
         try{return JSON.parse(prev);}catch{return m;}
@@ -1959,10 +1960,10 @@ function startApp(){
           m.turnIndex = nextAliveIndex(m, m.turnIndex);
         }
         checkWinner(m);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.winner?.name||"")); }
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name) || "")); }
         render();
         if(m.finished){
-          saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+          saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
         }
       }
 
@@ -2084,8 +2085,8 @@ function startApp(){
       if(!m.finished || m._saved) return;
       m._saved=true;
 
-      const winnerName=m.winner?.name || "Unknown";
-      const winnerRow=m.players.find(x=>x.email===m.winner?.email);
+      const winnerName=(m.winner && m.winner.name) || "Unknown";
+      const winnerRow=m.players.find(x=>x.email===(m.winner && m.winner.email));
       const winnerDarts=winnerRow ? winnerRow.dartsThrown : null;
 
       const summary = `🏁 ${winnerName} wins • Format: ${modeName(m)}${winnerDarts!=null?` • ${winnerDarts} darts`:``}`;
@@ -2099,7 +2100,7 @@ function startApp(){
         summary,
         meta:{
           mode:m.mode,
-          winnerEmail:m.winner?.email||null,
+          winnerEmail:(m.winner && m.winner.email) || null,
           darts:m.players.map(p=>({email:p.email, dartsThrown:p.dartsThrown, hits:p.hits}))
         }
       });
@@ -2113,12 +2114,12 @@ function startApp(){
       const myDarts=meRow?meRow.dartsThrown:0;
       const myHits=meRow?meRow.hits:0;
 
-      const wins=(g.wins||0) + ((m.winner?.email===ctx.meUser.email) ? 1 : 0);
+      const wins=(g.wins||0) + ((((m.winner && m.winner.email)===ctx.meUser.email)) ? 1 : 0);
       const totalDarts=(g.totalDarts||0)+myDarts;
       const totalHits=(g.totalHits||0)+myHits;
 
       let bestFewestDarts = g.bestFewestDarts||null;
-      if(m.winner?.email===ctx.meUser.email){
+      if(((m.winner && m.winner.email)===ctx.meUser.email)){
         if(bestFewestDarts==null || myDarts<bestFewestDarts) bestFewestDarts=myDarts;
       }
 
@@ -2148,7 +2149,7 @@ function startApp(){
       const isFinished = !!m.finished;
 
       const statusLine = isFinished
-        ? `Winner: <b>${esc(m.winner?.name||"")}</b> • Format: <b>${esc(modeName(m))}</b>`
+        ? `Winner: <b>${esc((m.winner && m.winner.name) || "")}</b> • Format: <b>${esc(modeName(m))}</b>`
         : `Target: <span class="targetFlash">${esc(tLabel)}</span> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
 
       const rows = m.players.map(p=>{
@@ -2192,7 +2193,7 @@ function startApp(){
             </div>
             <div class="headerIcon">🌍</div>
             <div class="headerTitle turnTitle3d">Around the World</div>
-            <div class="turnNameBox" id="turnNameBox">${turnNameHTML(m.players[m.turnIndex]?.name||"")}</div>
+            <div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>
             ${isFinished?'':'<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>'}
             <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
@@ -2242,7 +2243,7 @@ function startApp(){
       };
 
       if(m.finished){
-        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
         return;
       }
 
@@ -2255,17 +2256,17 @@ function startApp(){
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,true);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.winner?.name||m.players[m.turnIndex]?.name||"")); }
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
         render();
-        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
       };
       const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{ playBeep("miss");
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,false);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", (m.winner?.name||m.players[m.turnIndex]?.name||"")); }
+        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
         render();
-        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
       };
     }
 
@@ -2344,12 +2345,12 @@ function startApp(){
 
     presenceMap = {
       ...presenceMap,
-      [e]: { ...(presenceMap[e]||{}), email:e, name:(meUser?.name||null), lastSeenAt: now() }
+      [e]: { ...(presenceMap[e]||{}), email:e, name:((meUser && meUser.name) || null), lastSeenAt: now() }
     };
     try{ render(); }catch{}
 
     async function beat(){
-      const payload = { email:e, name:(meUser?.name||null), lastSeenAt: now() };
+      const payload = { email:e, name:((meUser && meUser.name) || null), lastSeenAt: now() };
       presenceMap = { ...presenceMap, [e]: { ...(presenceMap[e]||{}), ...payload } };
       try{ render(); }catch{}
       try{ await ref.set(payload, {merge:true}); }catch(_){}
@@ -2379,8 +2380,8 @@ function startApp(){
     const n=String(name||"").trim();
     if(!n) return "?";
     const parts=n.split(/\s+/).filter(Boolean);
-    const a=(parts[0]?.[0]||"").toUpperCase();
-    const b=(parts[1]?.[0]||"").toUpperCase();
+    const a=((parts[0] && parts[0][0]) || "").toUpperCase();
+    const b=((parts[1] && parts[1][0]) || "").toUpperCase();
     return (a+(b||"")).slice(0,2) || a || "?";
   }
 
@@ -2426,8 +2427,8 @@ function startApp(){
 
     const g=getGame(gameId);
     return {
-      title:g?.name||"Game",
-      icon:g?.icon||"🎯",
+      title:(g && g.name) || "Game",
+      icon:(g && g.icon) || "🎯",
       bullets:["Rules coming soon."]
     };
   }
@@ -2656,7 +2657,7 @@ function startApp(){
       btn.onclick=async()=>{
         const email=btn.getAttribute("data-del-player");
         const p=players.find(x=>x.email===email);
-        const name=p?.name||email;
+        const name=(p && p.name) || email;
         if(!confirm(`Remove ${name}? This deletes the player, their stats, and their history.`)) return;
         try{
           await deletePlayerAndData(email);
@@ -2667,7 +2668,7 @@ function startApp(){
           toastMsg=`Removed ${name}.`;
           render();
         }catch(e){
-          showFatal("Delete error", e?.message||String(e));
+          showFatal("Delete error", (e && e.message) || String(e));
         }
       };
     });
@@ -2987,21 +2988,21 @@ function startApp(){
     document.getElementById("resetAllStatsBtn").onclick=async()=>{
       const email=statsViewerEmail;
       const p=players.find(x=>x.email===email);
-      const name=p?.name||email;
+      const name=(p && p.name) || email;
       if(!confirm(`Reset ALL stats for ${name}?`)) return;
       try{
         await resetStatsAll(email);
         toastMsg=`Stats reset for ${name}.`;
         render();
       }catch(e){
-        showFatal("Reset error", e?.message||String(e));
+        showFatal("Reset error", (e && e.message) || String(e));
       }
     };
 
     document.getElementById("deletePlayerBtn").onclick=async()=>{
       const email=statsViewerEmail;
       const p=players.find(x=>x.email===email);
-      const name=p?.name||email;
+      const name=(p && p.name) || email;
       if(!confirm(`Delete ${name}? This deletes the player, their stats, and their history.`)) return;
       try{
         await deletePlayerAndData(email);
@@ -3014,7 +3015,7 @@ function startApp(){
         screen="home";
         render();
       }catch(e){
-        showFatal("Delete error", e?.message||String(e));
+        showFatal("Delete error", (e && e.message) || String(e));
       }
     };
 
@@ -3102,14 +3103,14 @@ function startApp(){
       resetBtn.onclick=async()=>{
         const email=statsViewerEmail;
         const p=players.find(x=>x.email===email);
-        const name=p?.name||email;
+        const name=(p && p.name) || email;
         if(!confirm(`Reset ${g.name} stats for ${name}?`)) return;
         try{
           await resetStatsGame(email, g.id);
           toastMsg=`${g.name} stats reset for ${name}.`;
           render();
         }catch(e){
-          showFatal("Reset error", e?.message||String(e));
+          showFatal("Reset error", (e && e.message) || String(e));
         }
       };
     }
@@ -3145,7 +3146,7 @@ function startApp(){
     if(ch){ ch.onclick=async()=>{
       if(!confirm("Clear your match history? This will NOT delete your player or stats.")) return;
       try{ await deleteHistoryForPlayer(meUser.email); toastMsg="History cleared."; render(); }
-      catch(e){ showFatal("Clear history error", e?.message||String(e)); }
+      catch(e){ showFatal("Clear history error", (e && e.message) || String(e)); }
     }; }
 
 
@@ -3158,7 +3159,7 @@ function startApp(){
           toastMsg="History cleared.";
           render();
         }catch(e){
-          showFatal("Clear history error", e?.message||String(e));
+          showFatal("Clear history error", (e && e.message) || String(e));
         }
       };
     }
@@ -3208,7 +3209,7 @@ function startApp(){
 
       screen="home"; return renderHome();
     }catch(e){
-      showFatal("App error", e?.message || String(e));
+      showFatal("App error", (e && e.message) || String(e));
     }
     finally{
       window.__rendering=false;
@@ -3236,6 +3237,7 @@ function playerStripHTML(players, activeIndex, extraLineFn){
 
 
 boot();
+
 </script>
 </body>
 </html>
