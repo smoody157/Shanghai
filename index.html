@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v13-2026-02-11</title>
-<!-- BUILD: v13-20260211 -->
+<title>Game Night • v14-2026-02-11</title>
+<!-- BUILD: v14_20260211T120000Z -->
 
 <style>
 :root{
@@ -718,7 +718,7 @@ th{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v11-20260211</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v14-20260211</div>
   </div>
 
   <div class="topActions right">
@@ -732,7 +732,7 @@ th{
 
 <!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
-  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v8-2026-02-11</div>
+  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v14-2026-02-11</div>
 </div>
 
 <script>
@@ -869,7 +869,7 @@ async function boot(){
 }
 
 function startApp(){
-  console.log('GameNight build v8-2026-02-11 loaded');
+  console.log('GameNight build v14-2026-02-11 loaded');
   const firebaseConfig = {
     apiKey: "AIzaSyCY3hTUNNlV6gAofPXY9BVGKb930WYz5RA",
     authDomain: "gamenightdarts-e7601.firebaseapp.com",
@@ -1193,7 +1193,7 @@ function startApp(){
 
             <div class="heroMain">
               <div class="gameTitleBig">Shanghai</div>
-              <div class="turnNameBox" id="turnNameBox" aria-live="polite"></div>
+              ${m.finished ? "" : turnSwipe("shanghai", activePlayer.name)}
               ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
               <div class="sub statusLine">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
@@ -1229,8 +1229,6 @@ function startApp(){
     }
 
     function bindPlay(ctx){
-      try{ animateTurnName("shanghai", ctx.match.players[ctx.match.turnIndex].name); }catch{}
-
       const $=(id)=>document.getElementById(id);
       function onHit(h){
         const m=ctx.match;
@@ -1396,6 +1394,7 @@ function startApp(){
 
       // Play phase header — aligned like all other screens
       const active=m.players[m.turnIndex];
+      const isFinished = !!m.finished;
       const nextOnDeck = (!isFinished && m.players.length>1) ? (function(){
         // next player who is not OUT
         for(let step=1; step<=m.players.length; step++){
@@ -1404,7 +1403,6 @@ function startApp(){
         }
         return null;
       })() : null;
-      const isFinished = !!m.finished;
 
       const statusLine = isFinished
         ? `Winner: <b>${esc(m.winner?.name||"")}</b>`
