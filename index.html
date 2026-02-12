@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v26-2026-02-12</title>
+<title>Game Night • v45-2026-02-12</title>
 <!-- BUILD: v26_20260212T174000Z -->
 
 <style>
@@ -966,7 +966,7 @@ input,select{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v17-20260212-174</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • build v45_20260212-20260212-220</div>
   </div>
 
   <div class="topActions right">
@@ -981,7 +981,7 @@ input,select{
 
 <!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
-  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v26-2026-02-12</div>
+  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • build v45_20260212-2026-02-12</div>
 </div>
 
 <script>
@@ -1598,9 +1598,14 @@ function startApp(){
     if(m.snaps.length>80) m.snaps.shift();
   }
   function popSnap(m){
-    if(!m || !m.snaps || m.snaps.length<1) return m;
-    const prev = m.snaps.pop();
-    try{ return JSON.parse(prev); }catch{ return m; }
+    if(!m?.snaps || m.snaps.length < 1) return m;
+    // snaps store the state *before* each action. Undo should roll back exactly ONE action.
+    const prevStr = m.snaps.pop();
+    let prev;
+    try{ prev = JSON.parse(prevStr); }catch{ return m; }
+    // Preserve remaining history so multiple undos work reliably.
+    prev.snaps = m.snaps;
+    return prev;
   }
 
   const Games=[
@@ -1743,7 +1748,7 @@ function startApp(){
             <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
             <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
             <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-            <button class="hitBtn undo3" id="undoBtn">UNDO</button>
+            <button class="hitBtn undo3" id="undoBtn" type="button">UNDO</button>
           </div>
 
           ${finishedBanner}
@@ -1993,7 +1998,7 @@ function startApp(){
             <div class="hitRow">
               <button class="hitBtn" id="myDouble">I HIT MY DOUBLE</button>
               <button class="hitBtn miss" id="miss">MISS</button>
-              <button class="hitBtn undo3" id="undoBtn">UNDO</button>
+              <button class="hitBtn undo3" id="undoBtn" type="button">UNDO</button>
             </div>
             <div class="divider"></div>
             <div class="pill">Attack Opponents</div>
@@ -2338,9 +2343,9 @@ function startApp(){
 
           ${isFinished ? "" : `
             <div class="hitRow">
-              <button class="hitBtn" id="hitBtn">HIT</button>
-              <button class="hitBtn miss3" id="missBtn">MISS</button>
-              <button class="hitBtn undo3" id="undoBtn">UNDO</button>
+              <button class="hitBtn" id="hitBtn" type="button">HIT</button>
+              <button class="hitBtn miss3" id="missBtn" type="button">MISS</button>
+              <button class="hitBtn undo3" id="undoBtn" type="button">UNDO</button>
             </div>
           `}
         </div>
