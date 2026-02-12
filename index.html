@@ -1193,7 +1193,7 @@ function startApp(){
 
             <div class="heroMain">
               <div class="gameTitleBig">Shanghai</div>
-              ${m.finished ? "" : turnSwipe("shanghai", activePlayer.name)}
+              ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
               ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
               <div class="sub statusLine">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
@@ -1229,6 +1229,7 @@ function startApp(){
     }
 
     function bindPlay(ctx){
+      try{ animateTurnName("shanghai", ctx.match.players[ctx.match.turnIndex].name); }catch{}
       const $=(id)=>document.getElementById(id);
       function onHit(h){
         const m=ctx.match;
@@ -1459,7 +1460,7 @@ function startApp(){
 
             <div class="heroMain">
               <div class="gameTitleBig">Killer</div>
-              ${isFinished ? "" : turnSwipe("killer", active.name)}
+              ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
               ${isFinished ? "" : `<div class="small"><span class="badge">NOW THROWING</span></div>`}
               <div class="sub statusLine">${statusLine}</div>
             </div>
@@ -1503,6 +1504,7 @@ function startApp(){
       const $=(id)=>document.getElementById(id);
       const m=ctx.match;
       if(!m) return;
+      try{ if(m.phase==="play" && !m.finished) animateTurnName("killer", m.players[m.turnIndex].name); }catch{}
 
       const backBtn=document.getElementById("backToSetup");
       if(backBtn){
