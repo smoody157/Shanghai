@@ -458,6 +458,32 @@ input,select{
   display:flex;align-items:center;justify-content:center;
   font-weight:1000;color:var(--c-cyan);
 }
+
+/* ===== Presence (online indicator) ===== */
+.avatar.online{
+  border-color:rgba(34,197,94,.55);
+  box-shadow:0 0 0 rgba(0,0,0,0), 0 0 22px rgba(34,197,94,.45);
+  color:#bfffd1;
+  position:relative;
+}
+.avatar.online::after{
+  content:"";
+  position:absolute;
+  right:-2px;
+  bottom:-2px;
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  background:rgba(34,197,94,.95);
+  box-shadow:0 0 14px rgba(34,197,94,.65);
+  border:1px solid rgba(6,8,20,.9);
+}
+@keyframes onlinePulse{
+  0%{ filter:brightness(1); box-shadow:0 0 18px rgba(34,197,94,.25); }
+  50%{ filter:brightness(1.35); box-shadow:0 0 28px rgba(34,197,94,.55); }
+  100%{ filter:brightness(1); box-shadow:0 0 18px rgba(34,197,94,.25); }
+}
+.avatar.online{ animation:onlinePulse 1.8s ease-in-out infinite; }
 .rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
 
 /* ===== Indicators kept ===== */
@@ -1910,6 +1936,89 @@ function startApp(){
   let rulesGameId=null;
   const MAX_PLAYERS=4;
 
+  // ===== Presence (who's online) =====
+  // We keep a lightweight "heartbeat" in Firestore under collection: presence/{email}.
+  // A player is considered online if their lastSeenAt is within PRESENCE_ONLINE_MS.
+  const PRESENCE_BEAT_MS = 20000;
+  const PRESENCE_ONLINE_MS = 45000;
+
+  let presenceMap = {};          // email -> {lastSeenAt, ...}
+  let presenceTimer = null;
+  let presenceEmail = null;
+  let presenceUnsubs = [];
+
+  function isOnline(email){
+    const e = normEmail(email);
+    const p = presenceMap[e];
+    if(!p) return false;
+    const last = Number(p.lastSeenAt||0);
+    return last > 0 && (now() - last) <= PRESENCE_ONLINE_MS;
+  }
+
+  function clearPresenceSubs(){
+    try{ presenceUnsubs.forEach(u=>{ try{u();}catch{} }); }catch{}
+    presenceUnsubs = [];
+  }
+
+  function subscribePresence(emails){
+    clearPresenceSubs();
+    const uniq = Array.from(new Set((emails||[]).map(normEmail).filter(Boolean)));
+    if(!uniq.length) return;
+
+    // Firestore "in" query supports up to 10 doc IDs at a time.
+    const chunks = [];
+    for(let i=0;i<uniq.length;i+=10) chunks.push(uniq.slice(i,i+10));
+
+    chunks.forEach(list=>{
+      const unsub = db.collection("presence")
+        .where(firebase.firestore.FieldPath.documentId(), "in", list)
+        .onSnapshot(snap=>{
+          const next = {...presenceMap};
+          snap.forEach(doc=>{ next[doc.id] = doc.data() || {}; });
+          presenceMap = next;
+          // re-render so avatars can light up/down
+          render();
+        }, ()=>{ /* ignore presence errors */ });
+      presenceUnsubs.push(unsub);
+    });
+  }
+
+  function startPresence(email){
+    const e = normEmail(email);
+    if(!e) return;
+    if(presenceEmail === e && presenceTimer) return;
+    stopPresence();
+    presenceEmail = e;
+
+    const ref = db.collection("presence").doc(e);
+
+    async function beat(){
+      try{
+        await ref.set({
+          email: e,
+          name: meUser?.name || null,
+          lastSeenAt: now()
+        }, {merge:true});
+      }catch(_){}
+    }
+
+    beat();
+    presenceTimer = setInterval(beat, PRESENCE_BEAT_MS);
+
+    // when the tab becomes visible again, refresh presence immediately
+    document.addEventListener("visibilitychange", ()=>{
+      if(document.visibilityState === "visible") beat();
+    });
+  }
+
+  function stopPresence(){
+    try{ if(presenceTimer) clearInterval(presenceTimer); }catch{}
+    presenceTimer = null;
+    presenceEmail = null;
+    clearPresenceSubs();
+  }
+
+
   function initials(name){
     const n=String(name||"").trim();
     if(!n) return "?";
@@ -2069,6 +2178,7 @@ function startApp(){
     brandTitle.textContent="Game Night";
 
     const players=await getPlayers();
+    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
 
     const gameCards = Games.map(g=>{
       const soon=!g.active;
@@ -2097,7 +2207,7 @@ function startApp(){
       .map(p=>`
         <div class="rosterCard">
           <div class="rosterLeft">
-            <div class="avatar">${esc(initials(p.name))}</div>
+            <div class="avatar ${isOnline(p.email)?"online":""}">${esc(initials(p.name))}</div>
             <div>
               <div class="rosterName">${esc(p.name)}</div>
               <div class="rosterSub">${esc(p.email)}</div>
@@ -2293,6 +2403,7 @@ function startApp(){
     brandTitle.textContent=g.name;
 
     const players=await getPlayers();
+    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
     const meEmail=meUser.email;
     const defaultCount=2;
 
@@ -2444,6 +2555,7 @@ screen="home"; render();
     brandTitle.textContent="Stats";
 
     const players=await getPlayers();
+    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
 
     const statsDoc=await getStatsDoc(statsViewerEmail);
@@ -2572,6 +2684,7 @@ screen="home"; render();
     brandTitle.textContent=`${g.name} • Stats`;
 
     const players=await getPlayers();
+    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
 
     const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
@@ -2685,11 +2798,13 @@ else{
     window.__rendering=true;
     try{
       homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
-      signOutBtn.onclick=()=>{ meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
+      signOutBtn.onclick=()=>{ stopPresence(); meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
 
       if(screen==="auth") return renderAuth();
       if(screen==="signup") return renderSignup();
       if(!meUser){ screen="auth"; return renderAuth(); }
+      // Keep presence heartbeat running while signed in
+      try{ startPresence(meUser.email); }catch{}
 
       if(screen==="home") return renderHome();
       if(screen==="rules") return renderRules();
