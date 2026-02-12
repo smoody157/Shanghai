@@ -561,18 +561,23 @@ input,select{
   text-shadow:none;
 }
 .playerChip.active{
-  border-color: rgba(34,197,94,.38);
-  box-shadow: 0 0 22px rgba(34,197,94,.22);
+  border-color: rgba(34,197,94,.55) !important;
+  background: linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.10)) !important;
+  box-shadow:
+    0 12px 26px rgba(0,0,0,.40),
+    0 0 32px rgba(34,197,94,.28),
+    inset 0 0 30px rgba(34,197,94,.18),
+    inset 0 1px 0 rgba(255,255,255,.18);
 }
 .playerChip.active::before{
   content:"";
   position:absolute;
-  inset:-12px;
+  inset:-18px;
   border-radius:inherit;
   pointer-events:none;
-  filter: blur(18px);
-  background: radial-gradient(120% 140% at 50% 50%, rgba(34,197,94,.55) 0%, rgba(34,197,94,.22) 52%, rgba(34,197,94,0) 78%);
-  opacity:.9;
+  filter: blur(22px);
+  background: radial-gradient(140% 160% at 50% 50%, rgba(34,197,94,.85) 0%, rgba(34,197,94,.52) 40%, rgba(34,197,94,.24) 60%, rgba(34,197,94,0) 80%);
+  opacity:1;
   animation:auraPulseSoft 2.0s ease-in-out infinite;
   z-index:-1;
 }
@@ -746,7 +751,9 @@ input,select{
   box-shadow:0 10px 22px rgba(0,0,0,.28);
   pointer-events:none;
 }
-\.turnNameBox{ position:relative; overflow:hidden; height:56px; display:flex; align-items:center; justify-content:center; width:100%; align-self:stretch; }
+\.turnNameBox{ position:relative; overflow:hidden; height:56px; display:flex; align-items:center; justify-content:center; width:100%; align-self:stretch;
+  padding-left:38px;
+}
 .turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
 @media(max-width:520px){
   .turnNameText{ font-size:24px; }
@@ -767,7 +774,9 @@ input,select{
   font-weight:1000;
 }
 .turnNameSlide{ position:absolute; left:0; right:0; top:0; display:flex; justify-content:center; }
-.turnNameBox{ position:relative; height:56px; }
+.turnNameBox{ position:relative; height:56px;
+  padding-left:38px;
+}
 .turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
 
 /* Target highlight */
@@ -1374,10 +1383,14 @@ function startApp(){
         const a1 = (idx+1)*seg + rot - 0.6;
 
         const slices = [
-          {r0:rDoubleInner, r1:rDoubleOuter, fill:"rgba(34,211,238,.22)", stroke:"rgba(34,211,238,.98)", sw:3.0},
-          {r0:rTripleInner, r1:rTripleOuter, fill:"rgba(34,211,238,.18)", stroke:"rgba(34,211,238,.92)", sw:2.6},
-          {r0:rTripleOuter, r1:rDoubleInner, fill:"rgba(34,211,238,.14)", stroke:"rgba(34,211,238,.86)", sw:2.6},
-          {r0:rSingleInner, r1:rTripleInner, fill:"rgba(34,211,238,.12)", stroke:"rgba(34,211,238,.82)", sw:2.4},
+          // Base glow across the full slice (covers all rings)
+          {r0:rSingleInner, r1:rDoubleOuter, fill:"rgba(34,211,238,.24)", stroke:"rgba(34,211,238,.98)", sw:3.6},
+
+          // Ring accents (double/triple + singles)
+          {r0:rDoubleInner, r1:rDoubleOuter, fill:"rgba(239,68,68,.32)", stroke:"rgba(255,255,255,.92)", sw:3.0},
+          {r0:rTripleInner, r1:rTripleOuter, fill:"rgba(239,68,68,.26)", stroke:"rgba(255,255,255,.88)", sw:2.6},
+          {r0:rTripleOuter, r1:rDoubleInner, fill:"rgba(34,211,238,.22)", stroke:"rgba(34,211,238,.95)", sw:3.0},
+          {r0:rSingleInner, r1:rTripleInner, fill:"rgba(34,211,238,.20)", stroke:"rgba(34,211,238,.90)", sw:2.7},
         ];
 
         // Big soft glow behind
@@ -1422,7 +1435,7 @@ function startApp(){
           <stop offset="100%" stop-color="#040814"/>
         </radialGradient>
         <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="4.8" result="b"/>
+          <feGaussianBlur stdDeviation="5.8" result="b"/>
           <feColorMatrix in="b" type="matrix"
             values="0 0 0 0 0.20  0 0 0 0 0.80  0 0 0 0 0.95  0 0 0 1.0 0" result="c"/>
           <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
