@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v8-2026-02-11</title>
-<!-- BUILD: v7-20260211 -->
+<title>Game Night • v11-2026-02-11</title>
+<!-- BUILD: v11-20260211 -->
 
 <style>
 :root{
@@ -643,6 +643,69 @@ th{
   animation:targetPulse 1.1s ease-in-out infinite;
 }
 
+
+/* ===== Header overhaul (v11) ===== */
+.headerStack{
+  position:relative;
+  display:grid;
+  grid-template-rows:auto auto auto auto;
+  gap:6px;
+  padding:10px 10px 6px;
+}
+.headerTopRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+}
+.headerTopRow .left{justify-self:start}
+.headerTopRow .right{justify-self:end}
+.headerTitle{
+  text-align:center;
+  font-size:22px;
+  font-weight:1000;
+  margin:0;
+}
+.headerIcon{
+  position:absolute;
+  left:14px;
+  top:44px; /* sits just under the left pill */
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);
+  box-shadow:0 10px 22px rgba(0,0,0,.28);
+  pointer-events:none;
+}
+.turnNameBox{
+  position:relative;
+  overflow:hidden;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.turnNameText{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:26px;
+  font-weight:1000;
+  white-space:nowrap;
+}
+.turnNameGlow{ animation:glowCycle 2.4s ease-in-out infinite; padding:6px 14px; border-radius:999px; }
+@keyframes swipeIn{ from{ transform:translateX(120%) } to{ transform:translateX(0%) } }
+@keyframes swipeOut{ from{ transform:translateX(0%) } to{ transform:translateX(-120%) } }
+
+/* Target highlight */
+@keyframes targetFlash{0%{filter:brightness(1)}50%{filter:brightness(2.2)}100%{filter:brightness(1)}}
+.targetNum{
+  color:var(--c-cyan);
+  font-weight:1000;
+  text-shadow:0 2px 12px rgba(0,0,0,.45);
+  animation:targetFlash 1.0s ease-in-out infinite;
+}
+
 </style>
 </head>
 
@@ -655,7 +718,7 @@ th{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v7-20260211</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v11-20260211</div>
   </div>
 
   <div class="topActions right">
@@ -687,6 +750,40 @@ function esc(s){ return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;")
 function normEmail(e){ return String(e??"").trim().toLowerCase(); }
 function now(){ return Date.now(); }
 function fmt(ts){ try{return new Date(ts).toLocaleString();}catch{return "";} }
+
+// ===== Turn name swipe helper (keeps state across renders) =====
+let _turnNameCache = {shanghai:null, around:null};
+function animateTurnName(gameId, name){
+  const box=document.getElementById("turnNameBox");
+  if(!box) return;
+  const prev=_turnNameCache[gameId];
+  if(prev===name){
+    // ensure centered text exists
+    const cur=box.querySelector(".turnNameText");
+    if(cur) cur.textContent=name;
+    return;
+  }
+  _turnNameCache[gameId]=name;
+
+  // First render: just place it
+  if(!prev){
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow">${esc(name)}</div>`;
+    return;
+  }
+
+  // Build outgoing + incoming nodes
+  box.innerHTML = `
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translateX(-50%)">${esc(prev)}</div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translateX(120%)">${esc(name)}</div>
+  `;
+  const oldEl=document.getElementById("turnOld");
+  const newEl=document.getElementById("turnNew");
+  // animate
+  oldEl.animate([{transform:"translateX(-50%)"},{transform:"translateX(-170%)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
+  newEl.animate([{transform:"translateX(120%)"},{transform:"translateX(-50%)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
+    box.innerHTML=`<div class="turnNameText turnTitle3d turnNameGlow">${esc(name)}</div>`;
+  };
+}
 
 function turnSwipe(gameId, name){
   window.__turnMem = window.__turnMem || {};
@@ -1098,7 +1195,7 @@ function startApp(){
               <div class="gameTitleBig">Shanghai</div>
               ${turnSwipe("shanghai", activePlayer.name)}
               ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="sub statusLine">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+              <div class="sub statusLine">Target: <span class="targetNum">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
             </div>
 
             <div class="heroCornerRight">
@@ -1132,6 +1229,8 @@ function startApp(){
     }
 
     function bindPlay(ctx){
+      try{ animateTurnName("shanghai", ctx.match.players[ctx.match.turnIndex].name); }catch{}
+
       const $=(id)=>document.getElementById(id);
       function onHit(h){
         const m=ctx.match;
@@ -1290,7 +1389,7 @@ function startApp(){
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
-            <button class="btn ok" id="saveClaim">Save & Next</button>
+            <button class="btn ok" id="saveClaim" type="button">Save & Next</button>
           </div>
         `;
       }
@@ -1426,7 +1525,7 @@ function startApp(){
 
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
-        claimBtn.onclick=()=>{
+        claimBtn.onclick=(ev)=>{ ev?.preventDefault?.(); ev?.stopPropagation?.();
           const p=m.players[m.claimIndex];
           const raw=document.getElementById("claimNum").value;
           const n=parseInt(raw,10);
@@ -1664,7 +1763,7 @@ function startApp(){
 
       const statusLine = isFinished
         ? `Winner: <b>${esc(m.winner?.name||"")}</b> • Format: <b>${esc(modeName(m))}</b>`
-        : `Target: <span class="targetFlash">${esc(tLabel)}</span> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
+        : `Target: <span class="targetNum">${esc(tLabel)}</span> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
 
       const rows = m.players.map(p=>{
         const ct=currentTarget(m,p);
@@ -1698,24 +1797,18 @@ function startApp(){
         </div>
 
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
-          <div class="hero gameHero">
-            <div class="heroCornerLeft">
-              <div class="cornerStack">
-                <span class="pill">Around the World</span>
-                <div class="cornerIcon">🌍</div>
+          <div class="headerStack">
+            <div class="headerTopRow">
+              <div class="left"><span class="pill">Around the World</span></div>
+              <div class="right">
+                ${isFinished?'<span class="pill">Ended</span>':'<span class="pill" data-live="1">Live</span>'}
               </div>
             </div>
-
-            <div class="heroMain">
-              <div class="gameTitleBig">Around the World</div>
-              ${turnSwipe("around", active.name)}
-              ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="sub statusLine">${statusLine}</div>
-            </div>
-
-            <div class="heroCornerRight">
-              ${livePill}
-            </div>
+            <div class="headerIcon">🌍</div>
+            <div class="headerTitle turnTitle3d">Around the World</div>
+            <div class="turnNameBox" id="turnNameBox"></div>
+            ${isFinished?'':'<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>'}
+            <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
 
           <div class="divider"></div>
@@ -1745,6 +1838,8 @@ function startApp(){
     }
 
     function bindPlay(ctx){
+      try{ animateTurnName("around", ctx.match.players[ctx.match.turnIndex].name); }catch{}
+
       const $=(id)=>document.getElementById(id);
       const m=ctx.match;
       if(!m) return;
