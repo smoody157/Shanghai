@@ -65,9 +65,6 @@ body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:
-        radial-gradient(900px 650px at 82% 0%, rgba(0,0,0,0), transparent 65%),
-    radial-gradient(1200px 760px at 48% 0%, rgba(34,211,238,.18), var(--bg) 62%),
-    radial-gradient(1100px 720px at 50% 115%, rgba(249,115,22,.10), transparent 60%),
     linear-gradient(180deg, #040610, var(--bg));
   color:var(--text);
   padding-bottom:56px; /* room for footer */
@@ -588,67 +585,61 @@ input,select{
 
 /* GREEN = primary action */
 .btn.ok::before{
-
-/* Full-surface halo (even across the whole button) */
-inset:-10px;
-background:
-  radial-gradient(140% 180% at 50% 50%,
-    rgba(34,197,94,.42) 0%,
-    rgba(34,197,94,.26) 46%,
-    rgba(34,197,94,.10) 62%,
-    rgba(34,197,94,0) 78%);
-opacity:.70;
-filter: blur(22px);
-animation: auraPulseSoft 2.05s ease-in-out infinite;
+  /* Full-surface halo (covers the whole button, not just edges) */
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(34,197,94,.16) 0%,
+      rgba(34,197,94,.32) 46%,
+      rgba(34,197,94,.58) 72%,
+      rgba(34,197,94,0) 92%);
+  opacity:.72;
+  animation: auraPulseSoft 2.05s ease-in-out infinite;
 }
 /* RED/ORANGE = destructive */
 .btn.danger::before{
-
-inset:-10px;
-background:
-  radial-gradient(140% 180% at 50% 50%,
-    rgba(239,68,68,.38) 0%,
-    rgba(249,115,22,.22) 46%,
-    rgba(239,68,68,.12) 62%,
-    rgba(239,68,68,0) 80%);
-opacity:.72;
-filter: blur(22px);
-animation: auraPulseSoft 2.0s ease-in-out infinite;
+  background:
+    radial-gradient(circle at 50% 50%,
+      rgba(239,68,68,.14) 0%,
+      rgba(239,68,68,.28) 46%,
+      rgba(249,115,22,.58) 72%,
+      rgba(239,68,68,0) 92%);
+  opacity:.74;
+  animation: auraPulseSoft 2.0s ease-in-out infinite;
 }
 /* LIVE pill */
 .pill[data-live="1"]::before{
-inset:-10px;
+  inset:-10px;
   background:
     radial-gradient(circle at 50% 50%,
-      rgba(34,211,238,0) 34%,
-      rgba(34,211,238,.28) 50%,
-      rgba(34,211,238,.72) 66%,
-      rgba(34,211,238,0) 84%);
-  opacity:.92;
+      rgba(34,211,238,.14) 0%,
+      rgba(34,211,238,.30) 44%,
+      rgba(34,211,238,.78) 70%,
+      rgba(34,211,238,0) 92%);
+  opacity:.88;
   animation: auraPulse 2.2s ease-in-out infinite;
 }
 /* HIT buttons + attack buttons */
 .hitBtn:not(.undo):not(:disabled)::before{
-inset:-12px;
+  inset:-12px;
   background:
     radial-gradient(circle at 50% 50%,
-      rgba(34,211,238,0) 34%,
-      rgba(34,211,238,.22) 48%,
-      rgba(34,211,238,.60) 64%,
-      rgba(0,0,0,0) 72%,
-      rgba(34,211,238,0) 86%);
-  opacity:.95;
+      rgba(34,211,238,.14) 0%,
+      rgba(34,211,238,.28) 44%,
+      rgba(34,211,238,.62) 68%,
+      rgba(236,72,153,.18) 76%,
+      rgba(34,211,238,0) 92%);
+  opacity:.90;
   animation: auraPulse 2.25s ease-in-out infinite;
 }
 .kAttackBtn:not(:disabled)::before{
-inset:-12px;
+  inset:-12px;
   background:
     radial-gradient(circle at 50% 50%,
-      rgba(59,130,246,0) 36%,
-      rgba(59,130,246,.22) 52%,
-      rgba(59,130,246,.55) 66%,
-      rgba(59,130,246,0) 84%);
-  opacity:.88;
+      rgba(59,130,246,.12) 0%,
+      rgba(59,130,246,.26) 46%,
+      rgba(59,130,246,.58) 72%,
+      rgba(59,130,246,0) 92%);
+  opacity:.86;
   animation: auraPulseSoft 2.25s ease-in-out infinite;
 }
 /* No glow on UNDO */
@@ -725,8 +716,10 @@ inset:-12px;
 .turnNameText{
   position:absolute;
   left:50%;
-  top:48%;
-  transform:translate(-50%,-50%);
+  top:50%;
+  transform:translate(-50%,-62%);
+  width:100%;
+  text-align:center;
   font-size:26px;
   font-weight:1000;
   white-space:nowrap;
@@ -928,6 +921,8 @@ window.addEventListener("touchstart", unlockAudio, {passive:true});
 
 function playBeep(kind){
   if(!soundEnabled) return;
+  // Ensure iOS/Safari audio is unlocked on first gesture
+  try{ unlockAudio(); }catch(_){ }
   const ctx = ensureAudio();
   if(!ctx) return;
 
@@ -946,14 +941,14 @@ function playBeep(kind){
   // click (neutral), toggle (tick), win (celebration).
   const preset = (() => {
     switch(kind){
-      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.30}; // C5
+      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.32}; // C5
       case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.28}; // A3
       case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.30}; // E5
       case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.28}; // G3
-      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.32}; // E4
+      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.24}; // E4
       case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.22}; // G4
       case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.22}; // G5
-      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.32}; // C major
+      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.36}; // C major
       case "click":
       default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.22}; // A4
     }
@@ -1002,6 +997,9 @@ document.addEventListener("click", (ev)=>{
   const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
   if(!btn || btn.disabled) return;
 
+  // Ensure audio is unlocked on first interaction
+  try{ unlockAudio(); }catch(_){ }
+
   // If a button explicitly opts out
   if(btn.dataset && btn.dataset.nosound === "1") return;
 
@@ -1047,13 +1045,13 @@ function animateTurnName(gameId, name){
 
   // Build outgoing + incoming nodes
   box.innerHTML = `
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(prev)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-50%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translate3d(-50%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(prev)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translate3d(120%,-62%,0)"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>
   `;
   const oldEl=document.getElementById("turnOld");
   const newEl=document.getElementById("turnNew");
-  oldEl.animate([{transform:"translate3d(-50%,-50%,0)"},{transform:"translate3d(-170%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
-  newEl.animate([{transform:"translate3d(120%,-50%,0)"},{transform:"translate3d(-50%,-50%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
+  oldEl.animate([{transform:"translate3d(-50%,-62%,0)"},{transform:"translate3d(-170%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
+  newEl.animate([{transform:"translate3d(120%,-62%,0)"},{transform:"translate3d(-50%,-62%,0)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
     box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow"><span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟦</span>${esc(name)}<span style="margin:0 8px;color:var(--c-cyan);text-shadow:0 0 12px rgba(34,211,238,.65),0 0 0 rgba(59,130,246,0);font-weight:1000;">⟧</span></div>`;
   };
 }
