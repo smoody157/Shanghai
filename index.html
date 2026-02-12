@@ -2014,6 +2014,7 @@ function startApp(){
   let presenceTimer = null;
   let presenceEmail = null;
   let presenceUnsubs = [];
+  let presenceVisibilityBound = false;
 
   function isOnline(email){
     const e = normEmail(email);
@@ -2063,28 +2064,45 @@ function startApp(){
     const e = normEmail(email);
     if(!e) return;
     if(presenceEmail === e && presenceTimer) return;
+
     stopPresence();
     presenceEmail = e;
 
     const ref = db.collection("presence").doc(e);
 
+    // Make *you* appear online instantly, even before Firestore round-trips.
+    presenceMap = {
+      ...presenceMap,
+      [e]: { ...(presenceMap[e]||{}), email:e, name:(meUser?.name||null), lastSeenAt: now() }
+    };
+    try{ render(); }catch{}
+
     async function beat(){
+      const payload = { email:e, name:(meUser?.name||null), lastSeenAt: now() };
+
+      // Update local copy every beat so UI doesn't wait for snapshot.
+      presenceMap = { ...presenceMap, [e]: { ...(presenceMap[e]||{}), ...payload } };
+      try{ render(); }catch{}
+
       try{
-        await ref.set({
-          email: e,
-          name: meUser?.name || null,
-          lastSeenAt: now()
-        }, {merge:true});
-      }catch(_){}
+        await ref.set(payload, {merge:true});
+      }catch(_){
+        // If writes are blocked by rules/network, UI still shows you online locally.
+      }
     }
 
     beat();
     presenceTimer = setInterval(beat, PRESENCE_BEAT_MS);
 
-    // when the tab becomes visible again, refresh presence immediately
-    document.addEventListener("visibilitychange", ()=>{
-      if(document.visibilityState === "visible") beat();
-    });
+    // Bind this listener once (avoid stacking listeners on repeated start/stop).
+    if(!presenceVisibilityBound){
+      presenceVisibilityBound = true;
+      document.addEventListener("visibilitychange", ()=>{
+        if(document.visibilityState === "visible"){
+          try{ beat(); }catch{}
+        }
+      });
+    }
   }
 
   function stopPresence(){
