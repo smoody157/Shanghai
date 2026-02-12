@@ -592,16 +592,16 @@ input,select{
 
 /* GREEN = primary action */
 .btn.ok::before{
-  /* Full-button halo (not side-dots) */
+  /* Full-button halo (soft fill + edge) */
   inset:-14px;
   background:
-    radial-gradient(120% 170% at 50% 50%,
-      rgba(34,197,94,.55) 0%,
-      rgba(34,197,94,.32) 42%,
-      rgba(34,197,94,.10) 62%,
+    radial-gradient(140% 160% at 50% 50%,
+      rgba(34,197,94,.65) 0%,
+      rgba(34,197,94,.38) 42%,
+      rgba(34,197,94,.18) 60%,
       rgba(34,197,94,0) 78%);
   opacity:.95;
-  animation: auraPulseSoft 1.95s ease-in-out infinite;
+  animation: auraPulseSoft 2.0s ease-in-out infinite;
 }
 /* RED/ORANGE = destructive */
 .btn.danger::before{
@@ -1744,9 +1744,13 @@ function startApp(){
             <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
 
+          
           ${isFinished ? "" : `
             <div class="divider"></div>
+            <div class="boardBox">${dartboardSVG(active.number!=null?active.number:null)}</div>
+            <div class="divider"></div>
             <div class="hitRow">
+
               <button class="hitBtn" id="myDouble">I HIT MY DOUBLE</button>
               <button class="hitBtn miss" id="miss">MISS</button>
               <button class="hitBtn undo" id="undoBtn">UNDO</button>
@@ -2590,7 +2594,7 @@ function startApp(){
                 <div class="rosterSub">${esc(g.active?"Active":"Coming soon")}</div>
               </div>
             </div>
-            <button class="btn" data-rule="${esc(g.id)}">Open</button>
+            <button class="btn ok" data-rule="${esc(g.id)}">Open</button>
           </div>
         `).join("")}
         <div class="divider"></div>
@@ -2859,7 +2863,7 @@ function startApp(){
                   <div class="gameMeta">${line}</div>
                 </div>
               </div>
-              <button class="btn" data-open="${esc(g.id)}">Open</button>
+              <button class="btn ok" data-open="${esc(g.id)}">Open</button>
             </div>
           </div>
         `;
