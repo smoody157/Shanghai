@@ -460,9 +460,10 @@ input,select{
 }
 
 /* ===== Presence (online indicator) ===== */
+/* Goal: subtle “online dot” that pulses smoothly without making the whole UI feel jumpy */
 .avatar.online{
   border-color:rgba(34,197,94,.55);
-  box-shadow:0 0 0 rgba(0,0,0,0), 0 0 22px rgba(34,197,94,.45);
+  box-shadow:0 0 0 rgba(0,0,0,0), 0 0 18px rgba(34,197,94,.28);
   color:#bfffd1;
   position:relative;
 }
@@ -475,17 +476,15 @@ input,select{
   height:9px;
   border-radius:999px;
   background:rgba(34,197,94,.95);
-  box-shadow:0 0 14px rgba(34,197,94,.65);
   border:1px solid rgba(6,8,20,.9);
+  box-shadow:0 0 10px rgba(34,197,94,.55);
+  animation:onlineDotPulse 1.6s ease-in-out infinite;
 }
-@keyframes onlinePulse{
-  0%{ filter:brightness(1); box-shadow:0 0 18px rgba(34,197,94,.25); }
-  50%{ filter:brightness(1.35); box-shadow:0 0 28px rgba(34,197,94,.55); }
-  100%{ filter:brightness(1); box-shadow:0 0 18px rgba(34,197,94,.25); }
+@keyframes onlineDotPulse{
+  0%{ transform:scale(1);   filter:brightness(1);   box-shadow:0 0 10px rgba(34,197,94,.45); }
+  50%{transform:scale(1.35);filter:brightness(1.25);box-shadow:0 0 18px rgba(34,197,94,.75); }
+  100%{transform:scale(1);  filter:brightness(1);   box-shadow:0 0 10px rgba(34,197,94,.45); }
 }
-.avatar.online{ animation:onlinePulse 1.8s ease-in-out infinite; }
-.rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
-
 /* ===== Indicators kept ===== */
 @keyframes dangerPulse{0%{box-shadow:0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 24px rgba(239,68,68,.35)}100%{box-shadow:0 0 0 rgba(239,68,68,0)}}
 .dangerPulse{animation:dangerPulse 1.1s ease-in-out infinite;}
@@ -2042,8 +2041,16 @@ function startApp(){
       const unsub = db.collection("presence")
         .where(firebase.firestore.FieldPath.documentId(), "in", list)
         .onSnapshot(snap=>{
+          // Update only the IDs in this chunk. If a doc is missing, treat that player as offline.
+          const got = {};
+          snap.forEach(doc=>{ got[doc.id] = doc.data() || {}; });
+
           const next = {...presenceMap};
-          snap.forEach(doc=>{ next[doc.id] = doc.data() || {}; });
+          list.forEach(id=>{
+            if(got[id]) next[id] = got[id];
+            else delete next[id];
+          });
+
           presenceMap = next;
           // re-render so avatars can light up/down (without bouncing the page)
           requestRender("presence");
