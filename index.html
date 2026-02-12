@@ -646,6 +646,14 @@ th{
 }
 
 
+
+/* ===== Neon brackets around turn name ===== */
+.turnBracket{
+  color: var(--c-cyan);
+  text-shadow: 0 0 12px rgba(34,211,238,.65), 0 0 18px rgba(139,92,246,.45);
+  font-weight:1000;
+  margin:0 8px;
+}
 /* ===== Header overhaul (v11) ===== */
 .headerStack{
   position:relative;
@@ -760,30 +768,27 @@ function animateTurnName(gameId, name){
   if(!box) return;
   const prev=_turnNameCache[gameId];
   if(prev===name){
-    // ensure centered text exists
-    const cur=box.querySelector(".turnNameText");
-    if(cur) cur.textContent=name;
     return;
   }
   _turnNameCache[gameId]=name;
 
   // First render: just place it
   if(!prev){
-    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow">${esc(name)}</div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow"><span class="turnBracket">⟦</span>${esc(name)}<span class="turnBracket">⟧</span></div>`;
     return;
   }
 
   // Build outgoing + incoming nodes
   box.innerHTML = `
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translateX(-50%)">${esc(prev)}</div>
-    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translateX(120%)">${esc(name)}</div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnOld" style="transform:translateX(-50%)"><span class="turnBracket">⟦</span>${esc(prev)}<span class="turnBracket">⟧</span></div>
+    <div class="turnNameText turnTitle3d turnNameGlow" id="turnNew" style="transform:translateX(120%)"><span class="turnBracket">⟦</span>${esc(name)}<span class="turnBracket">⟧</span></div>
   `;
   const oldEl=document.getElementById("turnOld");
   const newEl=document.getElementById("turnNew");
   // animate
   oldEl.animate([{transform:"translateX(-50%)"},{transform:"translateX(-170%)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"});
   newEl.animate([{transform:"translateX(120%)"},{transform:"translateX(-50%)"}],{duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}).onfinish=()=>{
-    box.innerHTML=`<div class="turnNameText turnTitle3d turnNameGlow">${esc(name)}</div>`;
+    box.innerHTML = `<div class="turnNameText turnTitle3d turnNameGlow"><span class="turnBracket">⟦</span>${esc(name)}<span class="turnBracket">⟧</span></div>`;
   };
 }
 
