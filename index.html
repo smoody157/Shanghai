@@ -592,15 +592,16 @@ input,select{
 
 /* GREEN = primary action */
 .btn.ok::before{
-  /* Full-surface halo (covers the whole button, not just edges) */
+  /* Full-button halo (not side-dots) */
+  inset:-14px;
   background:
-    radial-gradient(circle at 50% 50%,
-      rgba(34,197,94,.16) 0%,
-      rgba(34,197,94,.32) 46%,
-      rgba(34,197,94,.58) 72%,
-      rgba(34,197,94,0) 92%);
-  opacity:.72;
-  animation: auraPulseSoft 2.05s ease-in-out infinite;
+    radial-gradient(120% 170% at 50% 50%,
+      rgba(34,197,94,.55) 0%,
+      rgba(34,197,94,.32) 42%,
+      rgba(34,197,94,.10) 62%,
+      rgba(34,197,94,0) 78%);
+  opacity:.95;
+  animation: auraPulseSoft 1.95s ease-in-out infinite;
 }
 /* RED/ORANGE = destructive */
 .btn.danger::before{
@@ -708,7 +709,7 @@ input,select{
   position:absolute;
   left:50%;
   top:46%;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,-64%);
   font-size:26px;
   font-weight:1000;
   white-space:nowrap;
@@ -886,12 +887,27 @@ try{
 }catch{}
 
 let __audioCtx = null;
+let __masterGain = null;
+let __compressor = null;
 const MASTER_GAIN = 2.2; // boosted for phone speakers
 
 function ensureAudio(){
   if(__audioCtx) return __audioCtx;
   try{
     __audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Master output chain (louder + protected from clipping)
+    __masterGain = __audioCtx.createGain();
+    __masterGain.gain.value = 0.92;
+
+    __compressor = __audioCtx.createDynamicsCompressor();
+    __compressor.threshold.value = -18;
+    __compressor.knee.value = 24;
+    __compressor.ratio.value = 10;
+    __compressor.attack.value = 0.003;
+    __compressor.release.value = 0.22;
+
+    __masterGain.connect(__compressor);
+    __compressor.connect(__audioCtx.destination);
   }catch(_){}
   return __audioCtx;
 }
@@ -909,7 +925,7 @@ function unlockAudio(){
     const g = ctx.createGain();
     g.gain.value = 0.0002;
     o.frequency.value = 440;
-    o.connect(g); g.connect(ctx.destination);
+    o.connect(g); g.connect(__masterGain || ctx.destination);
     o.start(); o.stop(ctx.currentTime + 0.02);
   }catch(_){}
   __audioUnlocked = true;
@@ -965,7 +981,7 @@ function playBeep(kind){
     g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
 
     o.connect(g);
-    g.connect(ctx.destination);
+    g.connect(__masterGain || ctx.destination);
     o.start(start);
     o.stop(start + dur + 0.02);
   }
@@ -1321,13 +1337,13 @@ function startApp(){
         </filter>
       </defs>
       <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
-      ${activeOverlay}
-      ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
+            ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
       ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
       <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
       <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
+      ${activeOverlay}
       ${numText}
     </svg>`;
   }
