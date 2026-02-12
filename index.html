@@ -186,7 +186,9 @@ input,select{
   overflow:auto;
   border-radius:16px;
   border:1px solid rgba(255,255,255,.10);
-  background:rgba(6,8,20,.14);
+  width:100%;
+  max-width:100%;
+  -webkit-overflow-scrolling:touch;
 }
 .tableWrap table{
   width:100%;
@@ -491,10 +493,16 @@ input,select{
 /* Center the dartboard and prevent it from drifting left on iPhone */
 .boardBox{
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   width:100%;
-  padding:6px 0 2px;
+  padding:6px 0;
+}
+.boardBox svg{
+  display:block;
+  width:min(86vw, 420px);
+  height:auto;
+  margin:0 auto;
 }
 .boardBox svg{
   width:min(360px, 92vw);
@@ -508,10 +516,18 @@ input,select{
 .hitRow{
   display:flex;
   flex-wrap:wrap;
-  gap:10px;
+  gap:12px;
   justify-content:center;
-  align-items:center;
-  margin-top:6px;
+  align-items:stretch;
+  width:100%;
+  padding:2px 0;
+}
+.hitBtn{
+  flex: 1 1 140px;
+  max-width: 240px;
+  min-height: 54px;
+  font-size:16px;
+  letter-spacing:.3px;
 }
 .hitBtn{
   flex:1 1 120px;
@@ -1288,6 +1304,34 @@ body{
   .row > *{ min-width:120px; }
 }
 
+/* ===== Layout polish (v17.5) ===== */
+.tableWrap table th,
+.tableWrap table td{
+  text-align:center;
+  vertical-align:middle;
+}
+.tableWrap table th:first-child,
+.tableWrap table td:first-child{
+  text-align:left;
+  width:96px;
+}
+.tableWrap table th{
+  font-size:14px;
+}
+.tableWrap table td{
+  font-size:14px;
+}
+.tableWrap table td, .tableWrap table th{
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* Ensure the Shanghai/Around/Killer boards + controls are visually centered */
+.card .boardBox, .card .hitRow{ margin-left:auto; margin-right:auto; }
+
+/* Prevent any glow layer from looking like a “purple slab” behind grouped controls */
+.hitRow .hitBtn::before{ opacity:.72; }
+
 </style>
 </head>
 
@@ -1350,57 +1394,60 @@ function ensureAudio(){
   return __audioCtx;
 }
 function playBeep(kind){
-  // Prevent double-beeps when both a button handler and the global click delegator fire.
-  window.__gnJustBeepedAt = Date.now();
-
   if(!soundEnabled) return;
   const ctx = ensureAudio();
   if(!ctx) return;
 
-  // If suspended (iOS), try to resume on user gesture calls.
   try{ if(ctx.state === "suspended") ctx.resume(); }catch(_){}
+
+  // Prevent double-fires when both a handler and the global click listener beep.
+  const _nowMs = Date.now();
+  window.__lastBeepAt = window.__lastBeepAt || 0;
+  if((_nowMs - window.__lastBeepAt) < 70) return;
+  window.__lastBeepAt = _nowMs;
 
   const t0 = ctx.currentTime;
 
-  // Theme mapping:
-  // ok (green) / danger (red) / nav (ghost) / back (undo/back) / click (neutral) / hit / miss / win
-  const preset = (()=>{
+  // Theme: each "glow color" maps to a consistent sound family.
+  // ok (green), danger (red), hit (cyan), miss (low), back (neutral), click (neutral), win (celebration).
+  const preset = (() => {
     switch(kind){
-      case "ok":     return {type:"triangle", notes:[523], dur:0.14, vol:0.22};      // C5
-      case "danger": return {type:"sawtooth", notes:[233], dur:0.16, vol:0.20};      // A#3-ish
-      case "nav":    return {type:"sine",     notes:[440], dur:0.10, vol:0.16};      // A4
-      case "back":   return {type:"sine",     notes:[330], dur:0.11, vol:0.16};      // E4
-      case "hit":    return {type:"triangle", notes:[659], dur:0.11, vol:0.20};      // E5
-      case "miss":   return {type:"sine",     notes:[196], dur:0.14, vol:0.18};      // G3
-      case "win":    return {type:"triangle", notes:[659, 784, 988], dur:0.42, vol:0.22}; // E5 G5 B5
-      default:       return {type:"sine",     notes:[520], dur:0.10, vol:0.16};
+      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.22}; // C5
+      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.20}; // A3 low buzz
+      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.22}; // E5
+      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.20}; // G3
+      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.18}; // E4 short
+      case "toggle": return {type:"square",   notes:[784],    dur:0.09, gain:0.16}; // G5 tick
+      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.24}; // C major sparkle
+      case "click":
+      default:       return {type:"triangle", notes:[440],    dur:0.10, gain:0.16}; // A4
     }
   })();
 
-  const makeVoice = (freq, start, dur, vol, type)=>{
+  function tone(freq, start, dur, gain){
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.type = type || "sine";
+    o.type = preset.type;
     o.frequency.setValueAtTime(freq, start);
 
     g.gain.setValueAtTime(0.0001, start);
-    g.gain.exponentialRampToValueAtTime(vol, start + 0.02);
+    g.gain.exponentialRampToValueAtTime(gain, start + 0.015);
     g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
 
     o.connect(g);
     g.connect(ctx.destination);
-
     o.start(start);
     o.stop(start + dur + 0.02);
-  };
+  }
 
   if(kind === "win"){
-    // small "celebration" chord: 3 quick notes
-    preset.notes.forEach((f,i)=> makeVoice(f, t0 + i*0.06, preset.dur, preset.vol, preset.type));
+    // Arpeggio celebration
+    const step = 0.09;
+    preset.notes.forEach((f,i)=>tone(f, t0 + i*step, 0.18, preset.gain));
     return;
   }
 
-  makeVoice(preset.notes[0], t0, preset.dur, preset.vol, preset.type);
+  tone(preset.notes[0], t0, preset.dur, preset.gain);
 }
 
 
@@ -1412,6 +1459,31 @@ function setSoundEnabled(on){
     soundBtn.setAttribute("aria-label", soundEnabled ? "Sound on" : "Sound off");
   }
 }
+// ===== Global UI click sounds (covers any button we forgot) =====
+document.addEventListener("click", (ev)=>{
+  const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
+  if(!btn) return;
+  if(btn.disabled) return;
+
+  // If a button explicitly opts out
+  if(btn.dataset && btn.dataset.nosound === "1") return;
+
+  // Map common button styles to the theme
+  if(btn.id === "soundBtn") return; // handled in its own onclick
+
+  const cls = btn.className || "";
+  const isHit = cls.includes("hitBtn");
+  if(isHit){
+    if(cls.includes("miss")) return playBeep("miss");
+    if(cls.includes("undo")) return playBeep("back");
+    return playBeep("hit");
+  }
+  if(cls.includes("danger")) return playBeep("danger");
+  if(cls.includes("ok")) return playBeep("ok");
+  if(cls.includes("ghost")) return playBeep("back");
+  return playBeep("click");
+}, {capture:true});
+
 
 // Global sound delegator: gives the whole app a consistent "sound theme".
 // - Green glow (btn ok) => ok sound
@@ -1805,7 +1877,7 @@ function startApp(){
       numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
     }
 
-    return `<svg viewBox="0 0 200 200" width="70%">
+    return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
       <defs>
         <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
           <stop offset="0%" stop-color="#1a2a4a"/>
