@@ -48,6 +48,20 @@
     rgba(0,0,0,.34) 72%,
     rgba(255,255,255,.14) 100%
   );
+  --title-solid:#22d3ee;
+  --title-grad: linear-gradient(90deg,
+    #22d3ee 0%,
+    #ec4899 45%,
+    #f97316 70%,
+    #22c55e 100%
+  );
+  --active-solid:#f97316;
+  --active-grad: linear-gradient(90deg,
+    #f97316 0%,
+    #ec4899 55%,
+    #22d3ee 100%
+  );
+
   --chrome-text: linear-gradient(135deg,
     rgba(34,211,238,1) 0%,
     rgba(59,130,246,1) 22%,
@@ -126,7 +140,7 @@ body{
   text-align:center;
   max-width:min(540px, 66vw);
 }
-.brand .t{font-weight:1000;font-size:22px;letter-spacing:.4px; text-shadow:0 2px 14px rgba(0,0,0,.55), 0 0 18px rgba(34,211,238,.10)}
+.brand .t{font-weight:1000;font-size:20px;letter-spacing:.4px; text-shadow:0 2px 14px rgba(0,0,0,.55), 0 0 18px rgba(34,211,238,.10)}
 .brand .s{
   font-size:12px;
   color:var(--muted);
@@ -156,7 +170,7 @@ body{
   pointer-events:none;
 }
 
-.h1{font-size:28px;font-weight:1000;letter-spacing:.4px;margin:2px 0 6px;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.h1{font-size:26px;font-weight:1000;letter-spacing:.4px;margin:2px 0 6px;text-shadow:0 2px 14px rgba(0,0,0,.55)}
 .sub{color:var(--muted);font-size:13px}
 label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
 
@@ -292,19 +306,47 @@ input,select{
 @media(max-width:420px){#myDouble{font-size:12px;}}
 .pill,.badge,.kbd{ position:relative; }
 
-/* ===== Chrome text (HEADERS ONLY) ===== */
-.h1, .kTurnBig, .brand .t, .rosterName{
-  background:var(--chrome-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  background-size: 260% 260%;
-  animation: titleShift 7.5s ease-in-out infinite;
+/* ===== Title text (vivid + readable; no gray/white/black) ===== */
+.h1, .kTurnBig, .brand .t, .rosterName, .headerTitle, .gameTitleBig, .turnNameBig, .turnTitle3d{
+  color:var(--title-solid);
   text-shadow:
-    0 0 18px rgba(34,211,238,.20),
-    0 0 28px rgba(236,72,153,.12),
+    0 0 18px rgba(34,211,238,.42),
+    0 0 26px rgba(236,72,153,.22),
+    0 0 34px rgba(249,115,22,.16),
     0 2px 12px rgba(0,0,0,.55);
 }
+
+/* Use gradient only when text-clipping is supported (prevents “invisible/gray” titles). */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .h1, .kTurnBig, .brand .t, .rosterName, .headerTitle, .gameTitleBig, .turnNameBig, .turnTitle3d{
+    background:var(--title-grad);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    background-size:260% 260%;
+    animation:titleShift 7.5s ease-in-out infinite;
+  }
+}
+
+/* Active player name (offset color so it pops vs titles) */
+.turnPlayerName{
+  color:var(--active-solid);
+  text-shadow:
+    0 0 16px rgba(249,115,22,.45),
+    0 0 22px rgba(236,72,153,.18),
+    0 2px 12px rgba(0,0,0,.55);
+}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .turnPlayerName{
+    background:var(--active-grad);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    background-size:240% 240%;
+    animation:titleShift 6.5s ease-in-out infinite;
+  }
+}
+
 
 
 /* ===== Animated title gradient (electric, themed) ===== */
@@ -333,7 +375,7 @@ input,select{
 
 /* ===== Bigger game + turn titles ===== */
 .gameTitleBig{font-size:34px;font-weight:1000;letter-spacing:.6px;margin:0;white-space:nowrap;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 20%,#ffffff 42%,#a8b9de 78%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.25),0 10px 24px rgba(0,0,0,.60);}
-.turnNameBig{font-size:40px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
+.turnNameBig{font-size:38px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
 @media(max-width:520px){
   .gameTitleBig{ font-size:22px; }
   .turnNameBig{ font-size:28px; }
@@ -1109,7 +1151,7 @@ let _turnNameCache = {};
 function turnNameHTML(name){
   const nm = esc(name||"");
   return `<div class="turnNameText turnTitle3d turnNameGlow">
-    <span class="turnBracket">⟦</span>${nm}<span class="turnBracket">⟧</span>
+    <span class="turnBracket">⟦</span><span class="turnPlayerName">${nm}</span><span class="turnBracket">⟧</span>
   </div>`;
 }
 
