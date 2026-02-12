@@ -444,6 +444,71 @@ input,select{
 .gameActions{display:flex;gap:10px;margin-top:10px}
 .gameActions .btn{flex:1}
 
+
+/* ===== Play screen layout fixes (v17.2) ===== */
+/* Center the dartboard and prevent it from drifting left on iPhone */
+.boardBox{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  padding:6px 0 2px;
+}
+.boardBox svg{
+  width:min(360px, 92vw);
+  max-width:100%;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
+/* Make HIT/MISS/UNDO controls big, centered, and thumb-friendly */
+.hitRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+  margin-top:6px;
+}
+.hitBtn{
+  flex:1 1 120px;
+  min-width:120px;
+  max-width:180px;
+  padding:14px 12px;
+  border-radius:14px;
+  font-weight:1000;
+  letter-spacing:.3px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.14);
+  color:var(--text);
+  background:var(--chrome-fill);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,.32),
+    inset 0 1px 0 rgba(255,255,255,.20),
+    inset 0 -12px 18px rgba(0,0,0,.38);
+  position:relative;
+}
+.hitBtn::after{
+  content:"";
+  position:absolute;
+  left:10px; right:10px; top:7px;
+  height:38%;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0));
+  pointer-events:none;
+  opacity:.85;
+}
+.hitBtn.miss{
+  border-color: rgba(239,68,68,.38);
+}
+.hitBtn.undo{
+  color:var(--muted);
+}
+@media(max-width:380px){
+  .hitBtn{ min-width:104px; padding:13px 10px; font-size:13px; }
+}
+
 /* ===== Roster ===== */
 .rosterGrid{display:grid;grid-template-columns:1fr;gap:10px}
 @media(min-width:860px){ .rosterGrid{grid-template-columns:1fr 1fr;} }
@@ -1181,29 +1246,53 @@ function playBeep(kind){
   // If suspended (iOS), try to resume on user gesture calls.
   try{ if(ctx.state === "suspended") ctx.resume(); }catch(_){}
 
+  // Prevent double "click" beeps when handlers + global listener both fire.
+  if(kind==="click" || kind==="nav" || kind==="back" || kind==="danger"){
+    const t = Date.now();
+    if(window.__lastUiBeepAt && (t - window.__lastUiBeepAt) < 110) return;
+    window.__lastUiBeepAt = t;
+  }
+
   const t0 = ctx.currentTime;
+
+  // Small "theme" palette
+  const presets = {
+    click:  {f:[520],  dur:0.12, type:"sine",   gain:0.20},
+    nav:    {f:[560],  dur:0.11, type:"sine",   gain:0.18},
+    back:   {f:[420],  dur:0.12, type:"sine",   gain:0.18},
+    danger: {f:[260,210], dur:0.16, type:"triangle", gain:0.22},
+    hit:    {f:[660],  dur:0.14, type:"sine",   gain:0.22},
+    miss:   {f:[220],  dur:0.14, type:"sine",   gain:0.20},
+    win:    {f:[880,990,1180], dur:0.42, type:"sine", gain:0.24}
+  };
+  const p = presets[kind] || presets.click;
+
   const o = ctx.createOscillator();
   const g = ctx.createGain();
+  o.type = p.type || "sine";
 
-  const freq =
-    kind==="win" ? 880 :
-    kind==="hit" ? 660 :
-    kind==="click" ? 520 :
-    220; // miss/low
-
-  o.type = "sine";
-  o.frequency.setValueAtTime(freq, t0);
+  // Simple chirp (frequency ramp) for multi-step sounds
+  if(p.f && p.f.length>1){
+    o.frequency.setValueAtTime(p.f[0], t0);
+    const step = (p.dur || 0.16) / (p.f.length-1);
+    p.f.slice(1).forEach((fq,i)=>{
+      o.frequency.linearRampToValueAtTime(fq, t0 + step*(i+1));
+    });
+  }else{
+    o.frequency.setValueAtTime((p.f && p.f[0]) ? p.f[0] : 520, t0);
+  }
 
   g.gain.setValueAtTime(0.0001, t0);
-  g.gain.exponentialRampToValueAtTime(0.22, t0 + 0.02);
-  g.gain.exponentialRampToValueAtTime(0.0001, t0 + (kind==="win" ? 0.38 : 0.14));
+  g.gain.exponentialRampToValueAtTime(Math.max(0.0002, p.gain||0.2), t0 + 0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + (p.dur || 0.14));
 
   o.connect(g);
   g.connect(ctx.destination);
 
   o.start(t0);
-  o.stop(t0 + (kind==="win" ? 0.42 : 0.18));
+  o.stop(t0 + (p.dur || 0.14) + 0.02);
 }
+
 
 function setSoundEnabled(on){
   soundEnabled = !!on;
@@ -1213,6 +1302,29 @@ function setSoundEnabled(on){
     soundBtn.setAttribute("aria-label", soundEnabled ? "Sound on" : "Sound off");
   }
 }
+
+
+// ===== Global UI sounds (theme everywhere) =====
+// Adds subtle click/navigation tones across the whole app (without needing per-button wiring).
+// HIT/MISS/WIN sounds are still triggered by game logic so they feel different than navigation.
+document.addEventListener("click", (ev)=>{
+  const btn = ev.target?.closest ? ev.target.closest("button") : null;
+  if(!btn) return;
+  if(btn.disabled) return;
+
+  // Don't beep on the sound toggle itself (it already gives immediate feedback)
+  if(btn.id==="soundBtn") return;
+
+  // Game action buttons have their own sounds
+  if(btn.classList.contains("hitBtn") || btn.classList.contains("kAttackBtn")) return;
+
+  // Class-based theming
+  if(btn.classList.contains("danger")) return playBeep("danger");
+  if(btn.id && /back/i.test(btn.id)) return playBeep("back");
+  if(btn.classList.contains("ghost")) return playBeep("nav");
+  return playBeep("click");
+}, true);
+
 
 // ===== Turn name swipe helper (keeps state across renders) =====
 let _turnNameCache = {shanghai:null, around:null};
