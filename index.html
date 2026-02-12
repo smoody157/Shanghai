@@ -1598,10 +1598,9 @@ function startApp(){
     if(m.snaps.length>80) m.snaps.shift();
   }
   function popSnap(m){
-    if(!m || !m.snaps || m.snaps.length<2) return m;
-    m.snaps.pop();
-    const prev=m.snaps.pop();
-    try{return JSON.parse(prev);}catch{return m;}
+    if(!m || !m.snaps || m.snaps.length<1) return m;
+    const prev = m.snaps.pop();
+    try{ return JSON.parse(prev); }catch{ return m; }
   }
 
   const Games=[
@@ -2394,14 +2393,14 @@ function startApp(){
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
       };
-      const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{ playBeep("miss");
+      const missBtn=$("missBtn"); if(missBtn) missBtn.addEventListener("click", ()=>{ playBeep("miss");
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,false);
         if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
-      };
+      });
     }
 
     return { initMatch, renderPlay, bindPlay };
