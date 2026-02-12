@@ -1221,121 +1221,135 @@ function showFatal(title,msg){
         <button class="btn ghost" id="reloadBtn">Hard Reload</button>
       </div>
       <div class="divider"></div>
-      <div class="sub">If you’re on iPhone/Safari, make sure content blockers aren’t blocking Google scripts.</div>
+      <div class="sub">If you see an error, try a hard reload or re-paste the file.</div>
     </div>
   `);
   document.getElementById("retryBtn").onclick=()=>boot();
   document.getElementById("reloadBtn").onclick=()=>location.reload(true);
 }
 
-async function boot(){
+function boot(){
   try{
     setHTML(`<div class="card"><div class="h1">Loading…</div><div class="sub">Starting Game Night…</div></div>`);
-    await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js");
-    await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js");
-    await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js");
-    if(!window.firebase) throw new Error("Firebase loaded but window.firebase is missing.");
     startApp();
   }catch(err){
-    showFatal("Can’t start app", (err && err.message) || String(err));
+    showFatal("Can’t start app", err?.message || String(err));
   }
 }
 
 function startApp(){
-  console.log('GameNight build v17_4_2026-02-12 loaded');
-  const firebaseConfig = {
-    apiKey: "__REPLACE_WITH_NEW_API_KEY__",
-    authDomain: "gamenightdarts-e7601.firebaseapp.com",
-    projectId: "gamenightdarts-e7601",
-    storageBucket: "gamenightdarts-e7601.firebasestorage.app",
-    messagingSenderId: "270045452251",
-    appId: "1:270045452251:web:393956ce18b43316e939fe"
+  console.log('GameNight OFFLINE build loaded');
+
+  /* ========= Offline storage backend (no Firebase required) =========
+     - Players, stats, and history are stored in localStorage on this device.
+     - This guarantees the app loads anywhere (no blocked scripts).
+  */
+
+  const LS = {
+    players: "gn_players_v1",      // map: email -> {name,email,createdAt}
+    history: "gn_history_v1",      // array of match entries
+    statsPrefix: "gn_stats_v1__",  // per-player doc
   };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+
+  function lsRead(key, fallback){
+    try{
+      const raw = localStorage.getItem(key);
+      if(raw==null) return fallback;
+      return JSON.parse(raw);
+    }catch(_){
+      return fallback;
+    }
+  }
+  function lsWrite(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(_){}
+  }
+
+  function getPlayersMap(){ return lsRead(LS.players, {}) || {}; }
+  function setPlayersMap(map){ lsWrite(LS.players, map || {}); }
 
   async function getPlayers(){
-    const snap = await db.collection("players").get();
-    return snap.docs.map(d=>d.data());
+    const map = getPlayersMap();
+    return Object.values(map).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
   }
   async function upsertPlayer(name,email){
     const e=normEmail(email);
-    await db.collection("players").doc(e).set({name,email:e,createdAt:now()},{merge:true});
+    const map=getPlayersMap();
+    const cur = map[e] || { email:e, createdAt: now() };
+    map[e] = { ...cur, name: String(name||cur.name||"").trim(), email:e, createdAt: cur.createdAt || now() };
+    setPlayersMap(map);
   }
   async function getStatsDoc(email){
-    const doc=await db.collection("stats").doc(normEmail(email)).get();
-    return doc.exists?doc.data():{};
+    const e=normEmail(email);
+    return lsRead(LS.statsPrefix + e, {}) || {};
   }
   async function saveStatsDoc(email,data){
-    await db.collection("stats").doc(normEmail(email)).set(data,{merge:true});
+    const e=normEmail(email);
+    const cur = await getStatsDoc(e);
+    const next = { ...(cur||{}), ...(data||{}) };
+    lsWrite(LS.statsPrefix + e, next);
   }
   async function getHistory(email){
     const e=normEmail(email);
-    try{
-      const snap=await db.collection("history")
-        .where("players","array-contains",e)
-        .orderBy("endedAt","desc")
-        .limit(60).get();
-      return snap.docs.map(d=>d.data());
-    }catch{
-      const snap=await db.collection("history")
-        .where("players","array-contains",e)
-        .limit(60).get();
-      const items=snap.docs.map(d=>d.data());
-      items.sort((a,b)=>(b.endedAt||0)-(a.endedAt||0));
-      return items;
-    }
+    const all = lsRead(LS.history, []) || [];
+    const items = all.filter(h=>Array.isArray(h.players) && h.players.includes(e));
+    items.sort((a,b)=>(b.endedAt||0)-(a.endedAt||0));
+    return items.slice(0, 60);
   }
-  async function saveHistoryEntry(entry){ await db.collection("history").add(entry); }
+  async function saveHistoryEntry(entry){
+    const all = lsRead(LS.history, []) || [];
+    all.push(entry);
+    // keep bounded
+    if(all.length > 2500) all.splice(0, all.length-2500);
+    lsWrite(LS.history, all);
+  }
 
-  // ===== Admin helpers (delete players / reset stats) =====
+  // Admin helpers
   async function resetStatsAll(email){
     const e=normEmail(email);
-    await db.collection("stats").doc(e).set({games:{}, updatedAt:now()});
+    lsWrite(LS.statsPrefix + e, { games:{}, updatedAt: now() });
   }
   async function resetStatsGame(email, gameId){
     const e=normEmail(email);
-    const doc=await db.collection("stats").doc(e).get();
-    const cur=doc.exists?doc.data():{};
-    const games=cur.games||{};
-    const nextGames={...games};
+    const cur = await getStatsDoc(e);
+    const games = cur.games || {};
+    const nextGames = { ...games };
     delete nextGames[gameId];
-    await db.collection("stats").doc(e).set({games:nextGames, updatedAt:now()},{merge:true});
+    await saveStatsDoc(e, { games: nextGames, updatedAt: now() });
   }
   async function deleteHistoryForPlayer(email){
     const e=normEmail(email);
-    const snap=await db.collection("history").where("players","array-contains",e).get();
-    if(snap.empty) return;
-    let batch=db.batch();
-    let count=0;
-    for(const d of snap.docs){
-      batch.delete(d.ref);
-      count++;
-      if(count>=450){
-        await batch.commit();
-        batch=db.batch();
-        count=0;
-      }
-    }
-    if(count>0) await batch.commit();
+    const all = lsRead(LS.history, []) || [];
+    const next = all.filter(h=>!(Array.isArray(h.players) && h.players.includes(e)));
+    lsWrite(LS.history, next);
   }
   async function deletePlayerAndData(email){
     const e=normEmail(email);
-    await db.collection("players").doc(e).delete().catch(()=>{});
-    await db.collection("stats").doc(e).delete().catch(()=>{});
-    await deleteHistoryForPlayer(e).catch(()=>{});
+    const map=getPlayersMap();
+    delete map[e];
+    setPlayersMap(map);
+    try{ localStorage.removeItem(LS.statsPrefix + e); }catch(_){}
+    await deleteHistoryForPlayer(e);
   }
 
+  // Auth (offline)
   async function signInEmail(email){
     const e=normEmail(email);
-    const doc=await db.collection("players").doc(e).get();
-    return doc.exists?doc.data():null;
+    const map=getPlayersMap();
+    return map[e] || null;
   }
   async function signUpEmail(name,email){
     const e=normEmail(email);
     await upsertPlayer(name,e);
-    return {name,email:e};
+    const map=getPlayersMap();
+    return map[e] || {name:String(name||"").trim(), email:e};
   }
+
+  // Presence disabled in offline mode
+  function subscribePresence(){ /* no-op */ }
+  function startPresence(){ /* no-op */ }
+  function stopPresence(){ /* no-op */ }
+  function isOnline(){ return false; }
+
 
   const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 
@@ -2282,99 +2296,7 @@ function startApp(){
   let rulesGameId=null;
   const MAX_PLAYERS=4;
 
-  // ===== Presence =====
-  const PRESENCE_BEAT_MS = 20000;
-  const PRESENCE_ONLINE_MS = 45000;
-
-  let presenceMap = {};
-  let presenceTimer = null;
-  let presenceEmail = null;
-  let presenceUnsubs = [];
-  let presenceVisibilityBound = false;
-
-  function isOnline(email){
-    const e = normEmail(email);
-    const p = presenceMap[e];
-    if(!p) return false;
-    const last = Number(p.lastSeenAt||0);
-    return last > 0 && (now() - last) <= PRESENCE_ONLINE_MS;
-  }
-
-  function clearPresenceSubs(){
-    try{ presenceUnsubs.forEach(u=>{ try{u();}catch{} }); }catch{}
-    presenceUnsubs = [];
-  }
-
-  function subscribePresence(emails){
-    clearPresenceSubs();
-    const uniq = Array.from(new Set((emails||[]).map(normEmail).filter(Boolean)));
-    if(!uniq.length) return;
-
-    const chunks = [];
-    for(let i=0;i<uniq.length;i+=10) chunks.push(uniq.slice(i,i+10));
-
-    chunks.forEach(list=>{
-      const unsub = db.collection("presence")
-        .where(firebase.firestore.FieldPath.documentId(), "in", list)
-        .onSnapshot(snap=>{
-          const got = {};
-          snap.forEach(doc=>{ got[doc.id] = doc.data() || {}; });
-
-          const next = {...presenceMap};
-          list.forEach(id=>{
-            if(got[id]) next[id] = got[id];
-            else delete next[id];
-          });
-
-          presenceMap = next;
-          requestRender("presence");
-        }, ()=>{});
-      presenceUnsubs.push(unsub);
-    });
-  }
-
-  function startPresence(email){
-    const e = normEmail(email);
-    if(!e) return;
-    if(presenceEmail === e && presenceTimer) return;
-
-    stopPresence();
-    presenceEmail = e;
-
-    const ref = db.collection("presence").doc(e);
-
-    presenceMap = {
-      ...presenceMap,
-      [e]: { ...(presenceMap[e]||{}), email:e, name:((meUser && meUser.name) || null), lastSeenAt: now() }
-    };
-    try{ render(); }catch{}
-
-    async function beat(){
-      const payload = { email:e, name:((meUser && meUser.name) || null), lastSeenAt: now() };
-      presenceMap = { ...presenceMap, [e]: { ...(presenceMap[e]||{}), ...payload } };
-      try{ render(); }catch{}
-      try{ await ref.set(payload, {merge:true}); }catch(_){}
-    }
-
-    beat();
-    presenceTimer = setInterval(beat, PRESENCE_BEAT_MS);
-
-    if(!presenceVisibilityBound){
-      presenceVisibilityBound = true;
-      document.addEventListener("visibilitychange", ()=>{
-        if(document.visibilityState === "visible"){
-          try{ beat(); }catch{}
-        }
-      });
-    }
-  }
-
-  function stopPresence(){
-    try{ if(presenceTimer) clearInterval(presenceTimer); }catch{}
-    presenceTimer = null;
-    presenceEmail = null;
-    clearPresenceSubs();
-  }
+  // ===== Presence (offline: disabled) =====
 
   function initials(name){
     const n=String(name||"").trim();
@@ -3134,33 +3056,20 @@ function startApp(){
     setHTML(`
       <div class="row">
         <button class="btn ghost" id="historyBack">Back</button>
-        <button class="btn danger" id="clearHistoryBtn">Clear history</button>
+        <button class="btn danger" id="clearHistoryBtn">Clear my history</button>
       </div>
-      <div class="small">Clearing history removes match history entries for <b>${esc(meUser.email)}</b>. This does not delete players or stats.</div>
+      <div class="small">Clears match history for your account on this device. Does not delete your player or stats.</div>
       <div class="divider"></div>
       ${items}
     `);
 
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
-    const ch=document.getElementById("clearHistoryBtn");
-    if(ch){ ch.onclick=async()=>{
-      if(!confirm("Clear your match history? This will NOT delete your player or stats.")) return;
-      try{ await deleteHistoryForPlayer(meUser.email); toastMsg="History cleared."; render(); }
-      catch(e){ showFatal("Clear history error", (e && e.message) || String(e)); }
-    }; }
-
-
     const clearBtn=document.getElementById("clearHistoryBtn");
     if(clearBtn){
       clearBtn.onclick=async()=>{
-        if(!confirm("Clear your match history? This cannot be undone.")) return;
-        try{
-          await deleteHistoryForPlayer(meUser.email);
-          toastMsg="History cleared.";
-          render();
-        }catch(e){
-          showFatal("Clear history error", (e && e.message) || String(e));
-        }
+        if(!confirm("Clear your match history on this device?")) return;
+        try{ await deleteHistoryForPlayer(meUser.email); toastMsg="History cleared."; render(); }
+        catch(e){ showFatal("Clear history error", e?.message||String(e)); }
       };
     }
   }
