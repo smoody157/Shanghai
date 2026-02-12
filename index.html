@@ -747,7 +747,8 @@ input,select{
 
 
 /* Dartboard active target highlight */
-.hotWedge{ opacity:1; }
+.hotWedge{ opacity:.92; animation:hotPulse 1.25s ease-in-out infinite; }
+@keyframes hotPulse{ 0%,100%{opacity:.55; filter:brightness(1);} 50%{opacity:1; filter:brightness(1.85);} }
 /* ===== Win animation overlay ===== */
 .winOverlay{
   position:fixed;
@@ -1295,6 +1296,34 @@ function startApp(){
 
     let activeOverlay="";
 
+    // Active target highlight (glows & pulses the full slice across rings)
+    if(typeof activeTarget === "number"){
+      const idx = BOARD_NUMS.indexOf(activeTarget);
+      if(idx >= 0){
+        const a0 = idx*seg + rot + 0.6;
+        const a1 = (idx+1)*seg + rot - 0.6;
+
+        // Cover all 4 ring segments for the number: outer single, triple, inner single, double
+        const slices = [
+          {r0:rDoubleInner, r1:rDoubleOuter, fill:"rgba(239,68,68,.22)", stroke:"rgba(255,255,255,.88)", sw:2.6},
+          {r0:rTripleInner, r1:rTripleOuter, fill:"rgba(239,68,68,.18)", stroke:"rgba(255,255,255,.84)", sw:2.2},
+          {r0:rTripleOuter, r1:rDoubleInner, fill:"rgba(34,211,238,.14)", stroke:"rgba(34,211,238,.92)", sw:2.6},
+          {r0:rSingleInner, r1:rTripleInner, fill:"rgba(34,211,238,.12)", stroke:"rgba(34,211,238,.86)", sw:2.3},
+        ];
+
+        for(const s of slices){
+          activeOverlay += `<path class="hotWedge" d="${arcWedgePath(cx,cy,s.r0,s.r1,a0,a1)}" fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
+        }
+      }
+    }
+
+    if(activeTarget === "B"){
+      activeOverlay += `
+        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.20)" stroke="rgba(34,211,238,.95)" stroke-width="3.0" filter="url(#glow)"/>
+        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(239,68,68,.18)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+      `;
+    }
+
     function ringWedges(r0,r1,fillA,fillB){
       let out="";
       for(let i=0;i<20;i++){
@@ -1337,6 +1366,7 @@ function startApp(){
         </filter>
       </defs>
       <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
+      ${activeOverlay}
             ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
       ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
