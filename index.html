@@ -420,6 +420,10 @@ input,select{
 .gameGrid{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:860px){ .gameGrid{grid-template-columns:1fr 1fr;} }
 .gameCard{
+  position:relative;
+  overflow:visible;
+  z-index:0;
+  isolation:isolate;
   background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   border:1px solid rgba(255,255,255,.10);
   border-radius:18px;padding:14px;
@@ -739,6 +743,34 @@ input,select{
 }
 @keyframes haloCard{
   0%{ opacity:.40; filter:blur(16px); }
+
+/* BLACK "shadow glow" (depth) — use on sections when you want a darker aura instead of neon */
+.shadowHalo{
+  position:relative;
+  overflow:visible;
+  z-index:0;
+  isolation:isolate;
+}
+.shadowHalo::before{
+  content:"";
+  position:absolute;
+  inset:-20px;
+  border-radius:26px;
+  background:
+    radial-gradient(90% 140% at 50% 35%,
+      rgba(0,0,0,.65) 0%,
+      rgba(0,0,0,.35) 45%,
+      rgba(0,0,0,0) 78%);
+  filter:blur(24px);
+  opacity:.9;
+  z-index:-1;
+  pointer-events:none;
+  animation: shadowPulse 3.0s ease-in-out infinite;
+}
+@keyframes shadowPulse{
+  0%,100%{ opacity:.55; filter:blur(22px); }
+  50%{ opacity:.95; filter:blur(28px); }
+}
   50%{ opacity:.92; filter:blur(20px); }
   100%{ opacity:.40; filter:blur(16px); }
 }
@@ -982,20 +1014,20 @@ input,select{
 .gameCard.leaderGlow::before{
   content:"";
   position:absolute;
-  inset:-18px;                 /* how far the halo extends */
-  border-radius:26px;          /* slightly larger than card radius */
-  pointer-events:none;
-  z-index:-1;
+  inset:-18px;
+  border-radius:26px;
+  /* BLUE/PURPLE status halo (not “go” green) */
   background:
-    radial-gradient(120% 160% at 50% 35%,
-      rgba(34,211,238,.70) 0%,
-      rgba(139,92,246,.52) 42%,
-      rgba(236,72,153,.20) 62%,
-      rgba(0,0,0,0) 78%);
+    radial-gradient(90% 140% at 50% 35%,
+      rgba(34,211,238,.55) 0%,
+      rgba(139,92,246,.42) 40%,
+      rgba(236,72,153,.18) 62%,
+      rgba(0,0,0,0) 82%);
   filter:blur(22px);
-  opacity:.92;
-  transform:translateZ(0);
-  animation:segmentHalo 3.1s ease-in-out infinite;
+  opacity:.95;
+  z-index:-1;
+  pointer-events:none;
+  animation: haloCard 2.6s ease-in-out infinite;
 }
 /* Extra fallback for Safari if pseudo-element ever gets clipped */
 .gameCard.leaderGlow{
