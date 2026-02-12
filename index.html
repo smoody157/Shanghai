@@ -1177,6 +1177,48 @@ input,select{
   100%{ transform:translateY(420px) rotate(320deg); opacity:0; }
 }
 
+
+/* ===== POLISH PASS v17.2 (layout + touch targets + sound consistency) ===== */
+
+/* iOS safe-area padding so content doesn't feel "squished" to one side */
+body{
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+}
+
+/* Top-right/left buttons: make them real touch targets */
+.topActions .btn{
+  min-height:44px;
+  padding:10px 14px;
+}
+
+/* Dartboard always centered, never drifting */
+.boardBox{display:flex;justify-content:center;align-items:center;}
+.boardBox svg{display:block;margin:0 auto;max-width:520px;width:min(92vw,520px);height:auto;}
+
+/* Hit/throw controls: bigger + centered; 3-up then 2-up */
+.hitRow{
+  max-width:560px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  justify-items:stretch;
+}
+.hitBtn{
+  min-height:54px;
+  font-size:14px;
+  padding:14px 10px;
+  max-width:none;
+  min-width:0;
+}
+.hitBtn.miss{grid-column:1 / 2;}
+.hitBtn.undo{grid-column:2 / 4;}
+
+/* Make primary game action row (Play/Stats buttons etc.) feel centered */
+.gameActions{justify-content:center;}
+.gameActions .btn{min-height:48px;}
+
 </style>
 </head>
 
@@ -1303,6 +1345,22 @@ function setSoundEnabled(on){
   }
 }
 
+// ===== Global sound: every tap gets a consistent click "theme" =====
+// Exclusions: hit/attack buttons already play hit/miss/win sounds.
+(function bindGlobalClickSound(){
+  let bound=false;
+  if(bound) return;
+  bound=true;
+  document.addEventListener("click", (ev)=>{
+    const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
+    if(!btn) return;
+    if(btn.disabled) return;
+    // Avoid double-sounds on gameplay hit buttons / attack buttons
+    if(btn.classList.contains("hitBtn") || btn.classList.contains("kAttackBtn")) return;
+    playBeep("click");
+  }, true);
+})();
+
 
 // ===== Global UI sounds (theme everywhere) =====
 // Adds subtle click/navigation tones across the whole app (without needing per-button wiring).
@@ -1322,7 +1380,7 @@ document.addEventListener("click", (ev)=>{
   if(btn.classList.contains("danger")) return playBeep("danger");
   if(btn.id && /back/i.test(btn.id)) return playBeep("back");
   if(btn.classList.contains("ghost")) return playBeep("nav");
-  return playBeep("click");
+  return
 }, true);
 
 
@@ -1809,24 +1867,16 @@ function startApp(){
         </div>
 
         <div class="card">
-          <div class="hero gameHero">
-            <div class="heroCornerLeft">
-              <div class="cornerStack">
-                <span class="pill">Shanghai</span>
-                <div class="cornerIcon">🎯</div>
-              </div>
+          <div class="headerStack">
+            <div class="headerTopRow">
+              <div class="left"><span class="pill">Shanghai</span></div>
+              <div class="right"><span class="pill" data-live="1">Live</span></div>
             </div>
-
-            <div class="heroMain">
-              <div class="gameTitleBig">Shanghai</div>
-              ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
-              ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="sub statusLine">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
-            </div>
-
-            <div class="heroCornerRight">
-              <span class="pill" data-live="1">Live</span>
-            </div>
+            <div class="headerIcon">🎯</div>
+            <div class="headerTitle turnTitle3d">Shanghai</div>
+            ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
+            ${m.finished?"":`<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
+            <div class="sub" style="text-align:center;margin-top:6px">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
           </div>
 
           <div class="divider"></div>
@@ -2078,24 +2128,18 @@ function startApp(){
         </div>
 
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
-          <div class="hero gameHero">
-            <div class="heroCornerLeft">
-              <div class="cornerStack">
-                <span class="pill">Killer</span>
-                <div class="cornerIcon">🔥</div>
+          <div class="headerStack">
+            <div class="headerTopRow">
+              <div class="left"><span class="pill">Killer</span></div>
+              <div class="right">
+                <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
               </div>
             </div>
-
-            <div class="heroMain">
-              <div class="gameTitleBig">Killer</div>
-              ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
-              ${isFinished ? "" : `<div class="small"><span class="badge">NOW THROWING</span></div>`}
-              <div class="sub statusLine">${statusLine}</div>
-            </div>
-
-            <div class="heroCornerRight">
-              <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
-            </div>
+            <div class="headerIcon">🔥</div>
+            <div class="headerTitle turnTitle3d">Killer</div>
+            ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox"></div>`}
+            ${isFinished ? "" : `<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
+            <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
           </div>
 
           ${isFinished ? "" : `
@@ -2736,8 +2780,8 @@ function startApp(){
     `;
     setHTML(html);
 
-    document.getElementById("goBtn").onclick=async()=>{ playBeep("click");
-      const e=normEmail(document.getElementById("inEmail").value);
+    document.getElementById("goBtn").onclick=async()=>{
+const e=normEmail(document.getElementById("inEmail").value);
       if(!e){ toastMsg="Enter a valid email."; return render(); }
 
       const player=await signInEmail(e);
@@ -2784,8 +2828,8 @@ function startApp(){
     `);
     document.getElementById("backBtn").onclick=()=>{ meUser=null; screen="auth"; render(); };
 
-    document.getElementById("createBtn").onclick=async()=>{ playBeep("click");
-      const n=String(document.getElementById("upName").value).trim();
+    document.getElementById("createBtn").onclick=async()=>{
+const n=String(document.getElementById("upName").value).trim();
       if(!n){ toastMsg="Enter your name."; return render(); }
       meUser=await signUpEmail(n, meUser.email);
       statsViewerEmail=meUser.email;
@@ -3110,8 +3154,8 @@ function startApp(){
 
     document.getElementById("setupBack").onclick=()=>{ activeGameId=null; match=null; screen="home"; render(); };
 
-    document.getElementById("startMatchBtn").onclick=()=>{ playBeep("click");
-      if(!g.active){ toastMsg="Coming soon."; return render(); }
+    document.getElementById("startMatchBtn").onclick=()=>{
+if(!g.active){ toastMsg="Coming soon."; return render(); }
       const n=parseInt(document.getElementById("playerCount").value,10);
       const selectedEmails=Array.from(selectEl.selectedOptions).map(o=>o.value);
       if(selectedEmails.length!==n){ toastMsg=`You must select exactly ${n} players.`; return render(); }
@@ -3423,8 +3467,10 @@ else{
       window.__lastScreen = screen;
 
       homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
-      if(soundBtn){ soundBtn.onclick=()=>{ setSoundEnabled(!soundEnabled); playBeep("click"); }; setSoundEnabled(soundEnabled); }
-      signOutBtn.onclick=()=>{ playBeep("click"); stopPresence(); meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
+      if(soundBtn){ soundBtn.onclick=()=>{ setSoundEnabled(!soundEnabled);
+}; setSoundEnabled(soundEnabled); }
+      signOutBtn.onclick=()=>{
+stopPresence(); meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
 
       if(screen==="auth") return renderAuth();
       if(screen==="signup") return renderSignup();
