@@ -560,6 +560,10 @@ input,select{
   opacity:.85;
 }
 .hitBtn.miss{ border-color: rgba(239,68,68,.38); grid-column:1 / 2; }
+/* 3-button layouts (Around the World) should NOT inherit Shanghai grid spanning */
+.hitBtn.miss3{ border-color: rgba(239,68,68,.38); }
+.hitBtn.undo3{ color:var(--muted); }
+
 .hitBtn.undo{ color:var(--muted); grid-column:2 / 4; }
 
 /* ===== Roster ===== */
@@ -1740,7 +1744,7 @@ function startApp(){
             <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
             <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
             <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-            <button class="hitBtn undo" id="undoBtn">UNDO</button>
+            <button class="hitBtn undo3" id="undoBtn">UNDO</button>
           </div>
 
           ${finishedBanner}
@@ -1990,7 +1994,7 @@ function startApp(){
             <div class="hitRow">
               <button class="hitBtn" id="myDouble">I HIT MY DOUBLE</button>
               <button class="hitBtn miss" id="miss">MISS</button>
-              <button class="hitBtn undo" id="undoBtn">UNDO</button>
+              <button class="hitBtn undo3" id="undoBtn">UNDO</button>
             </div>
             <div class="divider"></div>
             <div class="pill">Attack Opponents</div>
@@ -2336,8 +2340,8 @@ function startApp(){
           ${isFinished ? "" : `
             <div class="hitRow">
               <button class="hitBtn" id="hitBtn">HIT</button>
-              <button class="hitBtn miss" id="missBtn">MISS</button>
-              <button class="hitBtn undo" id="undoBtn">UNDO</button>
+              <button class="hitBtn miss3" id="missBtn">MISS</button>
+              <button class="hitBtn undo3" id="undoBtn">UNDO</button>
             </div>
           `}
         </div>
