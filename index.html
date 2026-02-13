@@ -2749,7 +2749,7 @@ function startApp(){
                 <div class="rosterSub">${esc(g.active?"Active":"Coming soon")}</div>
               </div>
             </div>
-            <button class="btn" data-rule="${esc(g.id)}">Open</button>
+            <button class="btn ${g.active? "ok":"ghost"}" data-rule="${esc(g.id)}" ${g.active?"":"disabled"}>Open</button>
           </div>
         `).join("")}
         <div class="divider"></div>
@@ -2819,18 +2819,24 @@ function startApp(){
       <div class="small">Pick the format before starting.</div>
     ` : "";
 
-    const setupHeroMain = (activeGameId==="around") ? `
-          <div class="heroMain" style="text-align:center">
-            <div class="h1" style="font-size:28px;margin:0;white-space:nowrap;letter-spacing:.5px">Around the World</div>
+    const defaultHeroMain = `
+          <div class="heroMain">
+            <div class="h1">${esc(g.name)}</div>
+            <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
+          </div>
+    `;
+
+    const aroundHeroMain = `
+          <div class="heroMain" style="text-align:center;align-items:center">
+            <div class="h1" style="font-size:clamp(20px,5.8vw,30px);margin:0;white-space:nowrap;letter-spacing:.6px">Around the World</div>
             <div class="sub" style="margin-top:6px;max-width:520px">
               Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.
             </div>
             <div style="font-size:28px;line-height:1;margin-top:8px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">🌍</div>
           </div>
-    ` : `
-          ${setupHeroMain}
     `;
 
+    const setupHeroMain = (activeGameId==="around") ? aroundHeroMain : defaultHeroMain;
     const setupLeftBadge = (activeGameId==="around") ? `<span class="pill">Setup</span>` : `<span class="kbd">${esc(g.name)}</span>`;
 
     setHTML(`
