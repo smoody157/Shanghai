@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <title>Game Night • v45-2026-02-12</title>
-<!-- BUILD: v26_20260212T174000Z -->
+<!-- BUILD: v47_20260212T220500Z -->
 
 <style>
 :root{
@@ -958,7 +958,7 @@ input,select{
 </head>
 
 <body>
-<!-- BUILD: v26_20260212T174000Z -->
+<!-- BUILD: v47_20260212T220500Z -->
 <div class="topbar">
   <div class="topActions left">
     <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
@@ -2818,6 +2818,20 @@ function startApp(){
       <div class="small">Pick the format before starting.</div>
     ` : "";
 
+    const setupHeroMain = (activeGameId==="around") ? `
+          <div class="heroMain" style="text-align:center">
+            <div class="h1" style="font-size:28px;margin:0;white-space:nowrap;letter-spacing:.5px">Around the World</div>
+            <div class="sub" style="margin-top:6px;max-width:520px">
+              Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.
+            </div>
+            <div style="font-size:28px;line-height:1;margin-top:8px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">🌍</div>
+          </div>
+    ` : `
+          ${setupHeroMain}
+    `;
+
+    const setupLeftBadge = (activeGameId==="around") ? `<span class="pill">Setup</span>` : `<span class="kbd">${esc(g.name)}</span>`;
+
     setHTML(`
       <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
 
@@ -2825,13 +2839,10 @@ function startApp(){
         <div class="hero">
           <div class="heroCornerLeft">
             <div class="logoMark"><span>${esc(g.icon || "🎯")}</span></div>
-            <span class="kbd">${esc(g.name)}</span>
+            ${setupLeftBadge}
           </div>
 
-          <div class="heroMain">
-            <div class="h1">${esc(g.name)}</div>
-            <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
-          </div>
+          ${setupHeroMain}
 
           <div class="heroCornerRight">
             ${g.active?`<span class="pill" data-live="1">Ready</span>`:`<span class="pill soon">Coming soon</span>`}
