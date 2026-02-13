@@ -1317,70 +1317,95 @@ function boot(){
   }
 }
 
-function startApp(){
-  console.log('GameNight OFFLINE build loaded');
+  console.log("GameNight ONLINE build loaded");
 
-  /* ========= Offline storage backend (no Firebase required) =========
-     - Players, stats, and history are stored in localStorage on this device.
-     - This guarantees the app loads anywhere (no blocked scripts).
-  */
-
-  const LS = {
-    players: "gn_players_v1",      // map: email -> {name,email,createdAt}
-    history: "gn_history_v1",      // array of match entries
-    statsPrefix: "gn_stats_v1__",  // per-player doc
+  // ===== FIREBASE CONFIG =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
+    authDomain: "gamenightdarts-e7601.firebaseapp.com",
+    projectId: "gamenightdarts-e7601",
+    storageBucket: "gamenightdarts-e7601.appspot.com",
+    messagingSenderId: "270045452251",
+    appId: "1:270045452251:web:393956ce18b43316e939fe",
+    measurementId: "G-LQEHF02ZVR"
   };
 
-  function lsRead(key, fallback){
-    try{
-      const raw = localStorage.getItem(key);
-      if(raw==null) return fallback;
-      return JSON.parse(raw);
-    }catch(_){
-      return fallback;
-    }
-  }
-  function lsWrite(key, value){
-    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(_){}
+  const appFB = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
+
+  const ROOM_ID = "global";
+
+  async function ensureAuth(){
+    if(auth.currentUser) return auth.currentUser;
+    const res = await auth.signInAnonymously();
+    return res.user;
   }
 
-  function getPlayersMap(){ return lsRead(LS.players, {}) || {}; }
-  function setPlayersMap(map){ lsWrite(LS.players, map || {}); }
+  function normEmail(e){ return String(e||"").trim().toLowerCase(); }
+  function now(){ return Date.now(); }
 
+  // ===== PLAYERS =====
   async function getPlayers(){
-    const map = getPlayersMap();
-    return Object.values(map).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+    await ensureAuth();
+    const snap = await db.collection("rooms").doc(ROOM_ID).collection("players").get();
+    const arr = snap.docs.map(d => d.data());
+    arr.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+    return arr;
   }
+
   async function upsertPlayer(name,email){
+    await ensureAuth();
     const e=normEmail(email);
-    const map=getPlayersMap();
-    const cur = map[e] || { email:e, createdAt: now() };
-    map[e] = { ...cur, name: String(name||cur.name||"").trim(), email:e, createdAt: cur.createdAt || now() };
-    setPlayersMap(map);
+    await db.collection("rooms").doc(ROOM_ID).collection("players").doc(e).set({
+      email:e,
+      name:String(name||"").trim(),
+      updatedAt:now()
+    }, { merge:true });
   }
+
+  // ===== STATS =====
   async function getStatsDoc(email){
+    await ensureAuth();
     const e=normEmail(email);
-    return lsRead(LS.statsPrefix + e, {}) || {};
+    const doc = await db.collection("rooms").doc(ROOM_ID).collection("stats").doc(e).get();
+    return doc.exists ? doc.data() : {};
   }
+
   async function saveStatsDoc(email,data){
+    await ensureAuth();
     const e=normEmail(email);
-    const cur = await getStatsDoc(e);
-    const next = { ...(cur||{}), ...(data||{}) };
-    lsWrite(LS.statsPrefix + e, next);
+    await db.collection("rooms").doc(ROOM_ID).collection("stats").doc(e).set({
+      ...(data||{}),
+      updatedAt:now()
+    }, { merge:true });
   }
+
+  // ===== HISTORY =====
   async function getHistory(email){
+    await ensureAuth();
     const e=normEmail(email);
-    const all = lsRead(LS.history, []) || [];
-    const items = all.filter(h=>Array.isArray(h.players) && h.players.includes(e));
-    items.sort((a,b)=>(b.endedAt||0)-(a.endedAt||0));
-    return items.slice(0, 60);
+
+    const snap = await db.collection("rooms")
+      .doc(ROOM_ID)
+      .collection("history")
+      .where("players","array-contains",e)
+      .orderBy("endedAt","desc")
+      .limit(60)
+      .get();
+
+    return snap.docs.map(d => d.data());
   }
+
   async function saveHistoryEntry(entry){
-    const all = lsRead(LS.history, []) || [];
-    all.push(entry);
-    // keep bounded
-    if(all.length > 2500) all.splice(0, all.length-2500);
-    lsWrite(LS.history, all);
+    await ensureAuth();
+    await db.collection("rooms")
+      .doc(ROOM_ID)
+      .collection("history")
+      .add({
+        ...(entry||{}),
+        savedAt:now()
+      });
   }
 
   // Admin helpers
