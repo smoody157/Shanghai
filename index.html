@@ -378,7 +378,8 @@ input,select{
 .turnNameBig{font-size:38px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
 @media(max-width:520px){
   .gameTitleBig{ font-size:22px; }
-  .turnNameBig{ font-size:28px; }
+  .turnNameBig{ font-size:28px;   .titleOneLine{ font-size:20px; }
+}
 }
 
 /* ===== Pills / tags ===== */
@@ -2658,7 +2659,7 @@ function startApp(){
             <div class="logoMark"><span>👥</span></div>
           </div>
 
-          <div class="heroMain" style="text-align:left;align-items:flex-start">
+          <div class="heroMain" style="text-align:center;align-items:center">
             <div class="h1">Players</div>
             <div class="sub">Tap “View stats” to see someone’s game stats.</div>
           </div>
@@ -2740,7 +2741,7 @@ function startApp(){
         </div>
         <div class="divider"></div>
         ${Games.map(g=>`
-          <div class="rosterCard">
+          <div class="rosterCard ${g.active?"leaderGlow":""}">
             <div class="rosterLeft">
               <div class="avatar">${esc(g.icon||"🎯")}</div>
               <div>
@@ -3139,7 +3140,7 @@ function startApp(){
           </div>
 
           <div class="heroMain">
-            <div class="h1">${esc(g.name)}</div>
+            <div class="h1 titleOneLine">${esc(g.name)}</div>
             <div class="sub">Player: <b>${esc(viewer.name||"Player")}</b></div>
           </div>
 
