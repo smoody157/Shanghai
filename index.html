@@ -442,6 +442,24 @@ input,select{
   }
 }
 
+
+/* Around the World setup header: keep pills pinned to top corners (prevents overlap) */
+.awSetupHero{ position:relative; padding-top:6px; }
+.awSetupHero .heroCornerLeft,
+.awSetupHero .heroCornerRight{
+  position:absolute;
+  top:0;
+}
+.awSetupHero .heroCornerLeft{ left:0; }
+.awSetupHero .heroCornerRight{ right:0; }
+.awSetupHero .heroMain{
+  grid-column:1 / -1;
+  max-width:100%;
+  margin-top:40px; /* room for the pinned pills */
+}
+@media(max-width:520px){
+  .awSetupHero .heroMain{ margin-top:44px; }
+}
 /* target label glow */
 .targetGlow{
   display:inline-block;
@@ -2840,7 +2858,7 @@ function startApp(){
       <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
 
       <div class="card">
-        <div class="hero">
+        <div class="hero ${activeGameId==="around"?"awSetupHero":""}">
           <div class="heroCornerLeft">
             <div class="logoMark"><span>${esc(g.icon || "🎯")}</span></div>
             ${setupLeftBadge}
