@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en"> 
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v26-2026-02-12</title>
-<!-- BUILD: v26_20260212T174000Z -->
+<title>Game Night • v8-2026-02-11</title>
+<!-- BUILD: v7-20260211 -->
 
 <style>
 :root{
@@ -21,8 +21,7 @@
 
   /* MULTI-COLOR ACCENTS (NOT “ALL BLUE”) */
   --c-cyan:#22d3ee;
-  --c-purple:#3b82f6; /* purple removed */
-  --c-blue:#3b82f6;
+  --c-purple:#8b5cf6;
   --c-pink:#ec4899;
   --c-green:#22c55e;
   --c-orange:#f97316;
@@ -48,12 +47,13 @@
     rgba(0,0,0,.34) 72%,
     rgba(255,255,255,.14) 100%
   );
-  --chrome-text: linear-gradient(135deg,
-    rgba(34,211,238,1) 0%,
-    rgba(59,130,246,1) 22%,
-    rgba(236,72,153,1) 46%,
-    rgba(249,115,22,1) 70%,
-    rgba(34,197,94,1) 100%
+  --chrome-text: linear-gradient(180deg,
+    #ffffff 0%,
+    #d7deea 18%,
+    #ffffff 38%,
+    #aab7d0 60%,
+    #ffffff 82%,
+    #c7d0e3 100%
   );
 }
 
@@ -64,15 +64,13 @@ body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:
+    radial-gradient(1000px 700px at 18% 0%, rgba(139,92,246,.22), transparent 65%),
+    radial-gradient(900px 650px at 82% 0%, rgba(236,72,153,.18), transparent 65%),
+    radial-gradient(1200px 760px at 48% 0%, rgba(34,211,238,.18), var(--bg) 62%),
+    radial-gradient(1100px 720px at 50% 115%, rgba(249,115,22,.10), transparent 60%),
     linear-gradient(180deg, #040610, var(--bg));
   color:var(--text);
   padding-bottom:56px; /* room for footer */
-}
-
-/* iOS safe-area padding so content doesn't feel "squished" to one side */
-body{
-  padding-left: max(0px, env(safe-area-inset-left));
-  padding-right: max(0px, env(safe-area-inset-right));
 }
 
 /* ===== Footer legal ===== */
@@ -104,8 +102,8 @@ body{
   gap:10px;
   padding:10px 12px;
   padding-top:calc(10px + env(safe-area-inset-top));
-  background:var(--bg);
-  backdrop-filter:none;
+  background:rgba(7,10,20,.84);
+  backdrop-filter:blur(12px);
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .topActions{
@@ -126,7 +124,7 @@ body{
   text-align:center;
   max-width:min(540px, 66vw);
 }
-.brand .t{font-weight:1000;font-size:20px;letter-spacing:.4px; text-shadow:0 2px 14px rgba(0,0,0,.55), 0 0 18px rgba(34,211,238,.10)}
+.brand .t{font-weight:900;font-size:16px}
 .brand .s{
   font-size:12px;
   color:var(--muted);
@@ -156,7 +154,7 @@ body{
   pointer-events:none;
 }
 
-.h1{font-size:26px;font-weight:1000;letter-spacing:.4px;margin:2px 0 6px;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.h1{font-size:24px;font-weight:1000;margin:2px 0 6px}
 .sub{color:var(--muted);font-size:13px}
 label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}
 
@@ -168,11 +166,8 @@ input,select{
   border-radius:14px;padding:12px 12px;font-size:16px;outline:none;
 }
 
-.row{display:flex;gap:10px;flex-wrap:wrap;}
-.row>*{flex:1;min-width:140px}
-@media(max-width:420px){
-  .row > *{ min-width:120px; }
-}
+.row{display:flex;gap:10px}
+.row>*{flex:1}
 .stack{display:flex;flex-direction:column;gap:10px}
 
 .toast{
@@ -183,51 +178,6 @@ input,select{
 }
 
 .divider{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
-
-/* ===== Tables (Round table / rosters) ===== */
-.small{font-size:12px;color:var(--muted);}
-.tableWrap{
-  overflow:auto;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.10);
-  width:100%;
-  max-width:100%;
-  -webkit-overflow-scrolling:touch;
-}
-.tableWrap table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-}
-.tableWrap th,
-.tableWrap td{
-  padding:10px 10px;
-  text-align:center;
-  vertical-align:middle;
-  font-size:14px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.tableWrap th:first-child,
-.tableWrap td:first-child{
-  text-align:left;
-  width:96px;
-}
-.tableWrap thead th{
-  position:sticky;
-  top:0;
-  z-index:2;
-  background:rgba(7,10,20,.82);
-  backdrop-filter:blur(10px);
-}
-.tableWrap tbody tr:nth-child(odd) td{
-  background:rgba(255,255,255,.02);
-}
-.tableWrap td.activeCell{
-  outline:2px solid rgba(34,211,238,.22);
-  background:rgba(34,211,238,.06);
-  border-radius:10px;
-}
 
 /* ===== Chrome UI (buttons/badges) ===== */
 .btn{
@@ -244,15 +194,6 @@ input,select{
 .btn.ok{
   background:linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.12)) !important;
   border-color:rgba(34,197,94,.40) !important;
-
-  /* Strong full-button glow (not just edges) */
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.32),
-    0 0 34px rgba(34,197,94,.55),
-    0 0 70px rgba(34,197,94,.28),
-    inset 0 0 26px rgba(34,197,94,.22),
-    inset 0 1px 0 rgba(255,255,255,.20),
-    inset 0 -12px 18px rgba(0,0,0,.38);
 }
 .btn.danger{
   background:linear-gradient(135deg, rgba(239,68,68,.22), rgba(249,115,22,.12)) !important;
@@ -287,31 +228,15 @@ input,select{
   pointer-events:none;
   opacity:.85;
 }
-
-#myDouble{font-size:13px;}
-@media(max-width:420px){#myDouble{font-size:12px;}}
 .pill,.badge,.kbd{ position:relative; }
 
 /* ===== Chrome text (HEADERS ONLY) ===== */
-.h1, .kTurnBig, .brand .t, .rosterName{
+.h1, .kTurnBig, .brand .t, td.l, .rosterName{
   background:var(--chrome-text);
   -webkit-background-clip:text;
   background-clip:text;
   color:transparent;
-  background-size: 260% 260%;
-  animation: titleShift 7.5s ease-in-out infinite;
-  text-shadow:
-    0 0 18px rgba(34,211,238,.20),
-    0 0 28px rgba(236,72,153,.12),
-    0 2px 12px rgba(0,0,0,.55);
-}
-
-
-/* ===== Animated title gradient (electric, themed) ===== */
-@keyframes titleShift{
-  0%{ background-position: 0% 50%; filter:saturate(1.15) contrast(1.08); }
-  50%{ background-position: 100% 50%; filter:saturate(1.35) contrast(1.15); }
-  100%{ background-position: 0% 50%; filter:saturate(1.15) contrast(1.08); }
+  text-shadow:0 2px 12px rgba(0,0,0,.45);
 }
 
 /* ===== Turn titles (3D / granular metallic) ===== */
@@ -329,13 +254,15 @@ input,select{
   filter:contrast(1.05) saturate(1.05);
 }
 
+
 /* ===== Bigger game + turn titles ===== */
-.gameTitleBig{font-size:34px;font-weight:1000;letter-spacing:.6px;margin:0;white-space:nowrap;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 20%,#ffffff 42%,#a8b9de 78%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.25),0 10px 24px rgba(0,0,0,.60);}
-.turnNameBig{font-size:40px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
+.gameTitleBig{font-size:30px;font-weight:1000;letter-spacing:.6px;margin:0;white-space:nowrap;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 20%,#ffffff 42%,#a8b9de 78%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.25),0 10px 24px rgba(0,0,0,.60);}
+.turnNameBig{font-size:34px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
 @media(max-width:520px){
-  .gameTitleBig{ font-size:22px; }
-  .turnNameBig{ font-size:28px; }
+  .gameTitleBig{ font-size:20px; }
+  .turnNameBig{ font-size:24px; }
 }
+
 
 /* ===== Pills / tags ===== */
 .pill{
@@ -355,7 +282,7 @@ input,select{
   color:var(--muted); font-weight:900; font-size:12px;
 }
 
-/* ===== Hero alignment ===== */
+/* ===== Hero alignment (FIXED: spread left/center/right, no stacking) ===== */
 .hero{
   display:grid;
   grid-template-columns: 1fr auto 1fr;
@@ -396,14 +323,69 @@ input,select{
     max-width:100%;
   }
 }
+/* ===== Play header (turn swipe) ===== */
+.titleRow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:4px;
+}
+.logoMini{
+  width:34px;height:34px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.04);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
+  flex:0 0 auto;
+  font-size:18px;
+}
+.turnSwipe{
+  position:relative;
+  height:44px;
+  margin-top:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.turnName{
+  position:absolute;
+  left:50%;
+  transform:translate3d(-50%,0,0);
+  font-size:34px;
+  font-weight:1000;
+  letter-spacing:.5px;
+  background:var(--chrome-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);
+  white-space:nowrap;
+  max-width:min(90vw, 720px);
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.turnIn{ animation:turnIn .36s cubic-bezier(.2,.9,.2,1) both; }
+.turnOut{ animation:turnOut .36s cubic-bezier(.4,0,.2,1) both; }
+
+@keyframes turnIn{
+  from{ transform:translate3d(140%,0,0); opacity:.0; }
+  to  { transform:translate3d(-50%,0,0); opacity:1; }
+}
+@keyframes turnOut{
+  from{ transform:translate3d(-50%,0,0); opacity:1; }
+  to  { transform:translate3d(-220%,0,0); opacity:0; }
+}
 
 /* target label glow */
 .targetGlow{
   display:inline-block;
   padding:2px 8px;
   border-radius:999px;
-  box-shadow:0 0 18px rgba(34,211,238,.40), 0 0 0 rgba(59,130,246,0);
+  box-shadow:0 0 18px rgba(34,211,238,.40), 0 0 18px rgba(139,92,246,.35);
 }
+
 
 /* ===== Shanghai table header name styling (prevents split) ===== */
 .thName{
@@ -424,7 +406,7 @@ input,select{
 .logoMark{
   width:44px;height:44px;border-radius:14px;
   background:
-    radial-gradient(60% 60% at 30% 20%, rgba(34,211,238,.18), rgba(59,130,246,.16)),
+    radial-gradient(60% 60% at 30% 20%, rgba(34,211,238,.18), rgba(139,92,246,.16)),
     rgba(255,255,255,.05);
   border:1px solid rgba(255,255,255,.12);
   display:flex;align-items:center;justify-content:center;
@@ -437,10 +419,6 @@ input,select{
 .gameGrid{display:grid;grid-template-columns:1fr;gap:12px}
 @media(min-width:860px){ .gameGrid{grid-template-columns:1fr 1fr;} }
 .gameCard{
-  position:relative;
-  overflow:visible;
-  z-index:0;
-  isolation:isolate;
   background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   border:1px solid rgba(255,255,255,.10);
   border-radius:18px;padding:14px;
@@ -452,71 +430,14 @@ input,select{
   width:38px;height:38px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
   background:
-    radial-gradient(60% 60% at 30% 20%, rgba(0,0,0,0), rgba(34,211,238,.10)),
+    radial-gradient(60% 60% at 30% 20%, rgba(236,72,153,.16), rgba(34,211,238,.10)),
     rgba(255,255,255,.04);
   display:flex;align-items:center;justify-content:center;
   font-size:18px;
 }
 .gameMeta{color:var(--muted);font-size:13px;margin-top:4px}
-.gameActions{display:flex;gap:10px;margin-top:10px;justify-content:center}
-.gameActions .btn{flex:1;min-height:48px}
-
-/* ===== Play screen layout fixes ===== */
-.boardBox{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  width:100%;
-  padding:6px 0;
-}
-.boardBox svg{
-  display:block;
-  margin:0 auto;
-  width:min(420px, 92vw) !important;
-  max-width:92vw;
-  height:auto;
-}
-
-/* HIT/MISS/UNDO: centered and thumb-friendly */
-.hitRow{
-  max-width:560px;
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  justify-items:stretch;
-  justify-content:center;
-}
-.hitBtn{
-  min-height:54px;
-  font-size:14px;
-  padding:14px 10px;
-  max-width:none;
-  min-width:0;
-  border-radius:14px;
-  font-weight:1000;
-  letter-spacing:.3px;
-  text-align:center;
-  border:1px solid rgba(255,255,255,.14);
-  color:var(--text);
-  background:var(--chrome-fill);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.32),
-    inset 0 1px 0 rgba(255,255,255,.20),
-    inset 0 -12px 18px rgba(0,0,0,.38);
-  position:relative;;white-space:normal;line-height:1.12;}
-.hitBtn::after{
-  content:"";
-  position:absolute;
-  left:10px; right:10px; top:7px;
-  height:38%;
-  border-radius:12px;
-  background:linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0));
-  pointer-events:none;
-  opacity:.85;
-}
-.hitBtn.miss{ border-color: rgba(239,68,68,.38); grid-column:1 / 2; }
-.hitBtn.undo{ color:var(--muted); grid-column:2 / 4; }
+.gameActions{display:flex;gap:10px;margin-top:10px}
+.gameActions .btn{flex:1}
 
 /* ===== Roster ===== */
 .rosterGrid{display:grid;grid-template-columns:1fr;gap:10px}
@@ -532,107 +453,69 @@ input,select{
   width:34px;height:34px;border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
   background:
-    radial-gradient(60% 60% at 30% 20%, rgba(34,197,94,.18), rgba(59,130,246,.10)),
+    radial-gradient(60% 60% at 30% 20%, rgba(34,197,94,.18), rgba(139,92,246,.10)),
     rgba(255,255,255,.04);
   display:flex;align-items:center;justify-content:center;
   font-weight:1000;color:var(--c-cyan);
 }
-.rosterSub{ color:var(--muted); font-size:12px; overflow-wrap:anywhere; }
+.rosterSub{color:var(--muted);font-size:12px;margin-top:2px}
 
+/* ===== Indicators kept ===== */
+@keyframes dangerPulse{0%{box-shadow:0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 24px rgba(239,68,68,.35)}100%{box-shadow:0 0 0 rgba(239,68,68,0)}}
+.dangerPulse{animation:dangerPulse 1.1s ease-in-out infinite;}
+@keyframes leaderGlow{0%{box-shadow:0 0 0 rgba(34,197,94,0)}50%{box-shadow:0 0 26px rgba(34,197,94,.25)}100%{box-shadow:0 0 0 rgba(34,197,94,0)}}
+.leaderGlow{animation:leaderGlow 1.25s ease-in-out infinite;}
 
-/* ===== Player strip under dartboard (shows names + active) ===== */
-.playerStrip{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  align-items:stretch;
-  flex-wrap:wrap;
-  padding:4px 0 2px;
-}
-.playerChip{
-  min-width:140px;
-  max-width:min(320px, 90vw);
-  flex:1;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(255,255,255,.03);
-  padding:10px 12px;
-  text-align:center;
-  position:relative;
-}
-.playerChip .nm{
+/* ===== Tables / active cell ===== */
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.10);vertical-align:top}
+th{
+  position:sticky;top:0;
+  background:rgba(7,10,20,.88);
+  backdrop-filter:blur(10px);
+  color:var(--text);
   font-weight:1000;
-  font-size:15px;
-  letter-spacing:.2px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
 }
-.playerChip .sub{
-  margin-top:2px;
-  font-size:12px;
+.small{font-size:12px;color:var(--muted);margin-top:4px}
+.activeCell{outline:2px solid rgba(34,211,238,.55); outline-offset:-2px; border-radius:10px}
+
+/* ===== Play UI ===== */
+.boardBox{display:flex;justify-content:center;align-items:center}
+.hitRow{display:flex;gap:10px;flex-wrap:wrap}
+.hitBtn{
+  flex:1; min-width:120px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.14);
+  color:var(--text);
+  font-weight:1000;
+  padding:12px;
+  cursor:pointer;
+  position:relative;
+}
+.hitBtn.miss{border-color:rgba(239,68,68,.35)}
+.hitBtn.undo{
+  border-color:rgba(255,255,255,.18);
+  background:rgba(255,255,255,.04);
   color:var(--muted);
-  text-shadow:none;
+  box-shadow:none;
 }
-.playerChip.active{
-  border-color:rgba(34,197,94,.55);
-  background:
-    linear-gradient(135deg, rgba(34,197,94,.22), rgba(34,211,238,.10)),
-    var(--chrome-fill);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.32),
-    0 0 28px rgba(34,197,94,.22),
-    inset 0 0 26px rgba(34,197,94,.14),
-    inset 0 1px 0 rgba(255,255,255,.20),
-    inset 0 -12px 18px rgba(0,0,0,.38);
-  position:relative;
-  overflow:visible;
-  z-index:0;
-}
-.playerChip.active::before{
-  content:"";
-  position:absolute;
-  inset:-12px;
-  border-radius:inherit;
-  pointer-events:none;
-  filter: blur(18px);
-  background: radial-gradient(120% 140% at 50% 50%, rgba(34,197,94,.55) 0%, rgba(34,197,94,.22) 52%, rgba(34,197,94,0) 78%);
-  opacity:.9;
-  animation:auraPulseSoft 2.0s ease-in-out infinite;
-  z-index:-1;
-}
-/* ===== Presence (online indicator) ===== */
-.avatar.online{
-  border-color:rgba(34,197,94,.55);
-  box-shadow:0 0 0 rgba(0,0,0,0), 0 0 18px rgba(34,197,94,.28);
-  color:#bfffd1;
-  position:relative;
-}
-.avatar.online::after{
-  content:"";
-  position:absolute;
-  right:-2px;
-  bottom:-2px;
-  width:9px;
-  height:9px;
-  border-radius:999px;
-  background:rgba(34,197,94,.95);
-  border:1px solid rgba(6,8,20,.9);
-  box-shadow:0 0 10px rgba(34,197,94,.55);
-  animation:onlineDotPulse 1.6s ease-in-out infinite;
-}
-@keyframes onlineDotPulse{
-  0%{ transform:scale(1);   filter:brightness(1);   box-shadow:0 0 10px rgba(34,197,94,.45); }
-  50%{transform:scale(1.35);filter:brightness(1.25);box-shadow:0 0 18px rgba(34,197,94,.75); }
-  100%{transform:scale(1);  filter:brightness(1);   box-shadow:0 0 10px rgba(34,197,94,.45); }
-}
+.hitBtn.undo::after{display:none}
+
+/* ===== Active target pulse on the board ===== */
+@keyframes hotPulse{0%{opacity:.20;filter:brightness(1)}50%{opacity:.98;filter:brightness(2.2)}100%{opacity:.20;filter:brightness(1)}}
+.hotWedge{animation:hotPulse .85s ease-in-out infinite;}
 
 /* ===== Killer typography ===== */
-.kTurnBig{ font-size:34px; font-weight:1000; letter-spacing:.4px; margin:0; }
-.kTurnSub{ font-size:15px; color:var(--muted); margin-top:6px }
-.kNumberBig{ font-size:22px; font-weight:1000; }
-.kLivesBig{ font-size:18px; font-weight:1000; letter-spacing:2px; display:flex; justify-content:flex-end; gap:6px; align-items:center; }
-.kAttackGrid{ display:grid; grid-template-columns:1fr; gap:10px; }
+.kTurnBig{
+  font-size:34px;
+  font-weight:1000;
+  letter-spacing:.4px;
+  margin:0;
+}
+.kTurnSub{font-size:15px;color:var(--muted);margin-top:6px}
+.kNumberBig{font-size:22px;font-weight:1000;}
+.kLivesBig{font-size:18px;font-weight:1000;letter-spacing:2px; display:flex; justify-content:flex-end; gap:6px; align-items:center;}
+.kAttackGrid{display:grid;grid-template-columns:1fr;gap:10px;}
 @media(min-width:860px){ .kAttackGrid{grid-template-columns:1fr 1fr;} }
 .kAttackBtn{
   border-radius:16px;
@@ -648,160 +531,107 @@ input,select{
 .kAttackBtn::after{ border-radius:14px; }
 
 /* ===== Hearts ===== */
-.heart{ color:var(--danger); text-shadow:0 2px 10px rgba(0,0,0,.35); font-size:18px; line-height:1; }
-.lifeOut{ color:rgba(159,176,208,.9); font-weight:1000; letter-spacing:.8px; }
-
-/* ===== Glow system (kept as-is, but with final mobile tuning) ===== */
-@keyframes auraPulse{ 0%,100%{ opacity:.38; transform:scale(1); } 50%{ opacity:1; transform:scale(1.05); } }
-@keyframes auraPulseSoft{ 0%,100%{ opacity:.28; transform:scale(1); } 50%{ opacity:.92; transform:scale(1.035); } }
-.btn, .hitBtn, .kAttackBtn, .pill, .gameCard{ position:relative; overflow:visible; z-index:0; }
-
-.btn::before, .hitBtn::before, .kAttackBtn::before, .pill::before, .gameCard::before{
-  content:"";
-  position:absolute;
-  inset:-12px;
-  border-radius:inherit;
-  pointer-events:none;
-  opacity:0;
-  filter: blur(18px);
-  z-index:-2;
-  transform:translateZ(0);
+.heart{
+  color:var(--danger);
+  text-shadow:0 2px 10px rgba(0,0,0,.35);
+  font-size:18px;
+  line-height:1;
+}
+.lifeOut{
+  color:rgba(159,176,208,.9);
+  font-weight:1000;
+  letter-spacing:.8px;
 }
 
-/* GREEN = primary action */
-.btn.ok::before{
-  /* Full-button halo (behind the entire button) */
-  inset:-18px;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(34,197,94,.85) 0%,
-      rgba(34,197,94,.55) 34%,
-      rgba(34,197,94,.28) 60%,
-      rgba(34,197,94,0) 80%);
-  opacity:.98;
-  filter: blur(20px);
-  animation: auraPulseSoft 1.9s ease-in-out infinite;
+/* ===== Multi-color glow (active) ===== */
+@keyframes glowCycle{
+  0%   { box-shadow:0 0 0 rgba(0,0,0,0); }
+  25%  { box-shadow:0 0 18px rgba(34,211,238,.55); }
+  50%  { box-shadow:0 0 18px rgba(139,92,246,.55); }
+  75%  { box-shadow:0 0 18px rgba(236,72,153,.50); }
+  100% { box-shadow:0 0 0 rgba(0,0,0,0); }
 }
-/* RED/ORANGE = destructive */
-.btn.danger::before{
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(239,68,68,.14) 0%,
-      rgba(239,68,68,.28) 46%,
-      rgba(249,115,22,.58) 72%,
-      rgba(239,68,68,0) 92%);
-  opacity:.74;
-  animation: auraPulseSoft 2.0s ease-in-out infinite;
+@keyframes glowGreen{
+  0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 26px rgba(34,197,94,.65)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}
 }
-/* LIVE pill */
-.pill[data-live="1"]::before{
-  inset:-10px;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(34,211,238,.14) 0%,
-      rgba(34,211,238,.30) 44%,
-      rgba(34,211,238,.78) 70%,
-      rgba(34,211,238,0) 92%);
-  opacity:.88;
-  animation: auraPulse 2.2s ease-in-out infinite;
-}
-/* HIT buttons + attack buttons */
-.hitBtn:not(.undo):not(:disabled)::before{
-  inset:-12px;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(34,211,238,.14) 0%,
-      rgba(34,211,238,.28) 44%,
-      rgba(34,211,238,.62) 68%,
-      rgba(236,72,153,.18) 76%,
-      rgba(34,211,238,0) 92%);
-  opacity:.90;
-  animation: auraPulse 2.25s ease-in-out infinite;
-}
-.kAttackBtn:not(:disabled)::before{
-  inset:-12px;
-  background:
-    radial-gradient(circle at 50% 50%,
-      rgba(59,130,246,.12) 0%,
-      rgba(59,130,246,.26) 46%,
-      rgba(59,130,246,.58) 72%,
-      rgba(59,130,246,0) 92%);
-  opacity:.86;
-  animation: auraPulseSoft 2.25s ease-in-out infinite;
-}
-/* No glow on UNDO */
-.hitBtn.undo::before{ opacity:0 !important; }
 
-/* Game cards halo (DISABLED: removed overlay) */
-.gameCard.leaderGlow::before{ display:none !important; opacity:0 !important; }
+@keyframes glowRed{
+  0%{box-shadow:0 0 0 rgba(0,0,0,0)}
+  50%{box-shadow:0 0 26px rgba(239,68,68,.60)}
+  100%{box-shadow:0 0 0 rgba(0,0,0,0)}
+}
+@keyframes glowPurple{
+  0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 18px rgba(139,92,246,.55)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}
+}
+
+/* Live pills glow */
+.pill[data-live="1"]{ animation:glowCycle 2.4s ease-in-out infinite; }
+
+/* Primary actions glow */
+.btn.ok:not(:disabled){ animation:glowGreen 2.2s ease-in-out infinite; }
+.btn.danger:not(:disabled){ animation:glowRed 2.1s ease-in-out infinite; }
+.hitBtn:not(:disabled):not(.undo){ animation:glowCycle 2.4s ease-in-out infinite; }
+.kAttackBtn:not(:disabled){ animation:glowPurple 2.3s ease-in-out infinite; }
 
 /* Tiny readability boost */
 .sub,.small,.brand .s{ text-shadow:0 2px 10px rgba(0,0,0,.30); }
 
-/* ===== Header overhaul ===== */
-.headerStack{
-  position:relative;
-  display:grid;
-  grid-template-rows:auto auto auto auto;
-  gap:6px;
-  padding:8px 10px 6px;
+/* Keep key status lines on ONE line (ellipsis on small screens) */
+.statusLine{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
-.headerTopRow{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:center;
+
+
+/* ===== Turn swipe (FIX: visible + animated) ===== */
+.turnSwipe{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+.turnNames{position:relative;height:42px;width:100%;overflow:hidden}
+.turnName{
+  position:absolute; left:50%; top:0;
+  transform:translateX(-50%);
+  padding:4px 10px;
+  border-radius:14px;
+  text-align:center;
+  white-space:nowrap;
 }
-.headerTopRow .left{justify-self:start}
-.headerTopRow .right{justify-self:end}
-.headerTitle{text-align:center;font-size:26px;font-weight:1000;margin:0;letter-spacing:.6px;text-shadow:0 2px 14px rgba(0,0,0,.55), 0 0 18px rgba(34,211,238,.10)}
-.headerIcon{
-  position:absolute;
-  left:14px;
-  top:44px;
-  width:34px;height:34px;
-  display:flex;align-items:center;justify-content:center;
-  border-radius:12px;
+.turnName.flash{
+  animation:namePulse 1.25s ease-in-out infinite;
+}
+@keyframes namePulse{
+  0%{ box-shadow:0 0 0 rgba(239,68,68,0); }
+  50%{ box-shadow:0 0 22px rgba(239,68,68,.42); }
+  100%{ box-shadow:0 0 0 rgba(239,68,68,0); }
+}
+@keyframes turnIn{
+  from{ opacity:0; transform:translateX(calc(-50% + 56px)); }
+  to{ opacity:1; transform:translateX(-50%); }
+}
+@keyframes turnOut{
+  from{ opacity:1; transform:translateX(-50%); }
+  to{ opacity:0; transform:translateX(calc(-50% - 56px)); }
+}
+.turnIn{ animation:turnIn .32s ease-out both; }
+.turnOut{ animation:turnOut .32s ease-in both; }
+
+/* ===== Corner stack (pill above icon) ===== */
+.cornerStack{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.cornerIcon{
+  width:34px;height:34px;border-radius:14px;
+  background:rgba(255,255,255,.05);
   border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.04);
-  box-shadow:0 10px 22px rgba(0,0,0,.28);
-  pointer-events:none;
-}
-\.turnNameBox{ position:relative; overflow:hidden; height:56px; display:flex; align-items:center; justify-content:center; width:100%; align-self:stretch; }
-.turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
-.turnNameText{color:var(--text);text-shadow:0 2px 14px rgba(0,0,0,.60), 0 0 18px rgba(34,211,238,.28);}
-.turnNameText.turnTitle3d{background:none !important;-webkit-background-clip:initial !important;background-clip:initial !important;color:var(--text) !important;}
-.turnBracket{margin:0 10px;color:var(--c-cyan);text-shadow:0 0 14px rgba(34,211,238,.65),0 2px 10px rgba(0,0,0,.55);font-weight:1000;}
-
-@media(max-width:520px){
-  .turnNameText{ font-size:24px; }
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(0,0,0,.25);
+  font-size:16px;
 }
 
 
-.turnNameGlow{
-  animation:auraPulse 2.4s ease-in-out infinite;
-  padding:0;
-  border-radius:999px;
-  background:transparent;
-}
+/* ===== Game header layout tweaks (v11) ===== */
+.gameHero{ align-items:flex-start; }
+.gameHero .heroMain{ padding-top:14px; }
+.gameHero .heroCornerLeft,
+.gameHero .heroCornerRight{ padding-top:2px; }
 
-.turnBracket{
-  margin:0 8px;
-  color:var(--c-cyan);
-  text-shadow:0 0 12px rgba(34,211,238,.65);
-  font-weight:1000;
-}
-.turnNameSlide{ position:absolute; left:0; right:0; top:0; display:flex; justify-content:center; }
-.turnNameBox{ position:relative; height:56px; }
-.turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
-
-/* Target highlight */
-@keyframes targetFlash{0%{filter:brightness(1)}50%{filter:brightness(2.2)}100%{filter:brightness(1)}}
-.targetNum{
-  color:var(--c-cyan);
-  font-weight:1000;
-  text-shadow:0 2px 12px rgba(0,0,0,.45);
-  animation:targetFlash 1.0s ease-in-out infinite;
-}
 @keyframes targetPulse{
   0%{ transform:translateZ(0); filter:brightness(1); text-shadow:0 0 0 rgba(0,0,0,0); }
   50%{ filter:brightness(1.8); text-shadow:0 0 18px rgba(34,211,238,.65); }
@@ -813,104 +643,11 @@ input,select{
   animation:targetPulse 1.1s ease-in-out infinite;
 }
 
-
-/* Dartboard active target highlight */
-.hotWedge{ opacity:1; }
-/* ===== Win animation overlay ===== */
-.winOverlay{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  pointer-events:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:radial-gradient(900px 520px at 50% 40%, rgba(34,211,238,.12), rgba(6,8,20,.72) 62%, rgba(6,8,20,.88));
-  backdrop-filter: blur(6px);
-  animation: winFade 2.8s ease-out forwards;
-}
-@keyframes winFade{
-  0%{opacity:0}
-  12%{opacity:1}
-  80%{opacity:1}
-  100%{opacity:0}
-}
-.winCard{
-  position:relative;
-  padding:18px 18px 14px;
-  border-radius:20px;
-  border:1px solid rgba(255,255,255,.14);
-  background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
-  box-shadow:0 24px 60px rgba(0,0,0,.55);
-  text-align:center;
-  min-width:min(360px, 86vw);
-  transform:translateZ(0);
-  animation: winPop 900ms cubic-bezier(.2,.9,.2,1) both;
-}
-@keyframes winPop{
-  0%{ transform:scale(.92); opacity:.0; }
-  55%{ transform:scale(1.03); opacity:1; }
-  100%{ transform:scale(1); opacity:1; }
-}
-.winTitle{
-  font-weight:1000;
-  font-size:22px;
-  margin:0 0 6px;
-  background:var(--chrome-text);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  text-shadow:0 2px 12px rgba(0,0,0,.55);
-}
-.winSub{ color:rgba(238,244,255,.92); font-weight:900; letter-spacing:.3px; }
-.confetti{
-  position:absolute;
-  inset:-16px;
-  overflow:hidden;
-  border-radius:22px;
-  pointer-events:none;
-}
-.confetti span{
-  position:absolute;
-  top:-18px;
-  width:10px;
-  height:16px;
-  border-radius:4px;
-  opacity:.92;
-  transform:translateY(0) rotate(0deg);
-  animation: confettiFall 1.9s linear infinite;
-}
-@keyframes confettiFall{
-  0%{ transform:translateY(-10px) rotate(0deg); opacity:.0; }
-  10%{ opacity:1; }
-  100%{ transform:translateY(420px) rotate(320deg); opacity:0; }
-}
-
-/* ===== Topbar button sizing (touch friendly) ===== */
-.topActions .btn{
-  min-height:44px;
-  padding:10px 14px;
-}
-.topActions .btn.ghost#soundBtn{
-  min-width:52px;
-  width:52px;
-  padding:10px 0;
-  font-size:18px;
-}
-.btn.ghost{
-  border-color:rgba(255,255,255,.12);
-}
-.btn.ghost:active{ transform:translateY(1px); }
-
-/* ===== Safety: never hide table body text ===== */
-.tableWrap tbody td{ color: var(--text); background: transparent; }
-.tableWrap tbody td *{ color: inherit; -webkit-text-fill-color: currentColor; }
-
 </style>
 </head>
 
 <body>
-<!-- BUILD: v26_20260212T174000Z -->
+<!-- BUILD: v11_20260211T120000Z -->
 <div class="topbar">
   <div class="topActions left">
     <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
@@ -918,11 +655,10 @@ input,select{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v17-20260212-174</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v7-20260211</div>
   </div>
 
   <div class="topActions right">
-    <button class="btn ghost" id="soundBtn" type="button" aria-label="Sound toggle">🔊</button>
     <button class="btn ghost" id="homeBtn" type="button">Home</button>
   </div>
 </div>
@@ -933,11 +669,10 @@ input,select{
 
 <!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
-  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v26-2026-02-12</div>
+  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v8-2026-02-11</div>
 </div>
 
 <script>
-
 /* ========= Robust script loader ========= */
 function loadScript(src){
   return new Promise((resolve,reject)=>{
@@ -948,273 +683,55 @@ function loadScript(src){
     document.head.appendChild(s);
   });
 }
-function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function normEmail(e){ return String(e==null?"":e).trim().toLowerCase(); }
+function esc(s){ return String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function normEmail(e){ return String(e??"").trim().toLowerCase(); }
 function now(){ return Date.now(); }
 function fmt(ts){ try{return new Date(ts).toLocaleString();}catch{return "";} }
 
-// ===== Sound (toggle + tiny synth beeps; no external files) =====
-let soundEnabled = true;
-try{
-  const v = localStorage.getItem("gn_sound");
-  if(v === "0") soundEnabled = false;
-}catch{}
+function turnSwipe(gameId, name){
+  window.__turnMem = window.__turnMem || {};
+  const prev = window.__turnMem[gameId];
+  const changed = !!(prev && prev !== name);
+  window.__turnMem[gameId] = name;
 
-let __audioCtx = null;
-const MASTER_GAIN = 3.2; // boosted for phone speakers
-
-function ensureAudio(){
-  if(__audioCtx) return __audioCtx;
-  try{
-    __audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }catch(_){}
-  return __audioCtx;
-}
-
-// ===== Audio unlock (iOS/Safari) =====
-let __audioUnlocked = false;
-function unlockAudio(){
-  if(__audioUnlocked) return;
-  const ctx = ensureAudio();
-  if(!ctx) return;
-  try{ if(ctx.state === "suspended") ctx.resume(); }catch(_){}
-  // tiny silent tick to fully unlock
-  try{
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    g.gain.value = 0.0002;
-    o.frequency.value = 440;
-    o.connect(g); g.connect(ctx.destination);
-    o.start(); o.stop(ctx.currentTime + 0.02);
-  }catch(_){}
-  __audioUnlocked = true;
-}
-window.addEventListener("pointerdown", unlockAudio, {passive:true});
-window.addEventListener("touchstart", unlockAudio, {passive:true});
-
-function playBeep(kind){
-  unlockAudio();
-  if(!soundEnabled) return;
-  // Ensure iOS/Safari audio is unlocked on first gesture
-  try{ unlockAudio(); }catch(_){ }
-  const ctx = ensureAudio();
-  if(!ctx) return;
-
-  try{ if(ctx.state === "suspended") ctx.resume(); }catch(_){}
-
-  // Prevent double-fires
-  const _nowMs = Date.now();
-  window.__lastBeepAt = window.__lastBeepAt || 0;
-  if((_nowMs - window.__lastBeepAt) < 70) return;
-  window.__lastBeepAt = _nowMs;
-
-  const t0 = ctx.currentTime;
-
-  // Theme: each "glow color" maps to a consistent sound family.
-  // ok (green), danger (red), hit (cyan), miss (low), back (neutral), nav (neutral),
-  // click (neutral), toggle (tick), win (celebration).
-  const preset = (() => {
-    switch(kind){
-      case "ok":     return {type:"triangle", notes:[523.25], dur:0.14, gain:0.85}; // C5
-      case "danger": return {type:"sawtooth", notes:[220],    dur:0.16, gain:0.85}; // A3
-      case "hit":    return {type:"sine",     notes:[659.25], dur:0.13, gain:0.84}; // E5
-      case "miss":   return {type:"sine",     notes:[196],    dur:0.16, gain:0.85}; // G3
-      case "back":   return {type:"triangle", notes:[329.63], dur:0.10, gain:0.85}; // E4
-      case "nav":    return {type:"triangle", notes:[392.00], dur:0.10, gain:0.85}; // G4
-      case "toggle": return {type:"square",   notes:[784.00], dur:0.09, gain:0.85}; // G5
-      case "win":    return {type:"triangle", notes:[523.25,659.25,783.99,1046.5], dur:0.42, gain:0.85}; // C major
-      case "click":
-      default:       return {type:"triangle", notes:[440.00], dur:0.10, gain:0.85}; // A4
-    }
-  })();
-
-  function tone(freq, start, dur, gain){
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = preset.type;
-    o.frequency.setValueAtTime(freq, start);
-
-    g.gain.setValueAtTime(0.0001, start);
-    const g1 = Math.min(0.95, gain * MASTER_GAIN);
-    g.gain.exponentialRampToValueAtTime(g1, start + 0.015);
-    g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
-
-    o.connect(g);
-    g.connect(ctx.destination);
-    o.start(start);
-    o.stop(start + dur + 0.02);
+  if(changed){
+    return `<div class="turnSwipe">
+      <div class="turnNames">
+        <div class="turnName turnOut">${esc(prev)}</div>
+        <div class="turnName turnIn flash">${esc(name)}</div>
+      </div>
+    </div>`;
   }
-
-  if(kind === "win"){
-    const step = 0.09;
-    preset.notes.forEach((f,i)=>tone(f, t0 + i*step, 0.18, preset.gain));
-    return;
-  }
-
-  tone(preset.notes[0], t0, preset.dur, preset.gain);
-}
-
-function setSoundEnabled(on){
-  soundEnabled = !!on;
-  try{ localStorage.setItem("gn_sound", soundEnabled ? "1" : "0"); }catch(_){}
-  if(soundBtn){
-    soundBtn.textContent = soundEnabled ? "🔊" : "🔈";
-    soundBtn.setAttribute("aria-label", soundEnabled ? "Sound on" : "Sound off");
-  }
-}
-
-/* ===== Global UI click sounds (ONE handler; all buttons get a sound) =====
-   - Gameplay buttons (hitBtn/kAttackBtn) keep their own hit/miss/win sounds.
-   - Sound toggle uses its own tone.
-   - Back buttons and delete buttons are covered via class/id/text.
-*/
-document.addEventListener("click", (ev)=>{
-  const btn = ev.target && ev.target.closest ? ev.target.closest("button") : null;
-  if(!btn || btn.disabled) return;
-
-  // Ensure audio is unlocked on first interaction
-  try{ unlockAudio(); }catch(_){ }
-
-  // If a button explicitly opts out
-  if(btn.dataset && btn.dataset.nosound === "1") return;
-
-  // Sound toggle has its own handler
-  if(btn.id === "soundBtn") return;
-
-  // Gameplay buttons already trigger precise sounds inside game logic
-  if((btn.classList && btn.classList.contains("hitBtn")) || (btn.classList && btn.classList.contains("kAttackBtn"))) return;
-
-  const id = String(btn.id||"").toLowerCase();
-  const txt = String(btn.textContent||"").trim().toLowerCase();
-
-  // Delete / destructive
-  if((btn.classList && btn.classList.contains("danger"))) return playBeep("danger");
-
-  // Confirm / primary action
-  if((btn.classList && btn.classList.contains("ok"))) return playBeep("ok");
-
-  // Back/undo/nav (ghosts and any button that reads "back")
-  if(id.includes("back") || txt === "back" || txt === "undo") return playBeep("back");
-  if((btn.classList && btn.classList.contains("ghost"))) return playBeep("nav");
-
-  // Default
-  return playBeep("click");
-}, {capture:true});
-
-// ===== Turn name swipe helper (keeps state across renders) =====
-let _turnNameCache = {};
-
-function turnNameHTML(name){
-  const nm = esc(name||"");
-  return `<div class="turnNameText turnTitle3d turnNameGlow">
-    <span class="turnBracket">⟦</span>${nm}<span class="turnBracket">⟧</span>
+  return `<div class="turnSwipe">
+    <div class="turnNames">
+      <div class="turnName flash">${esc(name)}</div>
+    </div>
   </div>`;
-}
-
-function animateTurnName(gameId, name){
-  const box=document.getElementById("turnNameBox");
-  if(!box) return;
-
-  const prev=_turnNameCache[gameId];
-  _turnNameCache[gameId]=name;
-
-  // Always render something (DOM is replaced on every render)
-  if(!prev || prev===name){
-    box.innerHTML = turnNameHTML(name);
-    return;
-  }
-
-  // Slide old out, new in
-  box.innerHTML = `
-    <div class="turnNameSlide turnOld">${turnNameHTML(prev)}</div>
-    <div class="turnNameSlide turnNew">${turnNameHTML(name)}</div>
-  `;
-
-  const oldWrap = box.querySelector(".turnOld");
-  const newWrap = box.querySelector(".turnNew");
-
-  try{
-    oldWrap.animate(
-      [{transform:"translateX(0%)", opacity:1},{transform:"translateX(-140%)", opacity:0.2}],
-      {duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}
-    );
-    newWrap.animate(
-      [{transform:"translateX(140%)", opacity:0.2},{transform:"translateX(0%)", opacity:1}],
-      {duration:320,easing:"cubic-bezier(.2,.8,.2,1)"}
-    ).onfinish=()=>{ box.innerHTML = turnNameHTML(name); };
-  }catch(_){
-    box.innerHTML = turnNameHTML(name);
-  }
 }
 
 
 const appEl=document.getElementById("app");
 const homeBtn=document.getElementById("homeBtn");
-const soundBtn=document.getElementById("soundBtn");
 const signOutBtn=document.getElementById("signOutBtn");
 const brandTitle=document.getElementById("brandTitle");
 
-// ===== Render hygiene (prevents “bouncing” on presence updates) =====
-window.__renderReason = "nav";
-function requestRender(reason){
-  window.__renderReason = reason || "nav";
-  render();
-}
-
 function setHTML(html){
   appEl.innerHTML = html;
-
+  // Light "swipe" / fade-in on every screen render (no delays, bindings still work)
   try{
-    if(window.__screenChanged){
-      appEl.animate(
-        [{ opacity: 0 }, { opacity: 1 }],
-        { duration: 160, easing: "cubic-bezier(.2,.8,.2,1)" }
-      );
-    }
+    appEl.animate(
+      [
+        { opacity: 0, transform: "translateY(10px)" },
+        { opacity: 1, transform: "translateY(0px)" }
+      ],
+      { duration: 180, easing: "cubic-bezier(.2,.8,.2,1)" }
+    );
   }catch(e){}
-
-  try{
-    if(window.__screenChanged){
-      window.scrollTo({top:0, left:0, behavior:"instant"});
-    }
-  }catch(e){
-    if(window.__screenChanged) window.scrollTo(0,0);
-  }
+  // keep view at top for new screens
+  try{ window.scrollTo({top:0, left:0, behavior:"instant"}); }catch(e){ window.scrollTo(0,0); }
 }
 
-// ===== Win overlay (end of match) =====
-function showWinOverlay(title, subtitle){
-  try{
-    const wrap = document.createElement("div");
-    wrap.className = "winOverlay";
-    const card = document.createElement("div");
-    card.className = "winCard";
-    const conf = document.createElement("div");
-    conf.className = "confetti";
 
-    const colors = ["rgba(34,211,238,.95)","rgba(59,130,246,.95)","rgba(249,115,22,.90)","rgba(34,197,94,.90)","rgba(249,115,22,.90)"];
-    const pieces = 26;
-    for(let i=0;i<pieces;i++){
-      const s=document.createElement("span");
-      s.style.left = (Math.random()*100).toFixed(2) + "%";
-      s.style.animationDelay = (Math.random()*0.35).toFixed(2) + "s";
-      s.style.animationDuration = (1.35 + Math.random()*0.9).toFixed(2) + "s";
-      s.style.background = colors[i % colors.length];
-      s.style.transform = `translateY(-10px) rotate(${Math.floor(Math.random()*180)}deg)`;
-      conf.appendChild(s);
-    }
-
-    card.innerHTML = `
-      <div class="winTitle">${esc(title||"Match complete")}</div>
-      <div class="winSub">${esc(subtitle||"")}</div>
-    `;
-    card.appendChild(conf);
-    wrap.appendChild(card);
-    document.body.appendChild(wrap);
-
-    setTimeout(()=>{ try{ wrap.remove(); }catch{} }, 2850);
-  }catch(_){}
-}
 function showFatal(title,msg){
   setHTML(`
     <div class="card">
@@ -1234,16 +751,20 @@ function showFatal(title,msg){
         <button class="btn ghost" id="reloadBtn">Hard Reload</button>
       </div>
       <div class="divider"></div>
-      <div class="sub">If you see an error, try a hard reload or re-paste the file.</div>
+      <div class="sub">If you’re on iPhone/Safari, make sure content blockers aren’t blocking Google scripts.</div>
     </div>
   `);
   document.getElementById("retryBtn").onclick=()=>boot();
   document.getElementById("reloadBtn").onclick=()=>location.reload(true);
 }
 
-function boot(){
+async function boot(){
   try{
     setHTML(`<div class="card"><div class="h1">Loading…</div><div class="sub">Starting Game Night…</div></div>`);
+    await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js");
+    await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js");
+    await loadScript("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js");
+    if(!window.firebase) throw new Error("Firebase loaded but window.firebase is missing.");
     startApp();
   }catch(err){
     showFatal("Can’t start app", err?.message || String(err));
@@ -1251,177 +772,103 @@ function boot(){
 }
 
 function startApp(){
-  console.log('GameNight OFFLINE build loaded');
-
-  /* ========= Offline storage backend (no Firebase required) =========
-     - Players, stats, and history are stored in localStorage on this device.
-     - This guarantees the app loads anywhere (no blocked scripts).
-  */
-
-  const LS = {
-    players: "gn_players_v1",      // map: email -> {name,email,createdAt}
-    history: "gn_history_v1",      // array of match entries
-    statsPrefix: "gn_stats_v1__",  // per-player doc
+  console.log('GameNight build v8-2026-02-11 loaded');
+  const firebaseConfig = {
+    apiKey: "AIzaSyCY3hTUNNlV6gAofPXY9BVGKb930WYz5RA",
+    authDomain: "gamenightdarts-e7601.firebaseapp.com",
+    projectId: "gamenightdarts-e7601",
+    storageBucket: "gamenightdarts-e7601.firebasestorage.app",
+    messagingSenderId: "270045452251",
+    appId: "1:270045452251:web:393956ce18b43316e939fe"
   };
-
-  function lsRead(key, fallback){
-    try{
-      const raw = localStorage.getItem(key);
-      if(raw==null) return fallback;
-      return JSON.parse(raw);
-    }catch(_){
-      return fallback;
-    }
-  }
-  function lsWrite(key, value){
-    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(_){}
-  }
-
-  function getPlayersMap(){ return lsRead(LS.players, {}) || {}; }
-  function setPlayersMap(map){ lsWrite(LS.players, map || {}); }
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
   async function getPlayers(){
-    const map = getPlayersMap();
-    return Object.values(map).sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+    const snap = await db.collection("players").get();
+    return snap.docs.map(d=>d.data());
   }
   async function upsertPlayer(name,email){
     const e=normEmail(email);
-    const map=getPlayersMap();
-    const cur = map[e] || { email:e, createdAt: now() };
-    map[e] = { ...cur, name: String(name||cur.name||"").trim(), email:e, createdAt: cur.createdAt || now() };
-    setPlayersMap(map);
+    await db.collection("players").doc(e).set({name,email:e,createdAt:now()},{merge:true});
   }
   async function getStatsDoc(email){
-    const e=normEmail(email);
-    return lsRead(LS.statsPrefix + e, {}) || {};
+    const doc=await db.collection("stats").doc(normEmail(email)).get();
+    return doc.exists?doc.data():{};
   }
   async function saveStatsDoc(email,data){
-    const e=normEmail(email);
-    const cur = await getStatsDoc(e);
-    const next = { ...(cur||{}), ...(data||{}) };
-    lsWrite(LS.statsPrefix + e, next);
+    await db.collection("stats").doc(normEmail(email)).set(data,{merge:true});
   }
   async function getHistory(email){
     const e=normEmail(email);
-    const all = lsRead(LS.history, []) || [];
-    const items = all.filter(h=>Array.isArray(h.players) && h.players.includes(e));
-    items.sort((a,b)=>(b.endedAt||0)-(a.endedAt||0));
-    return items.slice(0, 60);
+    try{
+      const snap=await db.collection("history")
+        .where("players","array-contains",e)
+        .orderBy("endedAt","desc")
+        .limit(60).get();
+      return snap.docs.map(d=>d.data());
+    }catch{
+      const snap=await db.collection("history")
+        .where("players","array-contains",e)
+        .limit(60).get();
+      const items=snap.docs.map(d=>d.data());
+      items.sort((a,b)=>(b.endedAt||0)-(a.endedAt||0));
+      return items;
+    }
   }
-  async function saveHistoryEntry(entry){
-    const all = lsRead(LS.history, []) || [];
-    all.push(entry);
-    // keep bounded
-    if(all.length > 2500) all.splice(0, all.length-2500);
-    lsWrite(LS.history, all);
-  }
+  async function saveHistoryEntry(entry){ await db.collection("history").add(entry); }
 
-  // Admin helpers
+  // ===== Admin helpers (delete players / reset stats) =====
   async function resetStatsAll(email){
     const e=normEmail(email);
-    lsWrite(LS.statsPrefix + e, { games:{}, updatedAt: now() });
+    await db.collection("stats").doc(e).set({games:{}, updatedAt:now()});
   }
   async function resetStatsGame(email, gameId){
     const e=normEmail(email);
-    const cur = await getStatsDoc(e);
-    const games = cur.games || {};
-    const nextGames = { ...games };
+    const doc=await db.collection("stats").doc(e).get();
+    const cur=doc.exists?doc.data():{};
+    const games=cur.games||{};
+    const nextGames={...games};
     delete nextGames[gameId];
-    await saveStatsDoc(e, { games: nextGames, updatedAt: now() });
+    await db.collection("stats").doc(e).set({games:nextGames, updatedAt:now()},{merge:true});
   }
   async function deleteHistoryForPlayer(email){
     const e=normEmail(email);
-    const all = lsRead(LS.history, []) || [];
-    const next = all.filter(h=>!(Array.isArray(h.players) && h.players.includes(e)));
-    lsWrite(LS.history, next);
+    const snap=await db.collection("history").where("players","array-contains",e).get();
+    if(snap.empty) return;
+    // Batch delete in chunks (Firestore batch limit is 500 ops)
+    let batch=db.batch();
+    let count=0;
+    for(const d of snap.docs){
+      batch.delete(d.ref);
+      count++;
+      if(count>=450){
+        await batch.commit();
+        batch=db.batch();
+        count=0;
+      }
+    }
+    if(count>0) await batch.commit();
   }
   async function deletePlayerAndData(email){
     const e=normEmail(email);
-    const map=getPlayersMap();
-    delete map[e];
-    setPlayersMap(map);
-    try{ localStorage.removeItem(LS.statsPrefix + e); }catch(_){}
-    await deleteHistoryForPlayer(e);
+    // delete player + stats + their match history entries
+    await db.collection("players").doc(e).delete().catch(()=>{});
+    await db.collection("stats").doc(e).delete().catch(()=>{});
+    await deleteHistoryForPlayer(e).catch(()=>{});
   }
 
-  // Auth (offline)
+
   async function signInEmail(email){
     const e=normEmail(email);
-    const map=getPlayersMap();
-    return map[e] || null;
+    const doc=await db.collection("players").doc(e).get();
+    return doc.exists?doc.data():null;
   }
   async function signUpEmail(name,email){
     const e=normEmail(email);
     await upsertPlayer(name,e);
-    const map=getPlayersMap();
-    return map[e] || {name:String(name||"").trim(), email:e};
+    return {name,email:e};
   }
-
-  // Presence disabled in offline mode
-  function presenceKey(email){ return "gn_presence_"+normEmail(email); }
-  function readPresence(email){
-    const k=presenceKey(email);
-    try{
-      const raw=localStorage.getItem(k);
-      if(!raw) return null;
-      const obj=JSON.parse(raw);
-      return obj && typeof obj.lastSeenAt==="number" ? obj : null;
-    }catch(_){ return null; }
-  }
-  function beatPresence(email,name){
-    const e=normEmail(email);
-    if(!e) return;
-    const payload={email:e,name:(name||null),lastSeenAt:now()};
-    try{ localStorage.setItem(presenceKey(e), JSON.stringify(payload)); }catch(_){}
-  }
-  const PRESENCE_BEAT_MS = 20000;
-  const PRESENCE_ONLINE_MS = 45000;
-  let __presenceTimer=null;
-  let __presenceEmail=null;
-
-  function isOnline(email){
-    const p=readPresence(email);
-    if(!p) return false;
-    return (now() - (p.lastSeenAt||0)) <= PRESENCE_ONLINE_MS;
-  }
-  function subscribePresence(){ /* localStorage-backed; no subscription needed */ }
-
-  function startPresence(email){
-    const e=normEmail(email);
-    if(!e) return;
-    if(__presenceEmail===e && __presenceTimer) return;
-    stopPresence();
-    __presenceEmail=e;
-
-    const doBeat=()=>beatPresence(e, meUser?.name||null);
-    doBeat();
-    __presenceTimer=setInterval(doBeat, PRESENCE_BEAT_MS);
-
-    // Refresh roster when other tabs/devices on same iCloud profile update localStorage
-    if(!window.__presenceStorageBound){
-      window.__presenceStorageBound=true;
-      window.addEventListener("storage", (ev)=>{
-        if(ev && typeof ev.key==="string" && ev.key.startsWith("gn_presence_")){
-          requestRender("presence");
-        }
-      });
-    }
-    if(!window.__presencePoller){
-      window.__presencePoller=setInterval(()=>requestRender("presence"), 8000);
-    }
-    if(!window.__presenceVisBound){
-      window.__presenceVisBound=true;
-      document.addEventListener("visibilitychange", ()=>{
-        if(document.visibilityState==="visible"){ try{ doBeat(); }catch{} }
-      });
-    }
-  }
-  function stopPresence(){
-    try{ if(__presenceTimer) clearInterval(__presenceTimer); }catch(_){}
-    __presenceTimer=null;
-    __presenceEmail=null;
-  }
-
 
   const BOARD_NUMS=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 
@@ -1442,17 +889,27 @@ function startApp(){
     const seg=360/20;
     const rot=-seg/2;
 
-    function polar(cx,cy,r,deg){
-      const rad=(deg-90)*Math.PI/180;
-      return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
+    let activeOverlay="";
+    if(typeof activeTarget==="number"){
+      const idx=BOARD_NUMS.indexOf(activeTarget);
+      if(idx>=0){
+        const a0=idx*seg+rot+1.0;
+        const a1=(idx+1)*seg+rot-1.0;
+        const halo=arcWedgePath(cx,cy,rTripleOuter+8,rDoubleInner-8,a0,a1);
+        const core=arcWedgePath(cx,cy,rTripleOuter+2,rDoubleInner-2,a0,a1);
+        activeOverlay+=`
+          <path class="hotWedge" d="${halo}" fill="rgba(34,211,238,.42)" stroke="rgba(34,211,238,.95)" stroke-width="3.8" filter="url(#glow)"/>
+          <path class="hotWedge" d="${core}" fill="rgba(139,92,246,.14)" stroke="rgba(255,255,255,.92)" stroke-width="2.8" filter="url(#glow)"/>
+        `;
+      }
     }
-    function arcWedgePath(cx,cy,r0,r1,a0,a1){
-      const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1);
-      const p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
-      const large=(a1-a0)>180?1:0;
-      const f=n=>(Math.round(n*1000)/1000).toFixed(3);
-      return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
+    if(activeTarget==="B"){
+      activeOverlay+=`
+        <circle class="hotWedge" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.22)" stroke="rgba(34,211,238,.95)" stroke-width="3.0" filter="url(#glow)"/>
+        <circle class="hotWedge" cx="100" cy="100" r="7.6"  fill="rgba(139,92,246,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+      `;
     }
+
     function ringWedges(r0,r1,fillA,fillB){
       let out="";
       for(let i=0;i<20;i++){
@@ -1463,62 +920,14 @@ function startApp(){
       return out;
     }
 
-    // ===== Active target overlay (full slice across the 4 segments) =====
-    let activeOverlay="";
-    if(typeof activeTarget === "number"){
-      const idx = BOARD_NUMS.indexOf(activeTarget);
-      if(idx >= 0){
-        const a0 = idx*seg + rot + 0.6;
-        const a1 = (idx+1)*seg + rot - 0.6;
-
-        const slices = [
-          // Full slice glow (behind everything for this number)
-          {r0:rSingleInner, r1:rDoubleOuter, fill:"rgba(34,211,238,.16)", stroke:"rgba(34,211,238,.94)", sw:3.4},
-          // Double ring (outer)
-          {r0:rDoubleInner, r1:rDoubleOuter, fill:"rgba(239,68,68,.30)", stroke:"rgba(255,255,255,.92)", sw:3.0},
-          // Triple ring
-          {r0:rTripleInner, r1:rTripleOuter, fill:"rgba(239,68,68,.26)", stroke:"rgba(255,255,255,.88)", sw:2.8},
-          // Outer single ring (between triple and double)
-          {r0:rTripleOuter, r1:rDoubleInner, fill:"rgba(34,211,238,.20)", stroke:"rgba(34,211,238,.96)", sw:3.0},
-          // Inner single ring (between bull and triple)
-          {r0:rSingleInner, r1:rTripleInner, fill:"rgba(34,211,238,.18)", stroke:"rgba(34,211,238,.92)", sw:2.7},
-        ];
-
-        // Big soft glow behind
-        activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,rSingleInner,rDoubleOuter,a0,a1)}"
-          fill="rgba(34,197,94,.10)" stroke="rgba(34,211,238,.55)" stroke-width="7.5" filter="url(#glow)" />`;
-
-        for(const s of slices){
-          activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,s.r0,s.r1,a0,a1)}"
-            fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
-        }
-      }
-    }else if(activeTarget === "B"){
-      activeOverlay += `
-        <circle class="hotWedgePulse" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.22)" stroke="rgba(34,211,238,.98)" stroke-width="3.0" filter="url(#glow)"/>
-        <circle class="hotWedgePulse" cx="100" cy="100" r="7.6"  fill="rgba(34,197,94,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
-      `;
-    }
-
-    // Numbers (with active number emphasized too)
     let numText="";
     for(let i=0;i<20;i++){
       const ang=i*seg+rot+seg/2;
       const p=polar(cx,cy,90,ang);
-      const n=BOARD_NUMS[i];
-      const isActive = (typeof activeTarget==="number" && n===activeTarget);
-      if(isActive){
-        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
-          font-size="10.2" fill="#22d3ee" font-weight="1000"
-          style="paint-order:stroke;stroke:#ffffff;stroke-width:2.6px;filter:url(#glow)">${n}</text>`;
-      }else{
-        numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
-          font-size="8.5" fill="#dfe9ff" font-weight="900"
-          style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${n}</text>`;
-      }
+      numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="8.5" fill="#dfe9ff" font-weight="900" style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${BOARD_NUMS[i]}</text>`;
     }
 
-    return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+    return `<svg viewBox="0 0 200 200" width="70%">
       <defs>
         <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
           <stop offset="0%" stop-color="#1a2a4a"/>
@@ -1526,18 +935,18 @@ function startApp(){
           <stop offset="100%" stop-color="#040814"/>
         </radialGradient>
         <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="4.8" result="b"/>
+          <feGaussianBlur stdDeviation="4.2" result="b"/>
           <feColorMatrix in="b" type="matrix"
-            values="0 0 0 0 0.18  0 0 0 0 0.92  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
+            values="0 0 0 0 0.20  0 0 0 0 0.80  0 0 0 0 0.95  0 0 0 1.0 0" result="c"/>
           <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
       <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
+      ${activeOverlay}
       ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
       ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
       ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
-      ${activeOverlay}
       <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
       <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
       ${numText}
@@ -1550,7 +959,7 @@ function startApp(){
     if(m.snaps.length>80) m.snaps.shift();
   }
   function popSnap(m){
-    if(!m || !m.snaps || m.snaps.length<2) return m;
+    if(!m?.snaps||m.snaps.length<2) return m;
     m.snaps.pop();
     const prev=m.snaps.pop();
     try{return JSON.parse(prev);}catch{return m;}
@@ -1643,6 +1052,9 @@ function startApp(){
     function renderPlay(ctx){
       const m=ctx.match;
       const t=TARGETS[m.targetIndex];
+      const activePlayer=m.players[m.turnIndex];
+      const nextPlayer = (!m.finished && m.players.length>1) ? m.players[(m.turnIndex+1)%m.players.length] : null;
+
 
       let thead=`<tr><th>Target</th>`;
       for(const p of m.players){
@@ -1674,21 +1086,28 @@ function startApp(){
         </div>
 
         <div class="card">
-          <div class="headerStack">
-            <div class="headerTopRow">
-              <div class="left"><span class="pill">Shanghai</span></div>
-              <div class="right"><span class="pill" data-live="1">Live</span></div>
+          <div class="hero gameHero">
+            <div class="heroCornerLeft">
+              <div class="cornerStack">
+                <span class="pill">Shanghai</span>
+                <div class="cornerIcon">🎯</div>
+              </div>
             </div>
-            <div class="headerIcon">🎯</div>
-            <div class="headerTitle turnTitle3d">Shanghai</div>
-            ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>`}
-            ${m.finished?"":`<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
-            <div class="sub" style="text-align:center;margin-top:6px">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+
+            <div class="heroMain">
+              <div class="gameTitleBig">Shanghai</div>
+              ${turnSwipe("shanghai", activePlayer.name)}
+              ${m.finished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="sub statusLine">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
+            </div>
+
+            <div class="heroCornerRight">
+              <span class="pill" data-live="1">Live</span>
+            </div>
           </div>
 
           <div class="divider"></div>
           <div class="boardBox">${dartboardSVG(t)}</div>
-          ${playerStripHTML(m.players, m.turnIndex, (p)=>"Score: <b>"+esc(p.total)+"</b>")}
           <div class="divider"></div>
 
           <div class="hitRow">
@@ -1705,7 +1124,7 @@ function startApp(){
         <div class="card">
           <div class="pill">Round table</div>
           <div class="divider"></div>
-          <div class="tableWrap">
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
             <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
           </div>
         </div>
@@ -1713,17 +1132,14 @@ function startApp(){
     }
 
     function bindPlay(ctx){
-      try{ animateTurnName("shanghai", ctx.match.players[ctx.match.turnIndex].name); }catch{}
       const $=(id)=>document.getElementById(id);
       function onHit(h){
-        playBeep(h==="M" ? "miss" : "hit");
         const m=ctx.match;
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,h);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.players.slice().sort((a,b)=>b.total-a.total)[0] && m.players.slice().sort((a,b)=>b.total-a.total)[0].name)||"")); }
         render();
-        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
       }
       document.getElementById("hitT").onclick=()=>onHit("T");
       document.getElementById("hitS").onclick=()=>onHit("S");
@@ -1792,7 +1208,7 @@ function startApp(){
       if(!m.finished || m._saved) return;
       m._saved=true;
 
-      const winnerName = (m.winner && m.winner.name) || "Unknown";
+      const winnerName = m.winner?.name || "Unknown";
       const summary = `🏆 ${winnerName} wins • ` + m.players
         .map(p=>`${p.name}${p.out?" (OUT)":""}`)
         .join(" | ");
@@ -1805,7 +1221,7 @@ function startApp(){
         players:m.players.map(p=>p.email),
         summary,
         meta:{
-          winnerEmail: (m.winner && m.winner.email) || null,
+          winnerEmail: m.winner?.email || null,
           numbers: m.players.map(p=>({email:p.email, number:p.number}))
         }
       });
@@ -1815,7 +1231,7 @@ function startApp(){
       const g=games.killer||{};
       const played=(g.played||0)+1;
 
-      const iWon = (((m.winner && m.winner.email) === ctx.meUser.email));
+      const iWon = (m.winner?.email === ctx.meUser.email);
       const wins = (g.wins||0) + (iWon?1:0);
 
       await saveStatsDoc(ctx.meUser.email,{
@@ -1874,16 +1290,25 @@ function startApp(){
             <div class="divider"></div>
             <select id="claimNum">${opts}</select>
             <div class="divider"></div>
-            <button class="btn ok" id="saveClaim" type="button">Save & Next</button>
+            <button class="btn ok" id="saveClaim">Save & Next</button>
           </div>
         `;
       }
 
+      // Play phase header — aligned like all other screens
       const active=m.players[m.turnIndex];
+      const nextOnDeck = (!isFinished && m.players.length>1) ? (function(){
+        // next player who is not OUT
+        for(let step=1; step<=m.players.length; step++){
+          const i=(m.turnIndex+step)%m.players.length;
+          if(!m.players[i].out) return m.players[i];
+        }
+        return null;
+      })() : null;
       const isFinished = !!m.finished;
 
       const statusLine = isFinished
-        ? `Winner: <b>${esc((m.winner && m.winner.name) || "")}</b>`
+        ? `Winner: <b>${esc(m.winner?.name||"")}</b>`
         : `${esc(active.name)} • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer ? "🔥 Killer" : "Not killer yet"}`;
 
       const rows = m.players.map(p=>{
@@ -1894,7 +1319,7 @@ function startApp(){
               <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
                 <div>
                   <div style="font-size:16px;font-weight:1000">${esc(p.name)}</div>
-                  <div class="small kNumberBig">Number: <b>${esc((p.number!=null?p.number:"?"))}</b></div>
+                  <div class="small kNumberBig">Number: <b>${esc(p.number??"?")}</b></div>
                 </div>
                 <div style="text-align:right">
                   <div class="kLivesBig">${livesHtml}</div>
@@ -1911,7 +1336,7 @@ function startApp(){
       const attackTargets = m.players
         .filter(p=>!p.out && p.email!==active.email)
         .map(p=>{
-          const label = `${p.name} • ${(p.number!=null?p.number:"?")} • ${"❤️".repeat(Math.max(0,p.lives))}`;
+          const label = `${p.name} • ${p.number ?? "?"} • ${"❤️".repeat(Math.max(0,p.lives))}`;
           return `<button class="kAttackBtn" data-attack="${esc(p.email)}" ${canAttack?"":"disabled"}>
             HIT ${esc(p.name)}’s DOUBLE → remove 1 life
             <div class="small">${esc(label)}</div>
@@ -1927,18 +1352,24 @@ function startApp(){
         </div>
 
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
-          <div class="headerStack">
-            <div class="headerTopRow">
-              <div class="left"><span class="pill">Killer</span></div>
-              <div class="right">
-                <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
+          <div class="hero gameHero">
+            <div class="heroCornerLeft">
+              <div class="cornerStack">
+                <span class="pill">Killer</span>
+                <div class="cornerIcon">🔥</div>
               </div>
             </div>
-            <div class="headerIcon">🔥</div>
-            <div class="headerTitle turnTitle3d">Killer</div>
-            ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>`}
-            ${isFinished ? "" : `<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
-            <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
+
+            <div class="heroMain">
+              <div class="gameTitleBig">Killer</div>
+              ${isFinished ? "" : turnSwipe("killer", active.name)}
+              ${isFinished ? "" : `<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="sub statusLine">${statusLine}</div>
+            </div>
+
+            <div class="heroCornerRight">
+              <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
+            </div>
           </div>
 
           ${isFinished ? "" : `
@@ -1961,7 +1392,7 @@ function startApp(){
         <div class="card">
           <div class="pill">Players & Lives</div>
           <div class="divider"></div>
-          <div class="tableWrap">
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
             <table>
               <thead><tr><th>Roster</th></tr></thead>
               <tbody>${rows}</tbody>
@@ -1972,9 +1403,9 @@ function startApp(){
     }
 
     function bindPlay(ctx){
+      const $=(id)=>document.getElementById(id);
       const m=ctx.match;
       if(!m) return;
-      try{ if(m.phase==="play" && !m.finished) animateTurnName("killer", m.players[m.turnIndex].name); }catch{}
 
       const backBtn=document.getElementById("backToSetup");
       if(backBtn){
@@ -1988,14 +1419,14 @@ function startApp(){
       if(resetBtn){
         resetBtn.onclick=()=>{
           const pls=m.players.map(p=>({name:p.name,email:p.email}));
-          match=KillerGame.initMatch(pls);
+          match=initMatch(pls);
           render();
         };
       }
 
       const claimBtn=document.getElementById("saveClaim");
       if(claimBtn){
-        claimBtn.onclick=(ev)=>{ if(ev && ev.preventDefault) ev.preventDefault(); if(ev && ev.stopPropagation) ev.stopPropagation();
+        claimBtn.onclick=()=>{
           const p=m.players[m.claimIndex];
           const raw=document.getElementById("claimNum").value;
           const n=parseInt(raw,10);
@@ -2007,19 +1438,14 @@ function startApp(){
           }
           p.number=n;
 
-          let nextIdx=-1;
-          for(let step=1; step<=m.players.length; step++){
-            const i=(m.claimIndex+step)%m.players.length;
-            if(m.players[i].number==null){ nextIdx=i; break; }
-          }
-
-          if(nextIdx===-1){
+          const next = m.players.findIndex(x=>x.number==null);
+          if(next===-1){
             m.phase="play";
             m.turnIndex=0;
             m.dartInTurn=0;
             m.players.forEach(x=>{ x.out=false; x.killer=false; x.lives=MAX_LIVES; });
-          }else{
-            m.claimIndex=nextIdx;
+          } else {
+            m.claimIndex=next;
           }
           render();
         };
@@ -2027,13 +1453,13 @@ function startApp(){
       }
 
       if(m.finished){
-        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
         return;
       }
 
       function pushK(m){ m.snaps=m.snaps||[]; m.snaps.push(JSON.stringify(m)); if(m.snaps.length>80) m.snaps.shift(); }
       function popK(m){
-        if(!m || !m.snaps || m.snaps.length<2) return m;
+        if(!m?.snaps||m.snaps.length<2) return m;
         m.snaps.pop();
         const prev=m.snaps.pop();
         try{return JSON.parse(prev);}catch{return m;}
@@ -2046,10 +1472,9 @@ function startApp(){
           m.turnIndex = nextAliveIndex(m, m.turnIndex);
         }
         checkWinner(m);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name) || "")); }
         render();
         if(m.finished){
-          saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
+          saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
         }
       }
 
@@ -2061,12 +1486,12 @@ function startApp(){
         };
       }
 
-      document.getElementById("miss").onclick=()=>{ playBeep("miss");
+      document.getElementById("miss").onclick=()=>{
         pushK(m);
         endDart();
       };
 
-      document.getElementById("myDouble").onclick=()=>{ playBeep("hit");
+      document.getElementById("myDouble").onclick=()=>{
         pushK(m);
         const me=m.players[m.turnIndex];
         if(me.number==null) return;
@@ -2078,7 +1503,7 @@ function startApp(){
       };
 
       appEl.querySelectorAll("button[data-attack]").forEach(btn=>{
-        btn.onclick=()=>{ playBeep("hit");
+        btn.onclick=()=>{
           const me=m.players[m.turnIndex];
           if(!me.killer) return;
           const victimEmail=btn.getAttribute("data-attack");
@@ -2100,7 +1525,7 @@ function startApp(){
     return { initMatch, renderPlay, bindPlay };
   })();
 
-  // ===== Around the World =====
+  // ===== Around the World (NEW, ACTIVE) =====
   const AroundGame = (()=>{
     const TARGETS = Array.from({length:20},(_,i)=>i+1).concat(["B"]);
     const modeName = m => (m.mode==="D" ? "Doubles" : m.mode==="T" ? "Triples" : "Singles");
@@ -2112,7 +1537,7 @@ function startApp(){
         players: selectedPlayers.map(p=>({
           name:p.name,
           email:p.email,
-          progressIndex:0,
+          progressIndex:0, // 0..20 (20 means B is current, 21 means finished)
           dartsThrown:0,
           hits:0
         })),
@@ -2158,9 +1583,9 @@ function startApp(){
 
       if(wasHit){
         p.hits += 1;
-        p.progressIndex += 1;
+        p.progressIndex += 1; // advance one target per HIT
         finishIfDone(m,p);
-        if(m.finished) return;
+        if(m.finished) return; // game ends immediately when someone finishes
       }
 
       endDart(m);
@@ -2171,8 +1596,8 @@ function startApp(){
       if(!m.finished || m._saved) return;
       m._saved=true;
 
-      const winnerName=(m.winner && m.winner.name) || "Unknown";
-      const winnerRow=m.players.find(x=>x.email===(m.winner && m.winner.email));
+      const winnerName=m.winner?.name || "Unknown";
+      const winnerRow=m.players.find(x=>x.email===m.winner?.email);
       const winnerDarts=winnerRow ? winnerRow.dartsThrown : null;
 
       const summary = `🏁 ${winnerName} wins • Format: ${modeName(m)}${winnerDarts!=null?` • ${winnerDarts} darts`:``}`;
@@ -2186,11 +1611,12 @@ function startApp(){
         summary,
         meta:{
           mode:m.mode,
-          winnerEmail:(m.winner && m.winner.email) || null,
+          winnerEmail:m.winner?.email||null,
           darts:m.players.map(p=>({email:p.email, dartsThrown:p.dartsThrown, hits:p.hits}))
         }
       });
 
+      // Stats for the signed-in viewer only (matches existing pattern)
       const stats=await getStatsDoc(ctx.meUser.email);
       const games=stats.games||{};
       const g=games.around||{};
@@ -2200,12 +1626,12 @@ function startApp(){
       const myDarts=meRow?meRow.dartsThrown:0;
       const myHits=meRow?meRow.hits:0;
 
-      const wins=(g.wins||0) + ((((m.winner && m.winner.email)===ctx.meUser.email)) ? 1 : 0);
+      const wins=(g.wins||0) + ((m.winner?.email===ctx.meUser.email) ? 1 : 0);
       const totalDarts=(g.totalDarts||0)+myDarts;
       const totalHits=(g.totalHits||0)+myHits;
 
       let bestFewestDarts = g.bestFewestDarts||null;
-      if(((m.winner && m.winner.email)===ctx.meUser.email)){
+      if(m.winner?.email===ctx.meUser.email){
         if(bestFewestDarts==null || myDarts<bestFewestDarts) bestFewestDarts=myDarts;
       }
 
@@ -2229,13 +1655,15 @@ function startApp(){
     function renderPlay(ctx){
       const m=ctx.match;
       const active=m.players[m.turnIndex];
+      const nextPlayer = (!m.finished && m.players.length>1) ? m.players[(m.turnIndex+1)%m.players.length] : null;
       const t=currentTarget(m, active);
       const tLabel = (t==="B" ? "BULL" : String(t));
 
       const isFinished = !!m.finished;
+      const livePill = isFinished ? `<span class="pill">Ended</span>` : `<span class="pill" data-live="1">Live</span>`;
 
       const statusLine = isFinished
-        ? `Winner: <b>${esc((m.winner && m.winner.name) || "")}</b> • Format: <b>${esc(modeName(m))}</b>`
+        ? `Winner: <b>${esc(m.winner?.name||"")}</b> • Format: <b>${esc(modeName(m))}</b>`
         : `Target: <span class="targetFlash">${esc(tLabel)}</span> • Format: <b>${esc(modeName(m))}</b> • Dart <b>${m.dartInTurn+1}</b>/3`;
 
       const rows = m.players.map(p=>{
@@ -2270,23 +1698,28 @@ function startApp(){
         </div>
 
         <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
-          <div class="headerStack">
-            <div class="headerTopRow">
-              <div class="left"><span class="pill">Around the World</span></div>
-              <div class="right">
-                ${isFinished?'<span class="pill">Ended</span>':'<span class="pill" data-live="1">Live</span>'}
+          <div class="hero gameHero">
+            <div class="heroCornerLeft">
+              <div class="cornerStack">
+                <span class="pill">Around the World</span>
+                <div class="cornerIcon">🌍</div>
               </div>
             </div>
-            <div class="headerIcon">🌍</div>
-            <div class="headerTitle turnTitle3d">Around the World</div>
-            <div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>
-            ${isFinished?'':'<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>'}
-            <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
+
+            <div class="heroMain">
+              <div class="gameTitleBig">Around the World</div>
+              ${turnSwipe("around", active.name)}
+              ${isFinished?"":`<div class="small"><span class="badge">NOW THROWING</span></div>`}
+              <div class="sub statusLine">${statusLine}</div>
+            </div>
+
+            <div class="heroCornerRight">
+              ${livePill}
+            </div>
           </div>
 
           <div class="divider"></div>
           <div class="boardBox">${dartboardSVG(t==="B"?"B":t)}</div>
-          ${playerStripHTML(m.players, m.turnIndex, (p)=>"Target: <b>"+esc((currentTarget(m,p)==="B")?"BULL":currentTarget(m,p))+"</b>")}
           <div class="divider"></div>
 
           ${isFinished ? "" : `
@@ -2301,7 +1734,7 @@ function startApp(){
         <div class="card">
           <div class="pill">Players</div>
           <div class="divider"></div>
-          <div class="tableWrap">
+          <div style="overflow:auto;border-radius:16px;border:1px solid rgba(255,255,255,.10)">
             <table>
               <thead><tr><th>Progress</th></tr></thead>
               <tbody>${rows}</tbody>
@@ -2312,7 +1745,6 @@ function startApp(){
     }
 
     function bindPlay(ctx){
-      try{ animateTurnName("around", ctx.match.players[ctx.match.turnIndex].name); }catch{}
       const $=(id)=>document.getElementById(id);
       const m=ctx.match;
       if(!m) return;
@@ -2324,12 +1756,12 @@ function startApp(){
       };
       const resetBtn=$("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{
         const pls=m.players.map(p=>({name:p.name,email:p.email}));
-        match=AroundGame.initMatch(pls, m.mode);
+        match=initMatch(pls, m.mode);
         render();
       };
 
       if(m.finished){
-        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
         return;
       }
 
@@ -2338,21 +1770,19 @@ function startApp(){
         undoBtn.onclick=()=>{ match=popSnap(ctx.match); render(); };
       }
 
-      const hitBtn=$("hitBtn"); if(hitBtn) hitBtn.onclick=()=>{ playBeep("hit");
+      const hitBtn=$("hitBtn"); if(hitBtn) hitBtn.onclick=()=>{
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,true);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
         render();
-        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
       };
-      const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{ playBeep("miss");
+      const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,false);
-        if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
         render();
-        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
+        saveFinish(ctx).catch(e=>showFatal("Save error", e?.message||String(e)));
       };
     }
 
@@ -2368,14 +1798,12 @@ function startApp(){
   let rulesGameId=null;
   const MAX_PLAYERS=4;
 
-  // ===== Presence (offline: disabled) =====
-
   function initials(name){
     const n=String(name||"").trim();
     if(!n) return "?";
     const parts=n.split(/\s+/).filter(Boolean);
-    const a=((parts[0] && parts[0][0]) || "").toUpperCase();
-    const b=((parts[1] && parts[1][0]) || "").toUpperCase();
+    const a=(parts[0]?.[0]||"").toUpperCase();
+    const b=(parts[1]?.[0]||"").toUpperCase();
     return (a+(b||"")).slice(0,2) || a || "?";
   }
 
@@ -2412,17 +1840,19 @@ function startApp(){
         "Before starting, choose a mode: Singles, Doubles, or Triples.",
         "Players take turns. Each turn is 3 darts.",
         "Your goal is to hit your current target number, starting at 1 and going up to 20, then BULL.",
-        "Tap HIT if you hit the current target (Singles / Doubles / Triples based on format).",
+        "Tap HIT if you hit the current target (any segment for Singles / double ring for Doubles / triple ring for Triples).",
         "Tap MISS if you miss the current target.",
         "Each HIT advances you to the next target immediately (you can advance up to 3 targets in one turn).",
         "Game ends immediately when someone hits BULL and finishes."
       ]
     };
 
+    
+
     const g=getGame(gameId);
     return {
-      title:(g && g.name) || "Game",
-      icon:(g && g.icon) || "🎯",
+      title:g?.name||"Game",
+      icon:g?.icon||"🎯",
       bullets:["Rules coming soon."]
     };
   }
@@ -2527,7 +1957,6 @@ function startApp(){
     brandTitle.textContent="Game Night";
 
     const players=await getPlayers();
-    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
 
     const gameCards = Games.map(g=>{
       const soon=!g.active;
@@ -2552,20 +1981,19 @@ function startApp(){
     }).join("");
 
     const roster = players
-      .slice()
-      .sort((a,b)=> (a.email===meUser.email?-1:0) - (b.email===meUser.email?-1:0))
+      .filter(p=>p.email!==meUser.email)
       .map(p=>`
         <div class="rosterCard">
           <div class="rosterLeft">
-            <div class="avatar ${isOnline(p.email)?"online":""}">${esc(initials(p.name))}</div>
+            <div class="avatar">${esc(initials(p.name))}</div>
             <div>
-              <div class="rosterName">${esc(p.name)}${p.email===meUser.email?` <span class="badge">YOU</span>`:""}</div>
+              <div class="rosterName">${esc(p.name)}</div>
               <div class="rosterSub">${esc(p.email)}</div>
             </div>
           </div>
-          <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap">
+          <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end">
             <button class="btn ghost" data-view-player="${esc(p.email)}">View stats</button>
-            <button class="btn danger" data-del-player="${esc(p.email)}" ${p.email===meUser.email?"disabled":""}>Remove</button>
+            <button class="btn danger" data-del-player="${esc(p.email)}">Remove</button>
           </div>
         </div>
       `).join("");
@@ -2651,10 +2079,11 @@ function startApp(){
       btn.onclick=async()=>{
         const email=btn.getAttribute("data-del-player");
         const p=players.find(x=>x.email===email);
-        const name=(p && p.name) || email;
+        const name=p?.name||email;
         if(!confirm(`Remove ${name}? This deletes the player, their stats, and their history.`)) return;
         try{
           await deletePlayerAndData(email);
+          // If you deleted the currently signed-in user, sign out.
           if(normEmail(email)===normEmail(meUser.email)){
             meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth";
             return render();
@@ -2662,10 +2091,11 @@ function startApp(){
           toastMsg=`Removed ${name}.`;
           render();
         }catch(e){
-          showFatal("Delete error", (e && e.message) || String(e));
+          showFatal("Delete error", e?.message||String(e));
         }
       };
     });
+
   }
 
   async function renderRules(){
@@ -2751,7 +2181,6 @@ function startApp(){
     brandTitle.textContent=g.name;
 
     const players=await getPlayers();
-    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
     const meEmail=meUser.email;
     const defaultCount=2;
 
@@ -2808,6 +2237,8 @@ function startApp(){
           </select>
 
           ${aroundModeUI}
+
+          
 
           <button class="btn ok" id="startMatchBtn" disabled>Start Match</button>
           <div class="sub" id="hintLine">Select exactly ${defaultCount} players to continue.</div>
@@ -2891,7 +2322,9 @@ function startApp(){
       return;
     }
 
-    screen="home"; render();
+
+    
+screen="home"; render();
   }
 
   async function renderStats(){
@@ -2899,7 +2332,6 @@ function startApp(){
     brandTitle.textContent="Stats";
 
     const players=await getPlayers();
-    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
 
     const statsDoc=await getStatsDoc(statsViewerEmail);
@@ -2979,24 +2411,25 @@ function startApp(){
     document.getElementById("statsBack").onclick=()=>{ screen="home"; render(); };
     document.getElementById("statsPlayer").onchange=(e)=>{ statsViewerEmail=e.target.value; render(); };
 
+
     document.getElementById("resetAllStatsBtn").onclick=async()=>{
       const email=statsViewerEmail;
       const p=players.find(x=>x.email===email);
-      const name=(p && p.name) || email;
+      const name=p?.name||email;
       if(!confirm(`Reset ALL stats for ${name}?`)) return;
       try{
         await resetStatsAll(email);
         toastMsg=`Stats reset for ${name}.`;
         render();
       }catch(e){
-        showFatal("Reset error", (e && e.message) || String(e));
+        showFatal("Reset error", e?.message||String(e));
       }
     };
 
     document.getElementById("deletePlayerBtn").onclick=async()=>{
       const email=statsViewerEmail;
       const p=players.find(x=>x.email===email);
-      const name=(p && p.name) || email;
+      const name=p?.name||email;
       if(!confirm(`Delete ${name}? This deletes the player, their stats, and their history.`)) return;
       try{
         await deletePlayerAndData(email);
@@ -3004,12 +2437,13 @@ function startApp(){
           meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth";
           return render();
         }
+        // After deleting someone else, go back to home.
         statsViewerEmail=meUser.email;
         toastMsg=`Deleted ${name}.`;
         screen="home";
         render();
       }catch(e){
-        showFatal("Delete error", (e && e.message) || String(e));
+        showFatal("Delete error", e?.message||String(e));
       }
     };
 
@@ -3026,7 +2460,6 @@ function startApp(){
     brandTitle.textContent=`${g.name} • Stats`;
 
     const players=await getPlayers();
-    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
     if(!statsViewerEmail) statsViewerEmail=meUser.email;
 
     const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
@@ -3063,7 +2496,9 @@ function startApp(){
         <div class="sub">Best (fewest darts to win): <b>${esc(best)}</b></div>
         <div class="sub">Last played: <b>${esc(gs.lastPlayedAt?fmt(gs.lastPlayedAt):"—")}</b></div>
       `;
-    }else{
+
+    }
+else{
       body=g.active?`<div class="sub">Played: <b>${esc(gs.played||0)}</b></div>`:`<div class="sub">Coming soon.</div>`;
     }
 
@@ -3097,14 +2532,14 @@ function startApp(){
       resetBtn.onclick=async()=>{
         const email=statsViewerEmail;
         const p=players.find(x=>x.email===email);
-        const name=(p && p.name) || email;
+        const name=p?.name||email;
         if(!confirm(`Reset ${g.name} stats for ${name}?`)) return;
         try{
           await resetStatsGame(email, g.id);
           toastMsg=`${g.name} stats reset for ${name}.`;
           render();
         }catch(e){
-          showFatal("Reset error", (e && e.message) || String(e));
+          showFatal("Reset error", e?.message||String(e));
         }
       };
     }
@@ -3126,58 +2561,23 @@ function startApp(){
     if(!items) items=`<div class="card"><div class="sub">No matches yet.</div></div>`;
 
     setHTML(`
-      <div class="row">
-        <button class="btn ghost" id="historyBack">Back</button>
-        <button class="btn danger" id="clearHistoryBtn">Clear my history</button>
-      </div>
-      <div class="small">Clears match history for your account on this device. Does not delete your player or stats.</div>
+      <div class="row"><button class="btn ghost" id="historyBack">Back</button></div>
       <div class="divider"></div>
       ${items}
     `);
-
     document.getElementById("historyBack").onclick=()=>{ screen="home"; render(); };
-    const clearBtn=document.getElementById("clearHistoryBtn");
-    if(clearBtn){
-      clearBtn.onclick=async()=>{
-        if(!confirm("Clear your match history on this device?")) return;
-        try{ await deleteHistoryForPlayer(meUser.email); toastMsg="History cleared."; render(); }
-        catch(e){ showFatal("Clear history error", e?.message||String(e)); }
-      };
-    }
   }
 
   async function render(){
     if(window.__rendering){ window.__renderAgain=true; return; }
     window.__rendering=true;
     try{
-      window.__screenChanged = (window.__lastScreen !== screen);
-      window.__lastScreen = screen;
-
       homeBtn.onclick=()=>{ screen=meUser?"home":"auth"; render(); };
-
-      if(soundBtn){
-        soundBtn.onclick=()=>{
-          // Always unlock + make toggle audible (even when currently OFF)
-          try{ unlockAudio(); }catch(_){}
-          const wasOn = !!soundEnabled;
-          if(wasOn) playBeep("toggle");
-          setSoundEnabled(!soundEnabled);
-          if(!wasOn) playBeep("toggle");
-        };
-        setSoundEnabled(soundEnabled);
-      }
-
-      signOutBtn.onclick=()=>{
-        stopPresence();
-        meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null;
-        screen="auth"; render();
-      };
+      signOutBtn.onclick=()=>{ meUser=null; match=null; activeGameId=null; statsViewerEmail=null; rulesGameId=null; screen="auth"; render(); };
 
       if(screen==="auth") return renderAuth();
       if(screen==="signup") return renderSignup();
       if(!meUser){ screen="auth"; return renderAuth(); }
-
-      try{ startPresence(meUser.email); }catch{}
 
       if(screen==="home") return renderHome();
       if(screen==="rules") return renderRules();
@@ -3190,11 +2590,10 @@ function startApp(){
 
       screen="home"; return renderHome();
     }catch(e){
-      showFatal("App error", (e && e.message) || String(e));
+      showFatal("App error", e?.message || String(e));
     }
     finally{
       window.__rendering=false;
-      window.__renderReason="nav";
       if(window.__renderAgain){ window.__renderAgain=false; render(); }
     }
   }
@@ -3202,23 +2601,7 @@ function startApp(){
   render();
 }
 
-function playerStripHTML(players, activeIndex, extraLineFn){
-  try{
-    return `<div class="playerStrip">` + (players||[]).map((p,i)=>{
-      const act = (i===activeIndex);
-      const extra = extraLineFn ? (extraLineFn(p,i) || "") : "";
-      return `<div class="playerChip ${act?'active':''}">
-        <div class="nm">${esc(p.name||"")}</div>
-        <div class="sub">${act ? "NOW THROWING" : "&nbsp;"}</div>
-        ${extra?`<div class="small" style="margin-top:4px">${extra}</div>`:""}
-      </div>`;
-    }).join("") + `</div>`;
-  }catch(_){ return ""; }
-}
-
-
 boot();
-
 </script>
 </body>
 </html>
