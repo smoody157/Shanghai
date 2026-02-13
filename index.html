@@ -679,25 +679,89 @@ input,select{
 <script type="module">
 /* ====================== Firebase (ONLINE SHARED) ====================== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-app.js";
+
+import { getAuth, signInAnonymously, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-auth.js";
 import {
   getFirestore, doc, setDoc, getDoc, updateDoc, addDoc, collection,
   getDocs, query, where, onSnapshot, runTransaction, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-firestore.js";
 
 /* Your Firebase configuration (from your original project) */
-const firebaseConfig = {
-  apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
-  authDomain: "gamenightdarts-e7601.firebaseapp.com",
-  projectId: "gamenightdarts-e7601",
-  storageBucket: "gamenightdarts-e7601.appspot.com",
-  messagingSenderId: "270045452251",
-  appId: "1:270045452251:web:393956ce18b43316e939fe",
-  measurementId: "G-LQEHF02ZVR"
-};
 
+/* ====================== Firebase config (online shared) ======================
+   To avoid GitHub "secrets detected" warnings, this file does NOT hard-code your
+   Firebase keys. Instead, the config is saved locally on each device.
+   - First run: paste your firebaseConfig JSON and tap Save.
+   - After that: it loads automatically.
+   Your brother/Jace will need to do this once on their device too.
+============================================================================= */
+
+function _readSavedFirebaseConfig(){
+  try{
+    const raw = localStorage.getItem("gn_firebase_config");
+    if(!raw) return null;
+    const cfg = JSON.parse(raw);
+    if(cfg && cfg.apiKey && cfg.projectId) return cfg;
+  }catch(_){}
+  return null;
+}
+
+function _renderFirebaseConfigSetup(){
+  const el = document.getElementById("app") || document.body;
+  const sample = `{
+  "apiKey": "YOUR_API_KEY",
+  "authDomain": "YOUR_PROJECT.firebaseapp.com",
+  "projectId": "YOUR_PROJECT",
+  "storageBucket": "YOUR_PROJECT.appspot.com",
+  "messagingSenderId": "000000000000",
+  "appId": "1:000000000000:web:xxxxxxxxxxxxxxxxxxxxxx",
+  "measurementId": "G-XXXXXXXXXX"
+}`;
+  el.innerHTML = `
+    <div class="wrap">
+      <div class="card">
+        <div class="h1">One-time setup</div>
+        <div class="sub">Paste your <b>firebaseConfig</b> JSON below. This enables the online shared version.</div>
+        <div class="divider"></div>
+        <label>firebaseConfig JSON</label>
+        <textarea id="fbCfg" style="width:100%;min-height:220px;background:rgba(7,10,20,.72);border:1px solid rgba(255,255,255,.14);color:var(--text);border-radius:14px;padding:12px 12px;font-size:13px;outline:none;line-height:1.35;white-space:pre;">${sample}</textarea>
+        <div class="divider"></div>
+        <div class="row">
+          <button class="btn ok" id="saveFbCfg" type="button">Save & Reload</button>
+          <button class="btn ghost" id="clearFbCfg" type="button">Clear</button>
+        </div>
+        <div class="divider"></div>
+        <div class="small">Tip: You can find this in your Firebase console (Project settings → Your apps → SDK setup & config).</div>
+      </div>
+    </div>
+  `;
+  document.getElementById("saveFbCfg").onclick = ()=>{
+    const raw = (document.getElementById("fbCfg").value||"").trim();
+    try{
+      const cfg = JSON.parse(raw);
+      if(!cfg || !cfg.apiKey || !cfg.projectId) throw new Error("Missing apiKey or projectId.");
+      localStorage.setItem("gn_firebase_config", JSON.stringify(cfg));
+      location.reload();
+    }catch(e){
+      alert("That JSON doesn't look right. " + (e && e.message ? e.message : ""));
+    }
+  };
+  document.getElementById("clearFbCfg").onclick = ()=>{
+    try{ localStorage.removeItem("gn_firebase_config"); }catch(_){}
+    location.reload();
+  };
+}
+
+const firebaseConfig = _readSavedFirebaseConfig();
+if(!firebaseConfig){
+  _renderFirebaseConfigSetup();
+  throw new Error("Firebase config not set");
+}
+
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
+const auth = getAuth(app);
+const db = getFirestore(app);
 /* ====================== Helpers ====================== */
 const appEl=document.getElementById("app");
 const homeBtn=document.getElementById("homeBtn");
@@ -2591,10 +2655,12 @@ async function render(){
 }
 
 /* ====================== Boot ====================== */
-function boot(){
+async function boot(){
   try{
     setHTML(`<div class="card"><div class="h1">Loading…</div><div class="sub">Starting Game Night…</div></div>`);
-    render();
+    
+    await ensureAuth();
+render();
   }catch(err){
     showFatal("Can’t start app", err?.message||String(err));
   }
