@@ -1319,95 +1319,94 @@ function boot(){
 
   console.log("GameNight ONLINE build loaded");
 
-  // ===== FIREBASE CONFIG =====
-  const firebaseConfig = {
-    apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
-    authDomain: "gamenightdarts-e7601.firebaseapp.com",
-    projectId: "gamenightdarts-e7601",
-    storageBucket: "gamenightdarts-e7601.appspot.com",
-    messagingSenderId: "270045452251",
-    appId: "1:270045452251:web:393956ce18b43316e939fe",
-    measurementId: "G-LQEHF02ZVR"
-  };
+// ===== FIREBASE CONFIG =====
+const firebaseConfig = {
+  apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
+  authDomain: "gamenightdarts-e7601.firebaseapp.com",
+  projectId: "gamenightdarts-e7601",
+  storageBucket: "gamenightdarts-e7601.appspot.com",
+  messagingSenderId: "270045452251",
+  appId: "1:270045452251:web:393956ce18b43316e939fe",
+  measurementId: "G-LQEHF02ZVR"
+};
 
-  const appFB = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+const appFB = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
 
-  const ROOM_ID = "global";
+const ROOM_ID = "global";
 
-  async function ensureAuth(){
-    if(auth.currentUser) return auth.currentUser;
-    const res = await auth.signInAnonymously();
-    return res.user;
-  }
+async function ensureAuth(){
+  if(auth.currentUser) return auth.currentUser;
+  const res = await auth.signInAnonymously();
+  return res.user;
+}
 
-  function normEmail(e){ return String(e||"").trim().toLowerCase(); }
-  function now(){ return Date.now(); }
+function normEmail(e){ return String(e||"").trim().toLowerCase(); }
+function now(){ return Date.now(); }
 
-  // ===== PLAYERS =====
-  async function getPlayers(){
-    await ensureAuth();
-    const snap = await db.collection("rooms").doc(ROOM_ID).collection("players").get();
-    const arr = snap.docs.map(d => d.data());
-    arr.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
-    return arr;
-  }
+// ===== PLAYERS (ONLINE SHARED) =====
+async function getPlayers(){
+  await ensureAuth();
+  const snap = await db.collection("rooms").doc(ROOM_ID).collection("players").get();
+  const arr = snap.docs.map(d => d.data());
+  arr.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
+  return arr;
+}
 
-  async function upsertPlayer(name,email){
-    await ensureAuth();
-    const e=normEmail(email);
-    await db.collection("rooms").doc(ROOM_ID).collection("players").doc(e).set({
-      email:e,
-      name:String(name||"").trim(),
-      updatedAt:now()
-    }, { merge:true });
-  }
+async function upsertPlayer(name,email){
+  await ensureAuth();
+  const e=normEmail(email);
+  await db.collection("rooms").doc(ROOM_ID).collection("players").doc(e).set({
+    email:e,
+    name:String(name||"").trim(),
+    updatedAt:now()
+  }, { merge:true });
+}
 
-  // ===== STATS =====
-  async function getStatsDoc(email){
-    await ensureAuth();
-    const e=normEmail(email);
-    const doc = await db.collection("rooms").doc(ROOM_ID).collection("stats").doc(e).get();
-    return doc.exists ? doc.data() : {};
-  }
+// ===== STATS =====
+async function getStatsDoc(email){
+  await ensureAuth();
+  const e=normEmail(email);
+  const doc = await db.collection("rooms").doc(ROOM_ID).collection("stats").doc(e).get();
+  return doc.exists ? doc.data() : {};
+}
 
-  async function saveStatsDoc(email,data){
-    await ensureAuth();
-    const e=normEmail(email);
-    await db.collection("rooms").doc(ROOM_ID).collection("stats").doc(e).set({
-      ...(data||{}),
-      updatedAt:now()
-    }, { merge:true });
-  }
+async function saveStatsDoc(email,data){
+  await ensureAuth();
+  const e=normEmail(email);
+  await db.collection("rooms").doc(ROOM_ID).collection("stats").doc(e).set({
+    ...(data||{}),
+    updatedAt:now()
+  }, { merge:true });
+}
 
-  // ===== HISTORY =====
-  async function getHistory(email){
-    await ensureAuth();
-    const e=normEmail(email);
+// ===== HISTORY =====
+async function getHistory(email){
+  await ensureAuth();
+  const e=normEmail(email);
 
-    const snap = await db.collection("rooms")
-      .doc(ROOM_ID)
-      .collection("history")
-      .where("players","array-contains",e)
-      .orderBy("endedAt","desc")
-      .limit(60)
-      .get();
+  const snap = await db.collection("rooms")
+    .doc(ROOM_ID)
+    .collection("history")
+    .where("players","array-contains",e)
+    .orderBy("endedAt","desc")
+    .limit(60)
+    .get();
 
-    return snap.docs.map(d => d.data());
-  }
+  return snap.docs.map(d => d.data());
+}
 
-  async function saveHistoryEntry(entry){
-    await ensureAuth();
-    await db.collection("rooms")
-      .doc(ROOM_ID)
-      .collection("history")
-      .add({
-        ...(entry||{}),
-        savedAt:now()
-      });
-  }
-
+async function saveHistoryEntry(entry){
+  await ensureAuth();
+  await db.collection("rooms")
+    .doc(ROOM_ID)
+    .collection("history")
+    .add({
+      ...(entry||{}),
+      savedAt:now()
+    });
+}
   // Admin helpers
   async function resetStatsAll(email){
     const e=normEmail(email);
