@@ -6,8 +6,8 @@
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<title>Game Night • v45-2026-02-12</title>
-<!-- BUILD: v47_20260212T220500Z -->
+<title>Game Night • v26-2026-02-12</title>
+<!-- BUILD: v26_20260212T174000Z -->
 
 <style>
 :root{
@@ -48,20 +48,6 @@
     rgba(0,0,0,.34) 72%,
     rgba(255,255,255,.14) 100%
   );
-  --title-solid:#22d3ee;
-  --title-grad: linear-gradient(90deg,
-    #22d3ee 0%,
-    #ec4899 45%,
-    #f97316 70%,
-    #22c55e 100%
-  );
-  --active-solid:#f97316;
-  --active-grad: linear-gradient(90deg,
-    #f97316 0%,
-    #ec4899 55%,
-    #22d3ee 100%
-  );
-
   --chrome-text: linear-gradient(135deg,
     rgba(34,211,238,1) 0%,
     rgba(59,130,246,1) 22%,
@@ -306,47 +292,19 @@ input,select{
 @media(max-width:420px){#myDouble{font-size:12px;}}
 .pill,.badge,.kbd{ position:relative; }
 
-/* ===== Title text (vivid + readable; no gray/white/black) ===== */
-.h1, .kTurnBig, .brand .t, .rosterName, .headerTitle, .gameTitleBig, .turnNameBig, .turnTitle3d{
-  color:var(--title-solid);
+/* ===== Chrome text (HEADERS ONLY) ===== */
+.h1, .kTurnBig, .brand .t, .rosterName{
+  background:var(--chrome-text);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  background-size: 260% 260%;
+  animation: titleShift 7.5s ease-in-out infinite;
   text-shadow:
-    0 0 18px rgba(34,211,238,.42),
-    0 0 26px rgba(236,72,153,.22),
-    0 0 34px rgba(249,115,22,.16),
+    0 0 18px rgba(34,211,238,.20),
+    0 0 28px rgba(236,72,153,.12),
     0 2px 12px rgba(0,0,0,.55);
 }
-
-/* Use gradient only when text-clipping is supported (prevents “invisible/gray” titles). */
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .h1, .kTurnBig, .brand .t, .rosterName, .headerTitle, .gameTitleBig, .turnNameBig, .turnTitle3d{
-    background:var(--title-grad);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    background-size:260% 260%;
-    animation:titleShift 7.5s ease-in-out infinite;
-  }
-}
-
-/* Active player name (offset color so it pops vs titles) */
-.turnPlayerName{
-  color:var(--active-solid);
-  text-shadow:
-    0 0 16px rgba(249,115,22,.45),
-    0 0 22px rgba(236,72,153,.18),
-    0 2px 12px rgba(0,0,0,.55);
-}
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .turnPlayerName{
-    background:var(--active-grad);
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-    background-size:240% 240%;
-    animation:titleShift 6.5s ease-in-out infinite;
-  }
-}
-
 
 
 /* ===== Animated title gradient (electric, themed) ===== */
@@ -360,9 +318,7 @@ input,select{
 .turnTitle3d{
   font-weight:1000;
   letter-spacing:.4px;
-  background:var(--chrome-text);
-  background-size:260% 260%;
-  animation:titleShift 7.5s ease-in-out infinite;
+  background:linear-gradient(180deg,#ffffff 0%,#d8e2ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);
   -webkit-background-clip:text;
   background-clip:text;
   color:transparent;
@@ -375,11 +331,10 @@ input,select{
 
 /* ===== Bigger game + turn titles ===== */
 .gameTitleBig{font-size:34px;font-weight:1000;letter-spacing:.6px;margin:0;white-space:nowrap;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 20%,#ffffff 42%,#a8b9de 78%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.25),0 10px 24px rgba(0,0,0,.60);}
-.turnNameBig{font-size:38px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
+.turnNameBig{font-size:40px;font-weight:1000;letter-spacing:.5px;margin:0;background:linear-gradient(180deg,#ffffff 0%,#dfe7ff 22%,#ffffff 44%,#a8b9de 72%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 0 rgba(255,255,255,.18),0 4px 0 rgba(0,0,0,.26),0 14px 28px rgba(0,0,0,.65);}
 @media(max-width:520px){
   .gameTitleBig{ font-size:22px; }
-  .turnNameBig{ font-size:28px;   .titleOneLine{ font-size:20px; }
-}
+  .turnNameBig{ font-size:28px; }
 }
 
 /* ===== Pills / tags ===== */
@@ -442,24 +397,6 @@ input,select{
   }
 }
 
-
-/* Around the World setup header: keep pills pinned to top corners (prevents overlap) */
-.awSetupHero{ position:relative; padding-top:6px; }
-.awSetupHero .heroCornerLeft,
-.awSetupHero .heroCornerRight{
-  position:absolute;
-  top:0;
-}
-.awSetupHero .heroCornerLeft{ left:0; }
-.awSetupHero .heroCornerRight{ right:0; }
-.awSetupHero .heroMain{
-  grid-column:1 / -1;
-  max-width:100%;
-  margin-top:40px; /* room for the pinned pills */
-}
-@media(max-width:520px){
-  .awSetupHero .heroMain{ margin-top:44px; }
-}
 /* target label glow */
 .targetGlow{
   display:inline-block;
@@ -579,10 +516,6 @@ input,select{
   opacity:.85;
 }
 .hitBtn.miss{ border-color: rgba(239,68,68,.38); grid-column:1 / 2; }
-/* 3-button layouts (Around the World) should NOT inherit Shanghai grid spanning */
-.hitBtn.miss3{ border-color: rgba(239,68,68,.38); }
-.hitBtn.undo3{ color:var(--muted); }
-
 .hitBtn.undo{ color:var(--muted); grid-column:2 / 4; }
 
 /* ===== Roster ===== */
@@ -977,7 +910,7 @@ input,select{
 </head>
 
 <body>
-<!-- BUILD: v47_20260212T220500Z -->
+<!-- BUILD: v26_20260212T174000Z -->
 <div class="topbar">
   <div class="topActions left">
     <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
@@ -985,7 +918,7 @@ input,select{
 
   <div class="brand">
     <div class="t" id="brandTitle">Game Night</div>
-    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • build v45_20260212-20260212-220</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v17-20260212-174</div>
   </div>
 
   <div class="topActions right">
@@ -1000,7 +933,7 @@ input,select{
 
 <!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
-  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • build v45_20260212-2026-02-12</div>
+  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v26-2026-02-12</div>
 </div>
 
 <script>
@@ -1174,7 +1107,7 @@ let _turnNameCache = {};
 function turnNameHTML(name){
   const nm = esc(name||"");
   return `<div class="turnNameText turnTitle3d turnNameGlow">
-    <span class="turnBracket">⟦</span><span class="turnPlayerName">${nm}</span><span class="turnBracket">⟧</span>
+    <span class="turnBracket">⟦</span>${nm}<span class="turnBracket">⟧</span>
   </div>`;
 }
 
@@ -1617,14 +1550,10 @@ function startApp(){
     if(m.snaps.length>80) m.snaps.shift();
   }
   function popSnap(m){
-    if(!m?.snaps || m.snaps.length < 1) return m;
-    // snaps store the state *before* each action. Undo should roll back exactly ONE action.
-    const prevStr = m.snaps.pop();
-    let prev;
-    try{ prev = JSON.parse(prevStr); }catch{ return m; }
-    // Preserve remaining history so multiple undos work reliably.
-    prev.snaps = m.snaps;
-    return prev;
+    if(!m || !m.snaps || m.snaps.length<2) return m;
+    m.snaps.pop();
+    const prev=m.snaps.pop();
+    try{return JSON.parse(prev);}catch{return m;}
   }
 
   const Games=[
@@ -1767,7 +1696,7 @@ function startApp(){
             <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
             <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
             <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-            <button class="hitBtn undo3" id="undoBtn" type="button">UNDO</button>
+            <button class="hitBtn undo" id="undoBtn">UNDO</button>
           </div>
 
           ${finishedBanner}
@@ -2017,7 +1946,7 @@ function startApp(){
             <div class="hitRow">
               <button class="hitBtn" id="myDouble">I HIT MY DOUBLE</button>
               <button class="hitBtn miss" id="miss">MISS</button>
-              <button class="hitBtn undo3" id="undoBtn" type="button">UNDO</button>
+              <button class="hitBtn undo" id="undoBtn">UNDO</button>
             </div>
             <div class="divider"></div>
             <div class="pill">Attack Opponents</div>
@@ -2362,9 +2291,9 @@ function startApp(){
 
           ${isFinished ? "" : `
             <div class="hitRow">
-              <button class="hitBtn" id="hitBtn" type="button">HIT</button>
-              <button class="hitBtn miss3" id="missBtn" type="button">MISS</button>
-              <button class="hitBtn undo3" id="undoBtn" type="button">UNDO</button>
+              <button class="hitBtn" id="hitBtn">HIT</button>
+              <button class="hitBtn miss" id="missBtn">MISS</button>
+              <button class="hitBtn undo" id="undoBtn">UNDO</button>
             </div>
           `}
         </div>
@@ -2417,14 +2346,14 @@ function startApp(){
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
       };
-      const missBtn=$("missBtn"); if(missBtn) missBtn.addEventListener("click", ()=>{ playBeep("miss");
+      const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{ playBeep("miss");
         if(m.finished) return;
         pushSnap(m);
         addThrow(m,false);
         if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
         render();
         saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
-      });
+      };
     }
 
     return { initMatch, renderPlay, bindPlay };
@@ -2677,7 +2606,7 @@ function startApp(){
             <div class="logoMark"><span>👥</span></div>
           </div>
 
-          <div class="heroMain" style="text-align:center;align-items:center">
+          <div class="heroMain" style="text-align:left;align-items:flex-start">
             <div class="h1">Players</div>
             <div class="sub">Tap “View stats” to see someone’s game stats.</div>
           </div>
@@ -2759,7 +2688,7 @@ function startApp(){
         </div>
         <div class="divider"></div>
         ${Games.map(g=>`
-          <div class="rosterCard ${g.active?"leaderGlow":""}">
+          <div class="rosterCard">
             <div class="rosterLeft">
               <div class="avatar">${esc(g.icon||"🎯")}</div>
               <div>
@@ -2767,7 +2696,7 @@ function startApp(){
                 <div class="rosterSub">${esc(g.active?"Active":"Coming soon")}</div>
               </div>
             </div>
-            <button class="btn ${g.active? "ok":"ghost"}" data-rule="${esc(g.id)}" ${g.active?"":"disabled"}>Open</button>
+            <button class="btn" data-rule="${esc(g.id)}">Open</button>
           </div>
         `).join("")}
         <div class="divider"></div>
@@ -2824,7 +2753,7 @@ function startApp(){
     const players=await getPlayers();
     try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
     const meEmail=meUser.email;
-    const defaultCount=Math.max(1, Math.min(2, players.length||1));
+    const defaultCount=2;
 
     const aroundModeUI = (activeGameId==="around" && g.active) ? `
       <div class="divider"></div>
@@ -2837,34 +2766,20 @@ function startApp(){
       <div class="small">Pick the format before starting.</div>
     ` : "";
 
-    const defaultHeroMain = `
-          <div class="heroMain">
-            <div class="h1">${esc(g.name)}</div>
-            <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
-          </div>
-    `;
-
-    const aroundHeroMain = `
-          <div class="heroMain" style="text-align:center;align-items:center">
-            <div class="h1" style="font-size:clamp(22px,6.2vw,32px);margin:0;white-space:nowrap;letter-spacing:.4px">Around the World</div>
-            <div class="sub" style="margin-top:6px;text-align:center">Choose players (max 4). Select exactly the number you choose.</div>
-          </div>
-        `;
-
-    const setupHeroMain = (activeGameId==="around") ? aroundHeroMain : defaultHeroMain;
-    const setupLeftBadge = (activeGameId==="around") ? `<span class="pill">Setup</span>` : `<span class="kbd">${esc(g.name)}</span>`;
-
     setHTML(`
       <div class="card"><div class="row"><button class="btn ghost" id="setupBack">Back</button></div></div>
 
       <div class="card">
-        <div class="hero ${activeGameId==="around"?"awSetupHero":""}">
+        <div class="hero">
           <div class="heroCornerLeft">
             <div class="logoMark"><span>${esc(g.icon || "🎯")}</span></div>
-            ${setupLeftBadge}
+            <span class="kbd">${esc(g.name)}</span>
           </div>
 
-          ${setupHeroMain}
+          <div class="heroMain">
+            <div class="h1">${esc(g.name)}</div>
+            <div class="sub">Choose players (max ${MAX_PLAYERS}). Select exactly the number you choose.</div>
+          </div>
 
           <div class="heroCornerRight">
             ${g.active?`<span class="pill" data-live="1">Ready</span>`:`<span class="pill soon">Coming soon</span>`}
@@ -2878,7 +2793,7 @@ function startApp(){
             <div>
               <label>Number of players</label>
               <select id="playerCount">
-                ${Array.from({length:Math.min(MAX_PLAYERS, Math.max(1, players.length||1))},(_,i)=>i+1).map(n=>`<option value="${n}" ${n===defaultCount?"selected":""}>${n}</option>`).join("")}
+                ${Array.from({length:MAX_PLAYERS},(_,i)=>i+1).map(n=>`<option value="${n}" ${n===defaultCount?"selected":""}>${n}</option>`).join("")}
               </select>
             </div>
             <div>
@@ -3161,7 +3076,7 @@ function startApp(){
           </div>
 
           <div class="heroMain">
-            <div class="h1 titleOneLine">${esc(g.name)}</div>
+            <div class="h1">${esc(g.name)}</div>
             <div class="sub">Player: <b>${esc(viewer.name||"Player")}</b></div>
           </div>
 
