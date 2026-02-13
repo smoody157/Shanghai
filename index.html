@@ -18,6 +18,31 @@
   /* TEXT (READABLE) */
   --text:#eef4ff;
   --muted:#9fb0d0;
+  // firebase-setup.js
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-analytics.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.24.0/firebase-firestore.js";
+
+// Your Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
+  authDomain: "gamenightdarts-e7601.firebaseapp.com",
+  projectId: "gamenightdarts-e7601",
+  storageBucket: "gamenightdarts-e7601.appspot.com",
+  messagingSenderId: "270045452251",
+  appId: "1:270045452251:web:393956ce18b43316e939fe",
+  measurementId: "G-LQEHF02ZVR"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+console.log("Firebase is initialized and ready!");
 
   /* MULTI-COLOR ACCENTS (NOT “ALL BLUE”) */
   --c-cyan:#22d3ee;
