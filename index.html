@@ -1340,6 +1340,160 @@ function startApp(){
    // ===== Active target overlay (full slice across the 4 segments) =====
    let activeOverlay="";
    if(typeof activeTarget === "number"){
+    // ========= FIREBASE ONLINE MULTIPLAYER STORAGE =========
+
+// Firebase core
+import { initializeApp } from "firebase/app";
+import { 
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  updateDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  serverTimestamp
+} from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
+
+// CONFIG (yours)
+const firebaseConfig = {
+  apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
+  authDomain: "gamenightdarts-e7601.firebaseapp.com",
+  projectId: "gamenightdarts-e7601",
+  storageBucket: "gamenightdarts-e7601.firebasestorage.app",
+  messagingSenderId: "270045452251",
+  appId: "1:270045452251:web:5a4a661140a60780e939fe",
+  measurementId: "G-M60TDFYBW0"
+};
+
+// INIT
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const analytics = getAnalytics(app);
+
+// ===== PLAYERS =====
+
+async function getPlayers(){
+  const snap = await getDocs(query(collection(db,"players"), orderBy("name")));
+  return snap.docs.map(d=>d.data());
+}
+
+async function upsertPlayer(name,email){
+  const e = normEmail(email);
+  await setDoc(doc(db,"players",e), {
+    name,
+    email:e,
+    updatedAt:serverTimestamp()
+  }, {merge:true});
+}
+
+async function signInEmail(email){
+  const e = normEmail(email);
+  const ref = doc(db,"players",e);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return null;
+  return snap.data();
+}
+
+async function signUpEmail(name,email){
+  const e = normEmail(email);
+  await setDoc(doc(db,"players",e), {
+    name,
+    email:e,
+    createdAt:serverTimestamp()
+  });
+  return {name,email:e};
+}
+
+// ===== MATCH ROOMS (auto join if friend waiting) =====
+
+async function createMatchRoom(gameId, players){
+  const id = crypto.randomUUID();
+
+  await setDoc(doc(db,"rooms",id), {
+    gameId,
+    players,
+    state:"waiting",
+    createdAt:serverTimestamp(),
+    matchData:null
+  });
+
+  return id;
+}
+
+async function findExistingRoom(gameId, email){
+  const snap = await getDocs(query(
+    collection(db,"rooms"),
+    where("gameId","==",gameId),
+    where("state","==","waiting"),
+    where("players","array-contains",email),
+    limit(1)
+  ));
+
+  if(snap.empty) return null;
+  return snap.docs[0].id;
+}
+
+function subscribeToRoom(roomId, cb){
+  return onSnapshot(doc(db,"rooms",roomId), d=>{
+    cb(d.data());
+  });
+}
+
+async function joinRoom(roomId, email){
+  await updateDoc(doc(db,"rooms",roomId), {
+    state:"active"
+  });
+}
+
+// ===== MATCH STATE SAVE =====
+
+async function saveMatchState(roomId, match){
+  await updateDoc(doc(db,"rooms",roomId), {
+    matchData:match
+  });
+}
+
+function listenMatchState(roomId, cb){
+  return onSnapshot(doc(db,"rooms",roomId), d=>{
+    const data=d.data();
+    if(data && data.matchData) cb(data.matchData);
+  });
+}
+
+// ===== HISTORY =====
+
+async function saveHistoryEntry(entry){
+  await setDoc(doc(collection(db,"history")), entry);
+}
+
+async function getHistory(email){
+  const snap = await getDocs(query(
+    collection(db,"history"),
+    where("players","array-contains",email),
+    orderBy("endedAt","desc"),
+    limit(50)
+  ));
+  return snap.docs.map(d=>d.data());
+}
+
+// ===== STATS =====
+
+async function getStatsDoc(email){
+  const ref = doc(db,"stats",normEmail(email));
+  const snap = await getDoc(ref);
+  return snap.exists()?snap.data():{};
+}
+
+async function saveStatsDoc(email,data){
+  await setDoc(doc(db,"stats",normEmail(email)), data, {merge:true});
+}
      const idx = BOARD_NUMS.indexOf(activeTarget);
      if(idx >= 0){
        const a0 = idx*seg + rot + 0.6;
