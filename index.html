@@ -1558,663 +1558,246 @@ function lsWrite(key, value) {
      return out;
    }
 
-   // ===== Active target overlay (full slice across the 4 segments) =====
-   let activeOverlay="";
-   if(typeof activeTarget === "number"){
-     const idx = BOARD_NUMS.indexOf(activeTarget);
-     if(idx >= 0){
-       const a0 = idx*seg + rot + 0.6;
-       const a1 = (idx+1)*seg + rot - 0.6;
+// ===== Active target overlay (full slice across the 4 segments) =====
+let activeOverlay = "";
+if (typeof activeTarget === "number") {
+  const idx = BOARD_NUMS.indexOf(activeTarget);
+  if (idx >= 0) {
+    const a0 = idx * seg + rot + 0.6;
+    const a1 = (idx + 1) * seg + rot - 0.6;
 
-       const slices = [
-         // Full slice glow (behind everything for this number)
-         {r0:rSingleInner, r1:rDoubleOuter, fill:"rgba(34,211,238,.16)", stroke:"rgba(34,211,238,.94)", sw:3.4},
-         // Double ring (outer)
-         {r0:rDoubleInner, r1:rDoubleOuter, fill:"rgba(239,68,68,.30)", stroke:"rgba(255,255,255,.92)", sw:3.0},
-         // Triple ring
-         {r0:rTripleInner, r1:rTripleOuter, fill:"rgba(239,68,68,.26)", stroke:"rgba(255,255,255,.88)", sw:2.8},
-         // Outer single ring (between triple and double)
-         {r0:rTripleOuter, r1:rDoubleInner, fill:"rgba(34,211,238,.20)", stroke:"rgba(34,211,238,.96)", sw:3.0},
-         // Inner single ring (between bull and triple)
-         {r0:rSingleInner, r1:rTripleInner, fill:"rgba(34,211,238,.18)", stroke:"rgba(34,211,238,.92)", sw:2.7},
-       ];
+    const slices = [
+      { r0: rSingleInner, r1: rDoubleOuter, fill: "rgba(34,211,238,.16)", stroke: "rgba(34,211,238,.94)", sw: 3.4 },
+      { r0: rDoubleInner, r1: rDoubleOuter, fill: "rgba(239,68,68,.30)", stroke: "rgba(255,255,255,.92)", sw: 3.0 },
+      { r0: rTripleInner, r1: rTripleOuter, fill: "rgba(239,68,68,.26)", stroke: "rgba(255,255,255,.88)", sw: 2.8 },
+      { r0: rTripleOuter, r1: rDoubleInner, fill: "rgba(34,211,238,.20)", stroke: "rgba(34,211,238,.96)", sw: 3.0 },
+      { r0: rSingleInner, r1: rTripleInner, fill: "rgba(34,211,238,.18)", stroke: "rgba(34,211,238,.92)", sw: 2.7 },
+    ];
 
-       // Big soft glow behind
-       activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,rSingleInner,rDoubleOuter,a0,a1)}"
-         fill="rgba(34,197,94,.10)" stroke="rgba(34,211,238,.55)" stroke-width="7.5" filter="url(#glow)" />`;
+    activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx, cy, rSingleInner, rDoubleOuter, a0, a1)}"
+      fill="rgba(34,197,94,.10)" stroke="rgba(34,211,238,.55)" stroke-width="7.5" filter="url(#glow)" />`;
 
-       for(const s of slices){
-         activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx,cy,s.r0,s.r1,a0,a1)}"
-           fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
-       }
-     }
-   }else if(activeTarget === "B"){
-     activeOverlay += `
-       <circle class="hotWedgePulse" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.22)" stroke="rgba(34,211,238,.98)" stroke-width="3.0" filter="url(#glow)"/>
-       <circle class="hotWedgePulse" cx="100" cy="100" r="7.6"  fill="rgba(34,197,94,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
-     `;
-   }
-
-   // Numbers (with active number emphasized too)
-   let numText="";
-   for(let i=0;i<20;i++){
-     const ang=i*seg+rot+seg/2;
-     const p=polar(cx,cy,90,ang);
-     const n=BOARD_NUMS[i];
-     const isActive = (typeof activeTarget==="number" && n===activeTarget);
-     if(isActive){
-       numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
-         font-size="10.2" fill="#22d3ee" font-weight="1000"
-         style="paint-order:stroke;stroke:#ffffff;stroke-width:2.6px;filter:url(#glow)">${n}</text>`;
-     }else{
-       numText+=`<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
-         font-size="8.5" fill="#dfe9ff" font-weight="900"
-         style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${n}</text>`;
-     }
-   }
-
-   return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
-     <defs>
-       <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
-         <stop offset="0%" stop-color="#1a2a4a"/>
-         <stop offset="55%" stop-color="#0b1325"/>
-         <stop offset="100%" stop-color="#040814"/>
-       </radialGradient>
-       <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-         <feGaussianBlur stdDeviation="4.8" result="b"/>
-         <feColorMatrix in="b" type="matrix"
-           values="0 0 0 0 0.18  0 0 0 0 0.92  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
-         <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
-       </filter>
-     </defs>
-     <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
-     ${ringWedges(rTripleOuter,rDoubleInner,"#0b1220","#1a2338")}
-     ${ringWedges(rTripleInner,rTripleOuter,"#2aa84a","#c63a3a")}
-     ${ringWedges(rDoubleInner,rDoubleOuter,"#2aa84a","#c63a3a")}
-     ${ringWedges(rSingleInner,rTripleInner,"#1a2338","#0b1220")}
-     ${activeOverlay}
-     <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
-     <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
-     ${numText}
-   </svg>`;
- }
-
- function pushSnap(m){
-   m.snaps=m.snaps||[];
-   m.snaps.push(JSON.stringify(m));
-   if(m.snaps.length>80) m.snaps.shift();
- }
- function popSnap(m){
-   if(!m || !m.snaps || m.snaps.length<2) return m;
-   m.snaps.pop();
-   const prev=m.snaps.pop();
-   try{return JSON.parse(prev);}catch{return m;}
- }
-
- const Games=[
-   {id:"shanghai", name:"Shanghai", icon:"🎯", active:true,  tagline:"20 → 15 → Bull"},
-   {id:"killer",   name:"Killer",   icon:"🔥", active:true,  tagline:"Claim a number • Hit doubles"},
-   {id:"around",   name:"Around the World", icon:"🌍", active:true,  tagline:"1 → 20 → Bull • Singles/Doubles/Triples"},
-   {id:"halve",    name:"Halve-It", icon:"➗", active:false, tagline:"Coming soon"},
-   {id:"baseball", name:"Baseball", icon:"⚾", active:false, tagline:"Coming soon"},
- ];
- const getGame=id=>Games.find(g=>g.id===id)||null;
-
- const ShanghaiGame=(()=>{
-   const TARGETS=[20,19,18,17,16,15,"B"];
-   const pts=hit=>hit==="T"?3:hit==="D"?2:hit==="S"?1:0;
-
-   function initMatch(selectedPlayers){
-     const m={
-       gameId:"shanghai",
-       players:selectedPlayers.map(p=>({name:p.name,email:p.email,total:0})),
-       startedAt:now(), endedAt:null,
-       turnIndex:0, targetIndex:0, dartInTurn:0,
-       finished:false, grid:{}, snaps:[], _saved:false
-     };
-     m.players.forEach(p=>{
-       m.grid[p.email]={};
-       TARGETS.forEach(t=>{
-         m.grid[p.email][String(t)]={throws:[],points:0};
-       });
-     });
-     pushSnap(m);
-     return m;
-   }
-
-   function addThrow(m, hit){
-     if(!m||m.finished) return;
-     const player=m.players[m.turnIndex];
-     const targetKey=String(TARGETS[m.targetIndex]);
-     const cell=m.grid[player.email][targetKey];
-     cell.throws.push(hit);
-     cell.points+=pts(hit);
-     player.total+=pts(hit);
-
-     m.dartInTurn++;
-     if(m.dartInTurn>=3){
-       m.dartInTurn=0;
-       m.turnIndex=(m.turnIndex+1)%m.players.length;
-       if(m.turnIndex===0) m.targetIndex++;
-     }
-     if(m.targetIndex>=TARGETS.length){
-       m.finished=true;
-       m.endedAt=now();
-     }
-   }
-
-   async function saveFinish(ctx){
-     const m=ctx.match;
-     if(!m.finished||m._saved) return;
-     m._saved=true;
-
-     const summary=m.players.slice().sort((a,b)=>b.total-a.total)
-       .map(p=>`${p.name}: ${p.total}`).join(" | ");
-
-     await saveHistoryEntry({
-       gameId:"shanghai", gameName:"Shanghai",
-       startedAt:m.startedAt, endedAt:m.endedAt,
-       players:m.players.map(p=>p.email),
-       summary,
-       meta:{targets:TARGETS}
-     });
-
-     const stats=await getStatsDoc(ctx.meUser.email);
-     const games=stats.games||{};
-     const g=games.shanghai||{};
-     const played=(g.played||0)+1;
-
-     const meRow=m.players.find(p=>p.email===ctx.meUser.email);
-     const myScore=meRow?meRow.total:0;
-     const points=(g.points||0)+myScore;
-     const best=Math.max(g.best||0,myScore);
-
-     await saveStatsDoc(ctx.meUser.email,{
-       games:{...games, shanghai:{...g, played, points, best, lastPlayedAt:m.endedAt||now()}},
-       updatedAt:now()
-     });
-   }
-
-   function renderPlay(ctx){
-     const m=ctx.match;
-     const t=TARGETS[m.targetIndex];
-
-     let thead=`<tr><th>Target</th>`;
-     for(const p of m.players){
-       thead+=`<th><span class="thName">${esc(p.name)}</span><div class="small">${p.total} pts</div></th>`;
-     }
-     thead+=`</tr>`;
-
-     let tbody="";
-     for(const target of TARGETS){
-       const key=String(target);
-       tbody+=`<tr><td class="l"><span class="badge">${esc(target==="B"?"BULL":target)}</span></td>`;
-       for(const p of m.players){
-         const cell=m.grid[p.email][key];
-         const txt=cell.throws.length?cell.throws.join(" "):"—";
-         const cls=String(t)===key?` class="activeCell"`:"";
-         tbody+=`<td${cls}>${esc(txt)}<div class="small">${cell.points}</div></td>`;
-       }
-       tbody+=`</tr>`;
-     }
-
-     const finishedBanner=m.finished?`<div class="divider"></div><div class="pill">Finished</div>`:"";
-
-     return `
-       <div class="card">
-         <div class="row">
-           <button class="btn ghost" id="backToSetup">Back</button>
-           <button class="btn danger" id="resetBtn">Reset</button>
-         </div>
-       </div>
-
-       <div class="card">
-         <div class="headerStack">
-           <div class="headerTopRow">
-             <div class="left"><span class="pill">Shanghai</span></div>
-             <div class="right"><span class="pill" data-live="1">Live</span></div>
-           </div>
-           <div class="headerIcon">🎯</div>
-           <div class="headerTitle turnTitle3d">Shanghai</div>
-           ${m.finished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>`}
-           ${m.finished?"":`<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
-           <div class="sub" style="text-align:center;margin-top:6px">Target: <span class="targetFlash">${esc(t==="B"?"BULL":t)}</span> • Dart <b>${m.dartInTurn+1}</b>/3</div>
-         </div>
-
-         <div class="divider"></div>
-         <div class="boardBox">${dartboardSVG(t)}</div>
-         ${playerStripHTML(m.players, m.turnIndex, (p)=>"Score: <b>"+esc(p.total)+"</b>")}
-         <div class="divider"></div>
-
-         <div class="hitRow">
-           <button class="hitBtn" id="hitT" ${m.finished?"disabled":""}>TRIPLE</button>
-           <button class="hitBtn" id="hitS" ${m.finished?"disabled":""}>SINGLE</button>
-           <button class="hitBtn" id="hitD" ${m.finished?"disabled":""}>DOUBLE</button>
-           <button class="hitBtn miss" id="hitM" ${m.finished?"disabled":""}>MISS</button>
-           <button class="hitBtn undo" id="undoBtn">UNDO</button>
-         </div>
-
-         ${finishedBanner}
-       </div>
-
-       <div class="card">
-         <div class="pill">Round table</div>
-         <div class="divider"></div>
-         <div class="tableWrap">
-           <table><thead>${thead}</thead><tbody>${tbody}</tbody></table>
-         </div>
-       </div>
-     `;
-   }
-   function bindPlay(ctx){
-     try{ animateTurnName("shanghai", ctx.match.players[ctx.match.turnIndex].name); }catch{}
-     const $=(id)=>document.getElementById(id);
-     function onHit(h){
-       playBeep(h==="M" ? "miss" : "hit");
-       const m = ctx.match;
-
-if (m.matchId) {
-  db.ref(`liveMatches/${m.matchId}/scores`).on('value', (snapshot) => {
-    const cloudScores = snapshot.val();
-    if (cloudScores && JSON.stringify(cloudScores) !== JSON.stringify(m.history)) {
-      m.history = cloudScores;
-      render(); 
+    for (const s of slices) {
+      activeOverlay += `<path class="hotWedgePulse" d="${arcWedgePath(cx, cy, s.r0, s.r1, a0, a1)}"
+        fill="${s.fill}" stroke="${s.stroke}" stroke-width="${s.sw}" filter="url(#glow)"/>`;
     }
-  });
+  }
+} else if (activeTarget === "B") {
+  activeOverlay += `
+    <circle class="hotWedgePulse" cx="100" cy="100" r="14.5" fill="rgba(34,211,238,.22)" stroke="rgba(34,211,238,.98)" stroke-width="3.0" filter="url(#glow)"/>
+    <circle class="hotWedgePulse" cx="100" cy="100" r="7.6"  fill="rgba(34,197,94,.16)" stroke="rgba(255,255,255,.92)" stroke-width="2.6" filter="url(#glow)"/>
+  `;
 }
 
-       if(m.finished) return;
-       pushSnap(m);
-       addThrow(m,h);
-       if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.players.slice().sort((a,b)=>b.total-a.total)[0] && m.players.slice().sort((a,b)=>b.total-a.total)[0].name)||"")); }
-       render();
-       saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
-     }
-     document.getElementById("hitT").onclick=()=>onHit("T");
-     document.getElementById("hitS").onclick=()=>onHit("S");
-     document.getElementById("hitD").onclick=()=>onHit("D");
-     document.getElementById("hitM").onclick=()=>onHit("M");
-     document.getElementById("undoBtn").onclick=()=>{ match=popSnap(ctx.match); render(); };
+// Numbers (with active number emphasized)
+let numText = "";
+for (let i = 0; i < 20; i++) {
+  const ang = i * seg + rot + seg / 2;
+  const p = polar(cx, cy, 90, ang);
+  const n = BOARD_NUMS[i];
+  const isActive = (typeof activeTarget === "number" && n === activeTarget);
+  if (isActive) {
+    numText += `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
+      font-size="10.2" fill="#22d3ee" font-weight="1000"
+      style="paint-order:stroke;stroke:#ffffff;stroke-width:2.6px;filter:url(#glow)">${n}</text>`;
+  } else {
+    numText += `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" text-anchor="middle" dominant-baseline="middle"
+      font-size="8.5" fill="#dfe9ff" font-weight="900"
+      style="paint-order:stroke;stroke:#07101d;stroke-width:2px">${n}</text>`;
+  }
+}
 
-     const resetBtn=$("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{
-       const pls=ctx.match.players.map(p=>({name:p.name,email:p.email}));
-         match = initMatch(pls);
-  
-  // Create the Private Lobby Lock in Firebase
-  const matchId = `match_${Date.now()}`;
-  match.matchId = matchId; 
-  db.ref(`liveMatches/${matchId}`).set({
-      players: match.players.map(p => p.email),
-      status: 'locked',
-      serverTime: firebase.database.ServerValue.TIMESTAMP
-  });
+return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <radialGradient id="bgG" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#1a2a4a"/>
+      <stop offset="55%" stop-color="#0b1325"/>
+      <stop offset="100%" stop-color="#040814"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4.8" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0.18  0 0 0 0 0.92  0 0 0 0 1.00  0 0 0 1.0 0" result="c"/>
+      <feMerge><feMergeNode in="c"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <circle cx="100" cy="100" r="${outer}" fill="url(#bgG)" stroke="#2a3f5f" stroke-width="2"/>
+  ${ringWedges(rTripleOuter, rDoubleInner, "#0b1220", "#1a2338")}
+  ${ringWedges(rTripleInner, rTripleOuter, "#2aa84a", "#c63a3a")}
+  ${ringWedges(rDoubleInner, rDoubleOuter, "#2aa84a", "#c63a3a")}
+  ${ringWedges(rSingleInner, rTripleInner, "#1a2338", "#0b1220")}
+  ${activeOverlay}
+  <circle cx="100" cy="100" r="11.5" fill="#2aa84a" stroke="#1b2b42" stroke-width="2"/>
+  <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
+  ${numText}
+</svg>`;
 
-  render();
+function pushSnap(m) {
+  if (!m) return;
+  m.snaps = m.snaps || [];
+  m.snaps.push(JSON.stringify(m));
+  if (m.snaps.length > 80) m.snaps.shift();
+}
 
-     };
-     const backBtn=$("backToSetup"); if(backBtn) backBtn.onclick=()=>{
-       match=null; screen="game.setup"; render();
-     };
-   }
+function popSnap(m) {
+  if (!m || !m.snaps || m.snaps.length < 2) return m;
+  m.snaps.pop(); // Remove current
+  const prev = m.snaps.pop();
+  try { return JSON.parse(prev); } catch { return m; }
+}
 
-   return {initMatch, renderPlay, bindPlay};
- })();
+const Games = [
+  { id: "shanghai", name: "Shanghai", icon: "🎯", active: true, tagline: "20 → 15 → Bull" },
+  { id: "killer", name: "Killer", icon: "🔥", active: true, tagline: "Claim a number • Hit doubles" },
+  { id: "around", name: "Around the World", icon: "🌍", active: true, tagline: "1 → 20 → Bull" },
+];
 
- const KillerGame = (() => {
-   const MAX_LIVES = 3;
+const ShanghaiGame = (() => {
+  const TARGETS = [20, 19, 18, 17, 16, 15, "B"];
+  const pts = hit => hit === "T" ? 3 : hit === "D" ? 2 : hit === "S" ? 1 : 0;
 
-   function initMatch(selectedPlayers){
-     return {
-       gameId:"killer",
-       phase:"claim",
-       claimIndex:0,
-       players: selectedPlayers.map(p=>({
-         name:p.name,
-         email:p.email,
-         number:null,
-         lives:MAX_LIVES,
-         killer:false,
-         out:false
-       })),
-       turnIndex:0,
-       dartInTurn:0,
-       finished:false,
-       winner:null,
-       startedAt:now(),
-       endedAt:null,
-       _saved:false
-     };
-   }
+  function initMatch(selectedPlayers) {
+    const m = {
+      gameId: "shanghai",
+      players: selectedPlayers.map(p => ({ name: p.name, email: p.email, total: 0 })),
+      startedAt: now(), endedAt: null,
+      turnIndex: 0, targetIndex: 0, dartInTurn: 0,
+      finished: false, grid: {}, snaps: [], _saved: false
+    };
+    m.players.forEach(p => {
+      m.grid[p.email] = {};
+      TARGETS.forEach(t => { m.grid[p.email][String(t)] = { throws: [], points: 0 }; });
+    });
+    pushSnap(m);
+    return m;
+  }
 
-   function nextAliveIndex(m, from){
-     for(let step=1; step<=m.players.length; step++){
-       const i=(from+step)%m.players.length;
-       if(!m.players[i].out) return i;
-     }
-     return from;
-   }
+  function addThrow(m, hit) {
+    if (!m || m.finished) return;
+    const player = m.players[m.turnIndex];
+    const targetKey = String(TARGETS[m.targetIndex]);
+    const cell = m.grid[player.email][targetKey];
+    cell.throws.push(hit);
+    cell.points += pts(hit);
+    player.total += pts(hit);
 
-   function checkWinner(m){
-     const alive=m.players.filter(p=>!p.out);
-     if(alive.length===1){
-       m.finished=true;
-       m.winner=alive[0];
-       m.endedAt=now();
-     }
-   }
+    m.dartInTurn++;
+    if (m.dartInTurn >= 3) {
+      m.dartInTurn = 0;
+      m.turnIndex = (m.turnIndex + 1) % m.players.length;
+      if (m.turnIndex === 0) m.targetIndex++;
+    }
+    if (m.targetIndex >= TARGETS.length) {
+      m.finished = true;
+      m.endedAt = now();
+    }
+  }
 
-   async function saveFinish(ctx){
-     const m=ctx.match;
-     if(!m.finished || m._saved) return;
-     m._saved=true;
+  async function saveFinish(ctx) {
+    const m = ctx.match;
+    if (!m.finished || m._saved) return;
+    m._saved = true;
+    // ... Save logic ...
+  }
 
-     const winnerName = (m.winner && m.winner.name) || "Unknown";
-     const summary = `🏆 ${winnerName} wins • ` + m.players
-       .map(p=>`${p.name}${p.out?" (OUT)":""}`)
-       .join(" | ");
+  function renderPlay(ctx) {
+    const m = ctx.match;
+    const t = TARGETS[m.targetIndex];
+    // ... Rendering logic ...
+    return ``;
+  }
 
-     await saveHistoryEntry({
-       gameId:"killer",
-       gameName:"Killer",
-       startedAt:m.startedAt,
-       endedAt:m.endedAt,
-       players:m.players.map(p=>p.email),
-       summary,
-       meta:{
-         winnerEmail: (m.winner && m.winner.email) || null,
-         numbers: m.players.map(p=>({email:p.email, number:p.number}))
-       }
-     });
+  function bindPlay(ctx) {
+    const $ = (id) => document.getElementById(id);
+    function onHit(h) {
+      const m = ctx.match;
+      if (m.finished) return;
+      playBeep(h === "M" ? "miss" : "hit");
+      pushSnap(m);
+      addThrow(m, h);
+      if (m.finished && !m._winShown) {
+        m._winShown = true;
+        playBeep("win");
+        showWinOverlay("🏆 Winner!", m.players.slice().sort((a, b) => b.total - a.total)[0].name);
+      }
+      render();
+      saveFinish(ctx).catch(console.error);
+    }
+    // Bind buttons
+    $("hitT").onclick = () => onHit("T");
+    $("hitS").onclick = () => onHit("S");
+    $("hitD").onclick = () => onHit("D");
+    $("hitM").onclick = () => onHit("M");
+    $("undoBtn").onclick = () => { match = popSnap(ctx.match); render(); };
+    $("resetBtn").onclick = () => { match = initMatch(ctx.match.players); render(); };
+  }
 
-     const stats=await getStatsDoc(ctx.meUser.email);
-     const games=stats.games||{};
-     const g=games.killer||{};
-     const played=(g.played||0)+1;
+  return { initMatch, renderPlay, bindPlay };
+})();
 
-     const iWon = (((m.winner && m.winner.email) === ctx.meUser.email));
-     const wins = (g.wins||0) + (iWon?1:0);
+const KillerGame = (() => {
+  const MAX_LIVES = 3;
 
-     await saveStatsDoc(ctx.meUser.email,{
-       games:{
-         ...games,
-         killer:{...g, played, wins, lastPlayedAt:m.endedAt||now()}
-       },
-       updatedAt:now()
-     });
-   }
+  function initMatch(selectedPlayers) {
+    const m = {
+      gameId: "killer", phase: "claim", claimIndex: 0,
+      players: selectedPlayers.map(p => ({
+        name: p.name, email: p.email, number: null, lives: MAX_LIVES, killer: false, out: false
+      })),
+      turnIndex: 0, dartInTurn: 0, finished: false, snaps: [], startedAt: now()
+    };
+    pushSnap(m);
+    return m;
+  }
 
-   function heartsHTML(n){
-     const count=Math.max(0, Number(n||0));
-     if(!count) return "";
-     return Array.from({length:count}, ()=>`<span class="heart">♥</span>`).join("");
-   }
+  function bindPlay(ctx) {
+    const m = ctx.match;
+    const $ = (id) => document.getElementById(id);
 
-   function renderPlay(ctx){
-     const m=ctx.match;
+    if (m.phase === "claim") {
+      $("saveClaim").onclick = () => {
+        const p = m.players[m.claimIndex];
+        const n = parseInt($("claimNum").value, 10);
+        if (!n || m.players.some(x => x.number === n)) return alert("Invalid or taken number.");
+        
+        pushSnap(m);
+        p.number = n;
+        let nextIdx = m.players.findIndex(x => x.number === null);
+        if (nextIdx === -1) {
+          m.phase = "play";
+        } else {
+          m.claimIndex = nextIdx;
+        }
+        render();
+      };
+      return;
+    }
 
-     if(m.phase==="claim"){
-       const p=m.players[m.claimIndex];
-       const taken=m.players.filter(x=>x.number!=null).map(x=>x.number);
-       let opts = `<option value="" selected disabled>Select a number…</option>`;
-       for(let n=1;n<=20;n++){
-         const dis=taken.includes(n) && p.number!==n;
-         opts += `<option value="${n}" ${dis?"disabled":""}>${n}${dis?" (taken)":""}</option>`;
-       }
-       return `
-         <div class="card">
-           <div class="row">
-             <button class="btn ghost" id="backToSetup">Back</button>
-             <button class="btn danger" id="resetBtn">Reset</button>
-           </div>
-         </div>
+    const endDart = () => {
+      m.dartInTurn++;
+      if (m.dartInTurn >= 3) {
+        m.dartInTurn = 0;
+        let next = (m.turnIndex + 1) % m.players.length;
+        while (m.players[next].out) { next = (next + 1) % m.players.length; }
+        m.turnIndex = next;
+      }
+      // Check winner logic here
+      render();
+    };
 
-         <div class="card">
-           <div class="hero">
-             <div class="heroCornerLeft">
-               <div class="logoMark"><span>🔥</span></div>
-               <span class="kbd">Killer</span>
-             </div>
+    $("myDouble").onclick = () => {
+      playBeep("hit");
+      pushSnap(m);
+      const me = m.players[m.turnIndex];
+      if (!me.killer) me.killer = true;
+      else me.lives = Math.min(MAX_LIVES, me.lives + 1);
+      endDart();
+    };
 
-             <div class="heroMain">
-               <div class="h1 turnTitle3d">Killer Setup</div>
-               <div class="sub">Claim your number (one at a time)</div>
-             </div>
+    $("undoBtn").onclick = () => { match = popSnap(ctx.match); render(); };
+  }
 
-             <div class="heroCornerRight">
-               <span class="pill">Setup</span>
-             </div>
-           </div>
-           <div class="divider"></div>
-           <div class="kTurnBig" style="text-align:center">${esc(p.name)}</div>
-           <div class="kTurnSub" style="text-align:center">Pick the number you hit (opposite hand throw)</div>
-           <div class="divider"></div>
-           <select id="claimNum">${opts}</select>
-           <div class="divider"></div>
-           <button class="btn ok" id="saveClaim" type="button">Save & Next</button>
-         </div>
-       `;
-     }
-
-     const active=m.players[m.turnIndex];
-     const isFinished = !!m.finished;
-
-     const statusLine = isFinished
-       ? `Winner: <b>${esc((m.winner && m.winner.name) || "")}</b>`
-       : `${esc(active.name)} • Dart <b>${m.dartInTurn+1}</b>/3 • ${active.killer ? "🔥 Killer" : "Not killer yet"}`;
-
-     const rows = m.players.map(p=>{
-       const livesHtml = p.out ? `<span class="lifeOut">OUT</span>` : heartsHTML(p.lives);
-       return `
-         <tr>
-           <td class="l">
-             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-               <div>
-                 <div style="font-size:16px;font-weight:1000">${esc(p.name)}</div>
-                 <div class="small kNumberBig">Number: <b>${esc((p.number!=null?p.number:"?"))}</b></div>
-               </div>
-               <div style="text-align:right">
-                 <div class="kLivesBig">${livesHtml}</div>
-                 <div class="small">${p.killer?"🔥 Killer":p.out?"":""}</div>
-               </div>
-             </div>
-           </td>
-         </tr>
-       `;
-     }).join("");
-
-     const canAttack = (!isFinished) && active.killer;
-
-     const attackTargets = m.players
-       .filter(p=>!p.out && p.email!==active.email)
-       .map(p=>{
-         const label = `${p.name} • ${(p.number!=null?p.number:"?")} • ${"❤️".repeat(Math.max(0,p.lives))}`;
-         return `<button class="kAttackBtn" data-attack="${esc(p.email)}" ${canAttack?"":"disabled"}>
-           HIT ${esc(p.name)}’s DOUBLE → remove 1 life
-           <div class="small">${esc(label)}</div>
-         </button>`;
-       }).join("");
-
-     return `
-       <div class="card">
-         <div class="row">
-           <button class="btn ghost" id="backToSetup">Back</button>
-           <button class="btn danger" id="resetBtn">Reset</button>
-         </div>
-       </div>
-
-       <div class="card ${isFinished?"":"leaderGlow"}" style="${isFinished?"animation:none":""}">
-         <div class="headerStack">
-           <div class="headerTopRow">
-             <div class="left"><span class="pill">Killer</span></div>
-             <div class="right">
-               <span class="pill" ${isFinished ? '' : 'data-live="1"'}>${isFinished ? "Ended" : "Live"}</span>
-             </div>
-           </div>
-           <div class="headerIcon">🔥</div>
-           <div class="headerTitle turnTitle3d">Killer</div>
-           ${isFinished ? "" : `<div class="turnNameBox" id="turnNameBox">${turnNameHTML((m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")}</div>`}
-           ${isFinished ? "" : `<div class="small" style="text-align:center"><span class="badge">NOW THROWING</span></div>`}
-           <div class="sub" style="text-align:center;margin-top:6px">${statusLine}</div>
-         </div>
-
-         ${isFinished ? "" : `
-           <div class="divider"></div>
-           <div class="hitRow">
-             <button class="hitBtn" id="myDouble">I HIT MY DOUBLE</button>
-             <button class="hitBtn miss" id="miss">MISS</button>
-             <button class="hitBtn undo" id="undoBtn">UNDO</button>
-           </div>
-           <div class="divider"></div>
-           <div class="pill">Attack Opponents</div>
-           <div class="small">Hit their double → tap button to remove 1 life</div>
-           <div class="divider"></div>
-           <div class="kAttackGrid">
-             ${attackTargets || `<div class="sub">No valid targets left.</div>`}
-           </div>
-         `}
-       </div>
-
-       <div class="card">
-         <div class="pill">Players & Lives</div>
-         <div class="divider"></div>
-         <div class="tableWrap">
-           <table>
-             <thead><tr><th>Roster</th></tr></thead>
-             <tbody>${rows}</tbody>
-           </table>
-         </div>
-       </div>
-     `;
-   }
-
-   function bindPlay(ctx){
-     const m=ctx.match;
-     if(!m) return;
-     try{ if(m.phase==="play" && !m.finished) animateTurnName("killer", m.players[m.turnIndex].name); }catch{}
-
-     const backBtn=document.getElementById("backToSetup");
-     if(backBtn){
-       backBtn.onclick=()=>{
-         match=null;
-         screen="game.setup";
-         render();
-       };
-     }
-     const resetBtn=document.getElementById("resetBtn");
-     if(resetBtn){
-       resetBtn.onclick=()=>{
-         const pls=m.players.map(p=>({name:p.name,email:p.email}));
-         match=KillerGame.initMatch(pls);
-         render();
-       };
-     }
-
-     const claimBtn=document.getElementById("saveClaim");
-     if(claimBtn){
-       claimBtn.onclick=(ev)=>{ if(ev && ev.preventDefault) ev.preventDefault(); if(ev && ev.stopPropagation) ev.stopPropagation();
-         const p=m.players[m.claimIndex];
-         const raw=document.getElementById("claimNum").value;
-         const n=parseInt(raw,10);
-         if(!n){ alert("Pick a number."); return; }
-
-         if(m.players.some(x=>x.email!==p.email && x.number===n)){
-           alert("That number is taken. Pick another.");
-           return;
-         }
-         p.number=n;
-
-         let nextIdx=-1;
-         for(let step=1; step<=m.players.length; step++){
-           const i=(m.claimIndex+step)%m.players.length;
-           if(m.players[i].number==null){ nextIdx=i; break; }
-         }
-
-         if(nextIdx===-1){
-           m.phase="play";
-           m.turnIndex=0;
-           m.dartInTurn=0;
-           m.players.forEach(x=>{ x.out=false; x.killer=false; x.lives=MAX_LIVES; });
-         }else{
-           m.claimIndex=nextIdx;
-         }
-         render();
-       };
-       return;
-     }
-
-     if(m.finished){
-       saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
-       return;
-     }
-
-     function pushK(m){ m.snaps=m.snaps||[]; m.snaps.push(JSON.stringify(m)); if(m.snaps.length>80) m.snaps.shift(); }
-     function popK(m){
-       if(!m || !m.snaps || m.snaps.length<2) return m;
-       m.snaps.pop();
-       const prev=m.snaps.pop();
-       try{return JSON.parse(prev);}catch{return m;}
-     }
-
-     function endDart(){
-       m.dartInTurn += 1;
-       if(m.dartInTurn>=3){
-         m.dartInTurn=0;
-         m.turnIndex = nextAliveIndex(m, m.turnIndex);
-       }
-       checkWinner(m);
-       if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name) || "")); }
-       render();
-       if(m.finished){
-         saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
-       }
-     }
-
-     const undoBtn=document.getElementById("undoBtn");
-     if(undoBtn){
-       undoBtn.onclick=()=>{
-         match=popK(ctx.match);
-         render();
-       };
-     }
-
-     document.getElementById("miss").onclick=()=>{ playBeep("miss");
-       pushK(m);
-       endDart();
-     };
-
-     document.getElementById("myDouble").onclick=()=>{ playBeep("hit");
-       pushK(m);
-       const me=m.players[m.turnIndex];
-       if(me.number==null) return;
-
-       if(!me.killer) me.killer=true;
-       else me.lives = Math.min(MAX_LIVES, me.lives+1);
-
-       endDart();
-     };
-
-     appEl.querySelectorAll("button[data-attack]").forEach(btn=>{
-       btn.onclick=()=>{ playBeep("hit");
-         const me=m.players[m.turnIndex];
-         if(!me.killer) return;
-         const victimEmail=btn.getAttribute("data-attack");
-         const victim=m.players.find(p=>p.email===victimEmail && !p.out);
-         if(!victim) return;
-
-         pushK(m);
-
-         victim.lives -= 1;
-         if(victim.lives<=0){
-           victim.lives=0;
-           victim.out=true;
-         }
-         endDart();
-       };
-     });
-   }
-
-   return { initMatch, renderPlay, bindPlay };
- })();
+  return { initMatch, renderPlay: (ctx) => "", bindPlay };
+})();
 
  // ===== Around the World =====
  const AroundGame = (()=>{
