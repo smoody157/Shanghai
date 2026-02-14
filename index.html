@@ -7,8 +7,6 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <title>Game Night • v57-2026-02-12</title>
-<!-- BUILD: v57_20260212T174000Z -->
-
 <style>
 :root{
  /* DARK BACKGROUND */
@@ -547,7 +545,7 @@ input,select{
    0 10px 22px rgba(0,0,0,.32),
    inset 0 1px 0 rgba(255,255,255,.20),
    inset 0 -12px 18px rgba(0,0,0,.38);
- position:relative;;white-space:normal;line-height:1.12;}
+ position:relative;;white-space:nowrap;line-height:1.12;}
 .hitBtn::after{
  content:"";
  position:absolute;
@@ -778,258 +776,35 @@ input,select{
 
 /* Tiny readability boost */
 .sub,.small,.brand .s{ text-shadow:0 2px 10px rgba(0,0,0,.30); }
-
-/* ===== Header overhaul ===== */
-.headerStack{
- position:relative;
- display:grid;
- grid-template-rows:auto auto auto auto;
- gap:6px;
- padding:8px 10px 6px;
-}
-.headerTopRow{
- display:grid;
- grid-template-columns:1fr 1fr;
- align-items:center;
-}
-.headerTopRow .left{justify-self:start}
-.headerTopRow .right{justify-self:end}
-.headerTitle{text-align:center;font-size:26px;font-weight:1000;margin:0;letter-spacing:.6px;text-shadow:0 2px 14px rgba(0,0,0,.55), 0 0 18px rgba(34,211,238,.10)}
-.headerIcon{
- position:absolute;
- left:14px;
- top:44px;
- width:34px;height:34px;
- display:flex;align-items:center;justify-content:center;
- border-radius:12px;
- border:1px solid rgba(255,255,255,.12);
- background:rgba(255,255,255,.04);
- box-shadow:0 10px 22px rgba(0,0,0,.28);
- pointer-events:none;
-}
-\.turnNameBox{ position:relative; overflow:hidden; height:56px; display:flex; align-items:center; justify-content:center; width:100%; align-self:stretch; }
-.turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
-.turnNameText{color:var(--text);text-shadow:0 2px 14px rgba(0,0,0,.60), 0 0 18px rgba(34,211,238,.28);}
-.turnNameText.turnTitle3d{background:none !important;-webkit-background-clip:initial !important;background-clip:initial !important;color:var(--text) !important;}
-.turnBracket{margin:0 10px;color:var(--c-cyan);text-shadow:0 0 14px rgba(34,211,238,.65),0 2px 10px rgba(0,0,0,.55);font-weight:1000;}
-
-@media(max-width:520px){
- .turnNameText{ font-size:24px; }
-}
-
-
-.turnNameGlow{
- animation:auraPulse 2.4s ease-in-out infinite;
- padding:0;
- border-radius:999px;
- background:transparent;
-}
-
-.turnBracket{
- margin:0 8px;
- color:var(--c-cyan);
- text-shadow:0 0 12px rgba(34,211,238,.65);
- font-weight:1000;
-}
-.turnNameSlide{ position:absolute; left:0; right:0; top:0; display:flex; justify-content:center; }
-.turnNameBox{ position:relative; height:56px; }
-.turnNameText{ position:relative; font-size:26px; font-weight:1000; white-space:nowrap; max-width:100%; text-align:center; }
-
-/* Target highlight */
-@keyframes targetFlash{0%{filter:brightness(1)}50%{filter:brightness(2.2)}100%{filter:brightness(1)}}
-.targetNum{
- color:var(--c-cyan);
- font-weight:1000;
- text-shadow:0 2px 12px rgba(0,0,0,.45);
- animation:targetFlash 1.0s ease-in-out infinite;
-}
-@keyframes targetPulse{
- 0%{ transform:translateZ(0); filter:brightness(1); text-shadow:0 0 0 rgba(0,0,0,0); }
- 50%{ filter:brightness(1.8); text-shadow:0 0 18px rgba(34,211,238,.65); }
- 100%{ filter:brightness(1); text-shadow:0 0 0 rgba(0,0,0,0); }
-}
-.targetFlash{
- font-weight:1000;
- color:var(--c-cyan);
- animation:targetPulse 1.1s ease-in-out infinite;
-}
-
-
-/* Dartboard active target highlight */
-.hotWedge{ opacity:1; }
-/* ===== Win animation overlay ===== */
-.winOverlay{
- position:fixed;
- inset:0;
- z-index:9999;
- pointer-events:none;
- display:flex;
- align-items:center;
- justify-content:center;
- background:radial-gradient(900px 520px at 50% 40%, rgba(34,211,238,.12), rgba(6,8,20,.72) 62%, rgba(6,8,20,.88));
- backdrop-filter: blur(6px);
- animation: winFade 2.8s ease-out forwards;
-}
-@keyframes winFade{
- 0%{opacity:0}
- 12%{opacity:1}
- 80%{opacity:1}
- 100%{opacity:0}
-}
-.winCard{
- position:relative;
- padding:18px 18px 14px;
- border-radius:20px;
- border:1px solid rgba(255,255,255,.14);
- background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
- box-shadow:0 24px 60px rgba(0,0,0,.55);
- text-align:center;
- min-width:min(360px, 86vw);
- transform:translateZ(0);
- animation: winPop 900ms cubic-bezier(.2,.9,.2,1) both;
-}
-@keyframes winPop{
- 0%{ transform:scale(.92); opacity:.0; }
- 55%{ transform:scale(1.03); opacity:1; }
- 100%{ transform:scale(1); opacity:1; }
-}
-.winTitle{
- font-weight:1000;
- font-size:22px;
- margin:0 0 6px;
- background:var(--chrome-text);
- -webkit-background-clip:text;
- background-clip:text;
- color:transparent;
- text-shadow:0 2px 12px rgba(0,0,0,.55);
-}
-.winSub{ color:rgba(238,244,255,.92); font-weight:900; letter-spacing:.3px; }
-.confetti{
- position:absolute;
- inset:-16px;
- overflow:hidden;
- border-radius:22px;
- pointer-events:none;
-}
-.confetti span{
- position:absolute;
- top:-18px;
- width:10px;
- height:16px;
- border-radius:4px;
- opacity:.92;
- transform:translateY(0) rotate(0deg);
- animation: confettiFall 1.9s linear infinite;
-}
-@keyframes confettiFall{
- 0%{ transform:translateY(-10px) rotate(0deg); opacity:.0; }
- 10%{ opacity:1; }
- 100%{ transform:translateY(420px) rotate(320deg); opacity:0; }
-}
-
-/* ===== Topbar button sizing (touch friendly) ===== */
-.topActions .btn{
- min-height:44px;
- padding:10px 14px;
-}
-.topActions .btn.ghost#soundBtn{
- min-width:52px;
- width:52px;
- padding:10px 0;
- font-size:18px;
-}
-.btn.ghost{
- border-color:rgba(255,255,255,.12);
-}
-.btn.ghost:active{ transform:translateY(1px); }
-
-/* ===== Safety: never hide table body text ===== */
-.tableWrap tbody td{ color: var(--text); background: transparent; }
-.tableWrap tbody td *{ color: inherit; -webkit-text-fill-color: currentColor; }
-
 </style>
- <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-
 </head>
 
-<body>
-<!-- BUILD: v57-20260212T174000Z -->
+<body class="light">
 <div class="topbar">
- <div class="topActions left">
-   <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
- </div>
 
- <div class="brand">
-   <div class="t" id="brandTitle">Game Night</div>
-   <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v57_20260212-174</div>
- </div>
-
- <div class="topActions right">
-   <button class="btn ghost" id="soundBtn" type="button" aria-label="Sound toggle">🔊</button>
-   <button class="btn ghost" id="homeBtn" type="button">Home</button>
- </div>
-</div>
-
-<div class="wrap" id="app"><div class="card">
-  <div class="h1">Multiplayer Setup</div>
-  <div id="connection-area" style="background: #222; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
-    <button onclick="hostGame()" style="background: green; color: white; padding: 12px; border: none; border-radius: 5px; margin: 5px;">Host Game</button>
-    <button onclick="joinGame()" style="background: blue; color: white; padding: 12px; border: none; border-radius: 5px; margin: 5px;">Join Game</button>
-    <br>
-    <input type="text" id="roomCode" placeholder="Enter Code" style="width: 120px; padding: 10px; margin-top: 10px; border-radius: 5px; color: black;">
+  <div class="topActions left">
+    <button class="btn ghost" id="signOutBtn" type="button" style="display:none;">Sign out</button>
   </div>
-  <button id="btn-start" class="btn">Start Local Game</button>
-</div>
+
+  <div class="brand">
+    <div class="t" id="brandTitle">Game Night</div>
+    <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v57_20260212-174</div>
+  </div>
+
+  <div class="topActions right">
+    <button class="btn ghost" id="btn-save">Save</button>
+    <button class="btn ghost" id="btn-cancel">Cancel</button>
+  </div>
 
 </div>
 
-<!-- footer legal (on every page) -->
+<button id="btn-start" class="btn">Start Game</button>
+
 <div class="footerLegal" aria-hidden="true">
- <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v57_2026-02-12</div>
+  <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v57_2026-02-12</div>
 </div>
 
 <script>
- let peer;
-let conn;
-
-function hostGame() {
-    // Creates a random 6-digit code for your brother to type in
-    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    peer = new Peer(roomCode); 
-    
-    peer.on('open', (id) => {
-        document.getElementById('roomCode').value = id;
-        alert("Room Created! Tell your brother this code: " + id);
-    });
-
-    peer.on('connection', (c) => {
-        conn = c;
-        alert("Connected! You can now start the game.");
-        setupSync();
-    });
-}
-
-function joinGame() {
-    const code = document.getElementById('roomCode').value;
-    if (!code) return alert("Please enter the Room Code your brother gave you.");
-    
-    peer = new Peer();
-    peer.on('open', () => {
-        conn = peer.connect(code.toUpperCase());
-        conn.on('open', () => {
-            alert("Connected to the host!");
-            setupSync();
-        });
-    });
-}
-
-function setupSync() {
-    conn.on('data', (data) => {
-        console.log("Game update received:", data);
-        // This is where the scores will sync up later
-    });
-}
-
 
 /* ========= Robust script loader ========= */
 function loadScript(src){
@@ -1365,6 +1140,7 @@ function startApp(){
   } catch (_) {
     return fallback;
   }
+}
 function lsWrite(key, value) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
@@ -1410,6 +1186,22 @@ function lsWrite(key, value) {
    if(all.length > 2500) all.splice(0, all.length-2500);
    lsWrite(LS.history, all);
  }
+function initLiveSync(matchId) {
+  if (!matchId) return;
+  db.ref(`liveMatches/${matchId}/state`).on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val && JSON.stringify(val) !== JSON.stringify(match)) {
+      match = val;
+      render();
+    }
+  });
+}
+
+function syncToCloud(m) {
+  if (m && m.matchId) {
+    db.ref(`liveMatches/${m.matchId}/state`).set(JSON.parse(JSON.stringify(m)));
+  }
+}
 
  // Admin helpers
  async function resetStatsAll(email){
@@ -1537,17 +1329,6 @@ function lsWrite(key, value) {
    const seg=360/20;
    const rot=-seg/2;
 
-   function polar(cx,cy,r,deg){
-     const rad=(deg-90)*Math.PI/180;
-     return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
-   }
-   function arcWedgePath(cx,cy,r0,r1,a0,a1){
-     const p1=polar(cx,cy,r1,a0), p2=polar(cx,cy,r1,a1);
-     const p3=polar(cx,cy,r0,a1), p4=polar(cx,cy,r0,a0);
-     const large=(a1-a0)>180?1:0;
-     const f=n=>(Math.round(n*1000)/1000).toFixed(3);
-     return `M ${f(p1.x)} ${f(p1.y)} A ${r1} ${r1} 0 ${large} 1 ${f(p2.x)} ${f(p2.y)} L ${f(p3.x)} ${f(p3.y)} A ${r0} ${r0} 0 ${large} 0 ${f(p4.x)} ${f(p4.y)} Z`;
-   }
    function ringWedges(r0,r1,fillA,fillB){
      let out="";
      for(let i=0;i<20;i++){
@@ -1630,6 +1411,7 @@ return `<svg viewBox="0 0 200 200" width="100%" height="100%" preserveAspectRati
   <circle cx="100" cy="100" r="5.3" fill="#c63a3a" stroke="#1b2b42" stroke-width="1.5"/>
   ${numText}
 </svg>`;
+}
 
 function pushSnap(m) {
   if (!m) return;
@@ -1689,20 +1471,17 @@ const ShanghaiGame = (() => {
     if (m.targetIndex >= TARGETS.length) {
       m.finished = true;
       m.endedAt = now();
+          }
+      syncToCloud(m);
     }
-  }
 
-  async function saveFinish(ctx) {
+    async function saveFinish(ctx) {
     const m = ctx.match;
     if (!m.finished || m._saved) return;
     m._saved = true;
-    // ... Save logic ...
   }
 
   function renderPlay(ctx) {
-    const m = ctx.match;
-    const t = TARGETS[m.targetIndex];
-    // ... Rendering logic ...
     return ``;
   }
 
@@ -1722,7 +1501,6 @@ const ShanghaiGame = (() => {
       render();
       saveFinish(ctx).catch(console.error);
     }
-    // Bind buttons
     $("hitT").onclick = () => onHit("T");
     $("hitS").onclick = () => onHit("S");
     $("hitD").onclick = () => onHit("D");
@@ -1780,7 +1558,6 @@ const KillerGame = (() => {
         while (m.players[next].out) { next = (next + 1) % m.players.length; }
         m.turnIndex = next;
       }
-      // Check winner logic here
       render();
     };
 
@@ -1924,7 +1701,8 @@ const KillerGame = (() => {
        updatedAt:now()
      });
    }
-
+   return { initMatch, currentTarget, addThrow, saveFinish };
+ })();
    function renderPlay(ctx){
      const m=ctx.match;
      const active=m.players[m.turnIndex];
@@ -2011,19 +1789,28 @@ const KillerGame = (() => {
    }
 
    function bindPlay(ctx){
-     try{ animateTurnName("around", ctx.match.players[ctx.match.turnIndex].name); }catch{}
+     try{ animateTurnName("around", ctx.match.players[ctx.match.turnIndex].name); }catch(e){}
      const $=(id)=>document.getElementById(id);
      const m=ctx.match;
      if(!m) return;
 
-     const backBtn=$("backToSetup"); if(backBtn) backBtn.onclick=()=>{
+     const backBtn=$("backToSetup"); 
+     if(backBtn) backBtn.onclick=()=>{
        match=null;
        screen="game.setup";
        render();
      };
-     const resetBtn=$("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{
-       const pls=m.players.map(p=>({name:p.name,email:p.email}));
+
+     const resetBtn=$("resetBtn"); 
+     if(resetBtn) resetBtn.onclick=()=>{
+       const pls=m.players.map(p=>({name:p.name, email:p.email}));
        match=AroundGame.initMatch(pls, m.mode);
+       
+       const matchId = `match_${Date.now()}`;
+       match.matchId = matchId;
+       syncToCloud(match);
+       initLiveSync(matchId);
+
        render();
      };
 
@@ -2037,19 +1824,32 @@ const KillerGame = (() => {
        undoBtn.onclick=()=>{ match=popSnap(ctx.match); render(); };
      }
 
-     const hitBtn=$("hitBtn"); if(hitBtn) hitBtn.onclick=()=>{ playBeep("hit");
+     const hitBtn=$("hitBtn"); 
+     if(hitBtn) hitBtn.onclick=()=>{ 
+       playBeep("hit");
        if(m.finished) return;
        pushSnap(m);
        addThrow(m,true);
-       if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
+       if(m.finished && !m._winShown){ 
+         m._winShown=true; 
+         playBeep("win"); 
+         showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); 
+       }
        render();
        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
      };
-     const missBtn=$("missBtn"); if(missBtn) missBtn.onclick=()=>{ playBeep("miss");
+
+     const missBtn=$("missBtn"); 
+     if(missBtn) missBtn.onclick=()=>{ 
+       playBeep("miss");
        if(m.finished) return;
        pushSnap(m);
        addThrow(m,false);
-       if(m.finished && !m._winShown){ m._winShown=true; playBeep("win"); showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); }
+       if(m.finished && !m._winShown){ 
+         m._winShown=true; 
+         playBeep("win"); 
+         showWinOverlay("🏆 Winner!", ((m.winner && m.winner.name)||(m.players[m.turnIndex] && m.players[m.turnIndex].name)||"")); 
+       }
        render();
        saveFinish(ctx).catch(e=>showFatal("Save error", (e && e.message) || String(e)));
      };
@@ -2066,8 +1866,6 @@ const KillerGame = (() => {
  let statsViewerEmail=null;
  let rulesGameId=null;
  const MAX_PLAYERS=4;
-
- // ===== Presence (offline: disabled) =====
 
  function initials(name){
    const n=String(name||"").trim();
@@ -2091,30 +1889,28 @@ const KillerGame = (() => {
      ]
    };
    if(gameId==="killer") return {
-     title:"Killer",
-     icon:"🔥",
-     bullets:[
-       "Setup: each player claims a unique number (1–20).",
-       "Start with 3 lives (❤️❤️❤️).",
-       "On your turn you throw 3 darts.",
-       "Hit YOUR number as a DOUBLE to become a KILLER (🔥).",
-       "Once you’re a killer: you can ‘attack’ by hitting an opponent’s number as a DOUBLE.",
-       "When you hit an opponent’s double: tap their attack button to remove 1 life.",
-       "If a player reaches 0 lives, they are OUT.",
-       "Last player alive wins."
+     title: "Killer",
+     icon: "🔥",
+     bullets: [
+       "Setup: Each player claims a unique number.",
+       "Everyone starts with 3 lives (❤️❤️❤️).",
+       "Hit your own number as a DOUBLE to become a Killer.",
+       "Killers can 'attack' opponents by hitting THEIR doubles.",
+       "Each hit on an opponent's double removes 1 life.",
+       "If you reach 0 lives, you are OUT.",
+       "The last player with lives remaining wins!"
      ]
    };
    if(gameId==="around") return {
-     title:"Around the World",
-     icon:"🌍",
-     bullets:[
-       "Before starting, choose a mode: Singles, Doubles, or Triples.",
-       "Players take turns. Each turn is 3 darts.",
-       "Your goal is to hit your current target number, starting at 1 and going up to 20, then BULL.",
-       "Tap HIT if you hit the current target (Singles / Doubles / Triples based on format).",
-       "Tap MISS if you miss the current target.",
-       "Each HIT advances you to the next target immediately (you can advance up to 3 targets in one turn).",
-       "Game ends immediately when someone hits BULL and finishes."
+     title: "Around the World",
+     icon: "🌍",
+     bullets: [
+       "Goal: Hit numbers 1 through 20 in order, then the Bullseye.",
+       "Each player throws 3 darts per turn.",
+       "Any hit (Single, Double, or Triple) on your target counts.",
+       "If you hit your target, you advance to the next number.",
+       "Tap HIT to advance, or MISS to stay on your current number.",
+       "The first player to hit the Bullseye wins the game!"
      ]
    };
 
@@ -2226,7 +2022,7 @@ const KillerGame = (() => {
    brandTitle.textContent="Game Night";
 
    const players=await getPlayers();
-   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
+   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch(e){}
 
    const gameCards = Games.map(g=>{
      const soon=!g.active;
@@ -2449,7 +2245,7 @@ const KillerGame = (() => {
    brandTitle.textContent=g.name;
 
    const players=await getPlayers();
-   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
+   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch(e){}
    const meEmail=meUser.email;
    const defaultCount=2;
 
@@ -2597,7 +2393,7 @@ const KillerGame = (() => {
    brandTitle.textContent="Stats";
 
    const players=await getPlayers();
-   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
+   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch(e){}
    if(!statsViewerEmail) statsViewerEmail=meUser.email;
 
    const statsDoc=await getStatsDoc(statsViewerEmail);
@@ -2724,7 +2520,7 @@ const KillerGame = (() => {
    brandTitle.textContent=`${g.name} • Stats`;
 
    const players=await getPlayers();
-   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
+   try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch(e){}
    if(!statsViewerEmail) statsViewerEmail=meUser.email;
 
    const viewer=players.find(p=>p.email===statsViewerEmail)||meUser;
@@ -2855,7 +2651,6 @@ const KillerGame = (() => {
 
      if(soundBtn){
        soundBtn.onclick=()=>{
-         // Always unlock + make toggle audible (even when currently OFF)
          try{ unlockAudio(); }catch(_){}
          const wasOn = !!soundEnabled;
          if(wasOn) playBeep("toggle");
@@ -2875,7 +2670,7 @@ const KillerGame = (() => {
      if(screen==="signup") return renderSignup();
      if(!meUser){ screen="auth"; return renderAuth(); }
 
-     try{ startPresence(meUser.email); }catch{}
+     try{ startPresence(meUser.email); }catch(e){}
 
      if(screen==="home") return renderHome();
      if(screen==="rules") return renderRules();
@@ -2926,7 +2721,6 @@ const firebaseConfig = {
 };
  firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
 
 boot();
 
