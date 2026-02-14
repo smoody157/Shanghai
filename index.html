@@ -1811,7 +1811,18 @@ function lsWrite(key, value) {
      const $=(id)=>document.getElementById(id);
      function onHit(h){
        playBeep(h==="M" ? "miss" : "hit");
-       const m=ctx.match;
+       const m = ctx.match;
+
+if (m.matchId) {
+  db.ref(`liveMatches/${m.matchId}/scores`).on('value', (snapshot) => {
+    const cloudScores = snapshot.val();
+    if (cloudScores && JSON.stringify(cloudScores) !== JSON.stringify(m.history)) {
+      m.history = cloudScores;
+      render(); 
+    }
+  });
+}
+
        if(m.finished) return;
        pushSnap(m);
        addThrow(m,h);
