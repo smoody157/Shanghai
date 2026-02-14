@@ -3262,7 +3262,14 @@ boot();
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  getDocs, 
+  query, 
+  where 
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
@@ -3276,9 +3283,11 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 try { getAnalytics(fbApp); } catch {}
+
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
- // ===== Find existing match for player =====
+
+// ===== Find existing match for player =====
 async function findOpenMatchForPlayer(email, gameId){
   try{
     const q = query(
@@ -3288,6 +3297,7 @@ async function findOpenMatchForPlayer(email, gameId){
     );
 
     const snap = await getDocs(q);
+
     for(const doc of snap.docs){
       const data = doc.data();
       if(data.players && data.players.includes(email)){
