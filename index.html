@@ -959,7 +959,7 @@ input,select{
 
  <div class="brand">
    <div class="t" id="brandTitle">Game Night</div>
-   <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v17-20260212-174</div>
+   <div class="s">The Dart Room • Designed by Steve’s Graphic Designs • BUILD v57_20260212-174</div>
  </div>
 
  <div class="topActions right">
@@ -968,13 +968,22 @@ input,select{
  </div>
 </div>
 
-<div class="wrap" id="app">
- <div class="card"><div class="h1">Loading…</div><div class="sub">Starting up…</div></div>
+<div class="wrap" id="app"><div class="card">
+  <div class="h1">Multiplayer Setup</div>
+  <div id="connection-area" style="background: #222; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+    <button onclick="hostGame()" style="background: green; color: white; padding: 12px; border: none; border-radius: 5px; margin: 5px;">Host Game</button>
+    <button onclick="joinGame()" style="background: blue; color: white; padding: 12px; border: none; border-radius: 5px; margin: 5px;">Join Game</button>
+    <br>
+    <input type="text" id="roomCode" placeholder="Enter Code" style="width: 120px; padding: 10px; margin-top: 10px; border-radius: 5px; color: black;">
+  </div>
+  <button id="btn-start" class="btn">Start Local Game</button>
+</div>
+
 </div>
 
 <!-- footer legal (on every page) -->
 <div class="footerLegal" aria-hidden="true">
- <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v26-2026-02-12</div>
+ <div class="txt">Night Games is an official Dart Room online training tool. All rights reserved © Steve’s Graphic Designs. • Build v57_2026-02-12</div>
 </div>
 
 <script>
