@@ -3248,5 +3248,26 @@ function playerStripHTML(players, activeIndex, extraLineFn){
 boot();
 
 <script type="module">
+
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC0sdB54z0G73P3epW6GmHqgYvESFcqgTo",
+  authDomain: "gamenightdarts-e7601.firebaseapp.com",
+  projectId: "gamenightdarts-e7601",
+  storageBucket: "gamenightdarts-e7601.firebasestorage.app",
+  messagingSenderId: "270045452251",
+  appId: "1:270045452251:web:5a4a661140a60780e939fe",
+  measurementId: "G-M60TDFYBW0"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+try { getAnalytics(fbApp); } catch {}
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+ 
 </body>
 </html>
