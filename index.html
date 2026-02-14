@@ -2779,6 +2779,17 @@ async function saveStatsDoc(email,data){
    brandTitle.textContent=g.name;
 
    const players=await getPlayers();
+  // ===== Multiplayer auto-join check =====
+try {
+  const waitingMatch = await findOpenMatchForPlayer(meUser.email, activeGameId);
+  if (waitingMatch) {
+    match = waitingMatch;
+    screen = "game.play";
+    return render();
+  }
+} catch (e) {
+  console.warn("Match lookup failed", e);
+}
    try{ subscribePresence(players.map(p=>p.email).concat([meUser.email])); }catch{}
    const meEmail=meUser.email;
    const defaultCount=2;
