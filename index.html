@@ -987,6 +987,47 @@ input,select{
 </div>
 
 <script>
+ let peer;
+let conn;
+
+function hostGame() {
+    // Creates a random 6-digit code for your brother to type in
+    const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+    peer = new Peer(roomCode); 
+    
+    peer.on('open', (id) => {
+        document.getElementById('roomCode').value = id;
+        alert("Room Created! Tell your brother this code: " + id);
+    });
+
+    peer.on('connection', (c) => {
+        conn = c;
+        alert("Connected! You can now start the game.");
+        setupSync();
+    });
+}
+
+function joinGame() {
+    const code = document.getElementById('roomCode').value;
+    if (!code) return alert("Please enter the Room Code your brother gave you.");
+    
+    peer = new Peer();
+    peer.on('open', () => {
+        conn = peer.connect(code.toUpperCase());
+        conn.on('open', () => {
+            alert("Connected to the host!");
+            setupSync();
+        });
+    });
+}
+
+function setupSync() {
+    conn.on('data', (data) => {
+        console.log("Game update received:", data);
+        // This is where the scores will sync up later
+    });
+}
+
 
 /* ========= Robust script loader ========= */
 function loadScript(src){
