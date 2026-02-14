@@ -1827,8 +1827,19 @@ function lsWrite(key, value) {
 
      const resetBtn=$("resetBtn"); if(resetBtn) resetBtn.onclick=()=>{
        const pls=ctx.match.players.map(p=>({name:p.name,email:p.email}));
-       match=initMatch(pls);
-       render();
+         match = initMatch(pls);
+  
+  // Create the Private Lobby Lock in Firebase
+  const matchId = `match_${Date.now()}`;
+  match.matchId = matchId; 
+  db.ref(`liveMatches/${matchId}`).set({
+      players: match.players.map(p => p.email),
+      status: 'locked',
+      serverTime: firebase.database.ServerValue.TIMESTAMP
+  });
+
+  render();
+
      };
      const backBtn=$("backToSetup"); if(backBtn) backBtn.onclick=()=>{
        match=null; screen="game.setup"; render();
